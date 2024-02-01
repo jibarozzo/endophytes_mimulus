@@ -1,0 +1,1036 @@
+Using username "baponterolon".
+baponterolon@cypress1.tulane.edu's password:
+Last login: Tue Jun 13 14:44:22 2023 from 129.81.255.94
+[baponterolon@cypress1 ~]$ cd /lustre/project/svanbael
+[baponterolon@cypress1 svanbael]$ idev --partition=centos7
+Requesting 1 node(s)  task(s) to normal queue of centos7 partition
+1 task(s)/node, 20 cpu(s)/task, 0 MIC device(s)/node
+Time: 0 (hr) 60 (min).
+Submitted batch job 2333670
+JOBID=2333670 begin on cypress01-033
+--> Creating interactive terminal session (login) on node cypress01
+--> You have 0 (hr) 60 (min).
+--> Assigned Host List : /tmp/idev_nodes_file_baponterolon
+Warning: Permanently added 'cypress01-033,192.168.0.42' (RSA) to thwn hosts.
+[baponterolon@cypress01-033 svanbael]$ module load singularity/3.9.
+[baponterolon@cypress01-033 svanbael]$ singularity pull docker://ro
+INFO:    Converting OCI blobs to SIF format
+INFO:    Starting build...
+Getting image source signatures
+Copying blob 837dd4791cdc done
+Copying blob ba40636b7f28 done
+Copying blob 9585006500a8 done
+Copying blob 677c55ecc16c done
+Copying blob eef17c358816 done
+Copying config 552e187457 done
+Writing manifest to image destination
+Storing signatures
+2023/06/13 15:35:38  info unpack layer: sha256:837dd4791cdc6f67070863806d7ccc2783173b9e88f94878271
+2023/06/13 15:35:39  info unpack layer: sha256:ba40636b7f2887494541849bf10685e630a7fbdccf23415a63e
+2023/06/13 15:35:39  info unpack layer: sha256:9585006500a874a757ca13e8f620790a24f2389c98e0b3cf1de
+2023/06/13 15:35:47  info unpack layer: sha256:677c55ecc16cf71862bbb5af8d366a9f4b919cc38e9dd4e836e
+2023/06/13 15:35:47  info unpack layer: sha256:eef17c358816cd1570a9ce01e80e538f05487f5b122635c2eb2
+INFO:    Creating SIF file...
+[baponterolon@cypress01-033 svanbael]$ source /lustre/project/singu/setup_cypress.sh
+[baponterolon@cypress01-033 svanbael]$ ls -l
+total 311824
+drwxr-sr-x  2 clumibao      svanbael      4096 Jun 19  2018 BC3_bac
+drwxr-sr-x  6 baponterolon  svanbael      4096 Jun 13 15:05 bolivar
+drwxr-sr-x 11 clumibao      svanbael      4096 Mar 20  2019 candice
+drwxr-sr-x  3 kmighell      svanbael      4096 Sep 15  2016 JC_GH
+drwxr-sr-x  5 kmighell      svanbael      4096 Nov  2  2016 Kim
+drwxr-sr-x  5 ltorres2      svanbael      4096 May 19  2018 Lorena
+drwxr-sr-x  3 msanchezjulia svanbael      4096 Sep 29  2020 Mareli
+drwxrwsrwx  2 baponterolon  svanbael      4096 Jun 13 15:20 modulef
+drwxr-sr-x  5 clumibao      svanbael      4096 Jun 16  2017 program
+drwxrwsrwx  2 sformel       svanbael      4096 Aug 26  2021 rclone_
+drwxrwsrwx  2 sformel       svanbael      4096 Aug 20  2021 rclone_
+drwxr-sr-x  2 baponterolon  svanbael      4096 Jun 12 17:45 Rosi
+-rwxr-xr-x  1 baponterolon  svanbael 319250432 Jun 13 15:36 r-ver_l
+-rw-r--r--  1 baponterolon  svanbael         0 Jun 13 15:23 slurm-i668
+-rw-r--r--  1 baponterolon  svanbael         0 Jun 13 15:34 slurm-i670
+drwxr-sr-x 23 sformel       svanbael      4096 Feb 13  2021 steve
+[baponterolon@cypress01-033 svanbael]$ module load anaconda3/2020.0
+[baponterolon@cypress01-033 svanbael]$ module avail
+
+----------------------------------- /cm/local/modulefiles ---------
+cluster-tools/7.0 freeipmi/1.3.4    module-info       use.own
+cmd               ipmitool/1.8.13   null              version
+dot               module-git        shared
+
+----------------------------------- /cm/shared/modulefiles --------
+acml/gcc/64/5.3.1                     globalarrays/openmpi/open64/6
+acml/gcc/fma4/5.3.1                   hadoop/oak/Apache/2.4.1
+acml/gcc/mp/64/5.3.1                  hdf5/1.6.10
+acml/gcc/mp/fma4/5.3.1                hdf5_18/1.8.12
+acml/gcc-int64/64/5.3.1               hpl/2.1
+acml/gcc-int64/fma4/5.3.1             hwloc/1.8.1
+acml/gcc-int64/mp/64/5.3.1            intel/compiler/64/14.0/2013_s
+acml/gcc-int64/mp/fma4/5.3.1          intel-cluster-checker/2.1.2
+acml/open64/64/5.3.1                  intel-cluster-runtime/ia32/3.
+acml/open64/fma4/5.3.1                intel-cluster-runtime/intel64
+acml/open64/mp/64/5.3.1               intel-cluster-runtime/mic/3.6
+acml/open64/mp/fma4/5.3.1             intel-tbb-oss/ia32/42_2014060
+acml/open64-int64/64/5.3.1            intel-tbb-oss/intel64/42_2014
+acml/open64-int64/fma4/5.3.1          iozone/3_420
+acml/open64-int64/mp/64/5.3.1         lapack/gcc/64/3.5.0
+acml/open64-int64/mp/fma4/5.3.1       lapack/open64/64/3.5.0
+blacs/mpichge/gcc/64/1.1patch03       mpich/ge/gcc/64/3.1
+blacs/openmpi/gcc/64/1.1patch03       mpich/ge/open64/64/3.1
+blacs/openmpi/open64/64/1.1patch03    mpiexec/0.84_432
+blas/gcc/64/1                         mvapich/gcc/64/1.2rc1
+blas/open64/64/1                      mvapich/open64/64/1.2rc1
+bonnie++/1.97.1                       mvapich2/gcc/64/2.0b
+cmgui/7.0                             mvapich2/open64/64/2.0b
+cuda60/blas/6.0.37                    netcdf/gcc/64/4.3.1.1
+cuda60/fft/6.0.37                     netcdf/open64/64/4.3.1.1
+cuda60/nsight/6.0.37                  netperf/2.6.0
+cuda60/profiler/6.0.37                open64/4.5.2.1
+cuda60/toolkit/6.0.37                 openblas/dynamic/0.2.8
+default-environment                   openmpi/gcc/64/1.8.1
+fftw2/openmpi/gcc/64/double/2.1.5     openmpi/open64/64/1.8.1
+fftw2/openmpi/gcc/64/float/2.1.5      pbspro/12.2.1.140292
+fftw2/openmpi/open64/64/double/2.1.5  scalapack/gcc/64/1.8.0
+fftw2/openmpi/open64/64/float/2.1.5   scalapack/open64/64/1.8.0
+fftw3/openmpi/gcc/64/3.3.3            sge/2011.11p1
+fftw3/openmpi/open64/64/3.3.3         slurm/14.03.0
+gcc/4.8.2                             torque/4.2.6.1
+globalarrays/openmpi/gcc/64/5.3       tulane/intel-psxe/2015
+
+---------------------------------- /share/apps/modulefiles --------
+anaconda/2.1.0                   mercurial/3.7.3
+anaconda/2.5.0                   methpipe/4.1.1
+anaconda3/2018.12                metis/5.1.0
+anaconda3/2019.03                micsmc-gui
+anaconda3/2020.07                migraten/3.6.11
+anaconda3/4.0.0                  mosaik/2.2.3
+anaconda3/5.1.0                  mpc/1.2.1
+atlas/3.10.2                     mpfr/4.1.0
+bam-readcount/1.0.0              mpich/3.1.4
+bash/5.1.8                       multiqc/1.14
+bbcp/amd64_rhel60                muscle/5.1
+bcl2fastq2/2.17.1                namd2/2.13b2-charmrun-g++-4.4.7
+bcl2fastq2/2.20                  namd2/2.13b2-MPI-intel-2016
+bedops/2.4.41                    ncbi-blast/2.10.0+
+bedtools/2.27.1                  ncbi-blast/2.12.0+
+bedtools/2.30.0                  ncbi-blast/2.5.0+
+berkeleygw/1.1-beta2             netcdf/4.3.2
+bgen/1.1.7                       netcdf-cxx4/4.2.1
+binutils/2.37                    netcdf-fortran/4.4.1
+blcr/0.8.5                       netmhciipan/3.1
+boost/1.57.0                     netmhcpan/3.0
+boost/1.76.0                     openbabel/3.1.1
+bowtie/1.1.1                     OpenBLAS/0.3.18
+bowtie2/2.3.3                    openfoam/2.3.1
+bowtie2/2.5.1                    openmpi/1.8.4
+bwa/0.7.15                       openssh/9.1
+bzip2/1.0.6                      parallel/20230122
+cadaver/0.23.3                   pardre/2.2.5
+cellranger/1.1.0                 parmetis/4.0.3
+cellranger/2.1.0                 pcre/8.39
+cellranger/3.0.1                 pcre2/10.38
+cellranger/3.1.0                 petsc/3.16.6
+cellranger/5.1.0                 petsc/3.4.5
+cellranger/6.0.0                 petsc/3.5.3
+cellranger-arc/1.0.1             petsc/3.5.4
+cellranger-atac/1.1.0            picard/2.20.7
+cellranger-atac/2.0.0            plink/1.07
+cmake/3.0.2                      plink/1.9
+cmake/3.12.1                     popoolation2/1201
+cmake/3.24.1                     pyrad/3.0.66
+cnvnator/0.4.1                   python/2.7.11
+cnvpytor/1.0                     qiime/1.9.1
+cpat/1.2.2                       qiime2/2018.11
+diamond/0.6.12                   qiime2/2018.2
+eigen/3.2.4                      qiime8/2018.8
+emacs/24.4                       qt/4.8.6
+espresso/5.1.2                   R/3.1.2(default)
+fastqc/0.11.7                    R/3.2.4
+faststructure/1.0                R/3.2.5-intel
+fftw/2.1.5/double(default)       R/3.3.1-intel
+fftw/2.1.5/single                R/3.4.1-intel
+fftw/3.3.4                       R/3.5.2-intel
+fseq/1.85                        R/3.6.1-intel
+gatk/4.0.4.0                     R/4.1.0-intel
+gatk/4.1.8.1                     R/4.1.1-intel
+gcc/4.7.4                        rclone/1.49.3
+gcc/4.9.4                        regenie/2.2.4
+gcc/6.3.0                        regenie/3.2.7
+gcc/8.5.0                        rmats-turbo/4.1.1
+gcta/1.24.7                      ROOT/5.34.36
+gdc-client/1.0.1                 rosetta/3.9
+gdc-client/1.6.1                 rsem/1.2.19
+gemma/0.98.5                     rsem/1.2.22
+genetorrent/3.8.7                rsem/1.2.31
+geos/3.11.0                      rstudio/0.98.1103
+git/2.4.1                        ruby/2.2.3
+gmp/6.2.1                        ruby/2.5.1
+gnuparallel/20180322             salmon/0.14.1
+gnuplot/5.0.1                    samtools/0.1.17
+go/1.17.7                        samtools/0.1.19
+gromacs/2016.3                   samtools/1.10
+gromacs/2020.7                   samtools/1.13
+gromacs/5.1.2                    samtools/1.16.1
+gsl/2.6                          samtools/1.5
+hdf5/1.8.14                      shannon/0.0.2
+hdf5-parallel/1.8.14             smrt/2.3.0
+htslib/1.13                      spaceranger/1.3.1
+hypre/2.10.1                     spark/2.4.1
+ibamr/0.1-rc1                    stacks/1.41
+idev                             stacks/2.2
+igrepertoireconstructor/2.2.0    star/2.3.0e
+intel-opencl/1.2-4.5.0.8         star/2.4.0i
+intel-opencl-devel/1.2-4.6.0.178 star/2.4.2a
+intel-psxe/2015-update1(default) star/2.5.2a
+intel-psxe/2016                  stata/14
+intel-psxe/2019-update1          stata/15-site_lic
+jags/4.2.0                       structure/2.3.4
+jags/4.3.0                       sundials/2.5.0
+java-openjdk/1.8.0               tcl/8.6.11
+jellyfish/2.3.0                  tinker/7.1.2
+julia/1.5.2                      tk/8.6.11
+lammps/stable-17Nov2016          tophat/2.1.1
+libgit2/1.1.0                    trimmomatic/0.39
+libpng/1.6.37                    trinity/2012-06-08
+libssh2/1.9.0                    trinity/2.4.0
+libtiff/4.3.0                    trinity/2.8.5
+macaulay2/1.6-1                  unison/2.51.3+ocaml-4.07.0
+mafft/7.505                      vcftools/0.1.14
+mathematica/12.0                 vdjer/0.12
+matlab/r2013b                    viennacl/1.7.0
+matlab/r2015a                    virusfinder/2.0
+matlab/r2015b                    visit/2.9.2
+matlab/r2016a                    vtk/6.1.0
+matlab/r2017b                    xz/5.2.2
+matlab/r2020a                    zlib/1.2.8
+
+------------------------------ /share/apps/centos7/modulefiles ----
+afni/23.0.06      gcc/9.5.0         qiime2/2023.2     spaceranger/2
+cellranger/7.1.0  matlab/r2022b     singularity/3.9.0 sratoolkit/3.
+[baponterolon@cypress01-033 svanbael]$ ls
+BC3_bac_tree  JC_GH   Mareli       rclone_logs     r-ver_latest.sif
+bolivar       Kim     modulefiles  rclone_scripts  slurm-idv28169.o
+candice       Lorena  programs     Rosi            slurm-idv29906.o
+[baponterolon@cypress01-033 svanbael]$ cd r-ver_latest.sif
+-bash: cd: r-ver_latest.sif: Not a directory
+[baponterolon@cypress01-033 svanbael]$ conda config --add channels
+[baponterolon@cypress01-033 svanbael]$ ls
+BC3_bac_tree  JC_GH   Mareli       rclone_logs     r-ver_latest.sif
+bolivar       Kim     modulefiles  rclone_scripts  slurm-idv28169.o
+candice       Lorena  programs     Rosi            slurm-idv29906.o
+[baponterolon@cypress01-033 svanbael]$ conda config --set channel_p
+[baponterolon@cypress01-033 svanbael]$ conda search r-base
+Loading channels: \ #SBATCH --partition=centodone
+# Name                       Version           Build  Channel
+r-base                         3.3.1               1  pkgs/r
+r-base                         3.3.1               2  pkgs/r
+r-base                         3.3.1               3  pkgs/r
+r-base                         3.3.1               5  pkgs/r
+r-base                         3.3.1               6  pkgs/r
+r-base                         3.3.2               0  pkgs/r
+r-base                         3.3.2               1  pkgs/r
+r-base                         3.3.2               2  conda-forge
+r-base                         3.3.2               3  conda-forge
+r-base                         3.3.2               4  conda-forge
+r-base                         3.3.2               5  conda-forge
+r-base                         3.4.1               0  conda-forge
+r-base                         3.4.1               0  pkgs/r
+r-base                         3.4.1               1  conda-forge
+r-base                         3.4.1               1  pkgs/r
+r-base                         3.4.1               2  conda-forge
+r-base                         3.4.1               3  conda-forge
+r-base                         3.4.1               4  conda-forge
+r-base                         3.4.1      h4fe35fd_8  conda-forge
+r-base                         3.4.2      haf99962_0  pkgs/r
+r-base                         3.4.3      h1c2f66e_4  pkgs/r
+r-base                         3.4.3      h1e0a451_2  pkgs/r
+r-base                         3.4.3      h290ecf8_0  pkgs/r
+r-base                         3.4.3      h290ecf8_1  pkgs/r
+r-base                         3.4.3      h9bb98a2_5  pkgs/r
+r-base                         3.5.0      h1c2f66e_1  pkgs/r
+r-base                         3.5.0      h1e0a451_1  pkgs/r
+r-base                         3.5.1   h08e1455_1008  conda-forge
+r-base                         3.5.1      h1e0a451_2  pkgs/r
+r-base                         3.5.1   h271c98b_1006  conda-forge
+r-base                         3.5.1      h391c2eb_4  conda-forge
+r-base                         3.5.1      h391c2eb_5  conda-forge
+r-base                         3.5.1   hbc19587_1011  conda-forge
+r-base                         3.5.1   hc461eb7_1012  conda-forge
+r-base                         3.5.1   he45234b_1004  conda-forge
+r-base                         3.5.1   he45234b_1005  conda-forge
+r-base                         3.5.1   hea2b9be_1007  conda-forge
+r-base                         3.5.1   hfb2a302_1009  conda-forge
+r-base                         3.5.1   hfb2a302_1010  conda-forge
+r-base                         3.5.3      h067a564_0  pkgs/r
+r-base                         3.5.3      h26b83e4_0  pkgs/r
+r-base                         3.6.0      hce969dd_0  pkgs/r
+r-base                         3.6.1      h3a67422_6  conda-forge
+r-base                         3.6.1      h6e652e1_3  conda-forge
+r-base                         3.6.1      h8900bf8_0  conda-forge
+r-base                         3.6.1      h8900bf8_1  conda-forge
+r-base                         3.6.1      h8900bf8_2  conda-forge
+r-base                         3.6.1      h9bb98a2_1  pkgs/r
+r-base                         3.6.1      haffb61f_2  pkgs/r
+r-base                         3.6.1      hba50c9b_4  conda-forge
+r-base                         3.6.1      hba50c9b_5  conda-forge
+r-base                         3.6.1      hce969dd_0  pkgs/r
+r-base                         3.6.2      h3a67422_0  conda-forge
+r-base                         3.6.2      h7ed4ef7_1  conda-forge
+r-base                         3.6.3      h316533a_2  conda-forge
+r-base                         3.6.3      h7ed4ef7_0  conda-forge
+r-base                         3.6.3      h7ed4ef7_1  conda-forge
+r-base                         3.6.3      hbcea092_8  conda-forge
+r-base                         3.6.3      hbffa01f_7  conda-forge
+r-base                         3.6.3      hc603457_4  conda-forge
+r-base                         3.6.3      hd23ff56_6  conda-forge
+r-base                         3.6.3      hd272fe0_4  conda-forge
+r-base                         3.6.3      hd54c5f2_5  conda-forge
+r-base                         3.6.3      he766273_3  conda-forge
+r-base                         4.0.0      hdca8982_2  conda-forge
+r-base                         4.0.0      hdca8982_3  conda-forge
+r-base                         4.0.1      h95c6c4b_0  conda-forge
+r-base                         4.0.2      h95c6c4b_0  conda-forge
+r-base                         4.0.2      he766273_1  conda-forge
+r-base                         4.0.3      h349a78a_8  conda-forge
+r-base                         4.0.3      h8ff2632_7  conda-forge
+r-base                         4.0.3      ha43b4e8_3  conda-forge
+r-base                         4.0.3      hd23ff56_4  conda-forge
+r-base                         4.0.3      hd23ff56_5  conda-forge
+r-base                         4.0.3      hd23ff56_6  conda-forge
+r-base                         4.0.5      h06d3f91_6  conda-forge
+r-base                         4.0.5      h8cab1ac_0  conda-forge
+r-base                         4.0.5      h9e01966_1  conda-forge
+r-base                         4.0.5      ha8c3e7c_7  conda-forge
+r-base                         4.0.5      hb67fd72_2  conda-forge
+r-base                         4.0.5      hb87df5d_8  conda-forge
+r-base                         4.0.5      hb93adac_3  conda-forge
+r-base                         4.0.5      hd930d0e_5  conda-forge
+r-base                         4.0.5      hde4fec0_4  conda-forge
+r-base                         4.1.0      h9e01966_0  conda-forge
+r-base                         4.1.0      h9e01966_1  conda-forge
+r-base                         4.1.0      hb67fd72_2  conda-forge
+r-base                         4.1.1      hb67fd72_0  conda-forge
+r-base                         4.1.1      hb93adac_1  conda-forge
+r-base                         4.1.1      hde4fec0_2  conda-forge
+r-base                         4.1.2      h2553ce4_1  conda-forge
+r-base                         4.1.2      hde4fec0_0  conda-forge
+r-base                         4.1.3      h05c0162_6  conda-forge
+r-base                         4.1.3      h06d3f91_1  conda-forge
+r-base                         4.1.3      h0fc540b_8  conda-forge
+r-base                         4.1.3      h2f963a2_5  conda-forge
+r-base                         4.1.3      h6479b40_7  conda-forge
+r-base                         4.1.3      h7880091_3  conda-forge
+r-base                         4.1.3      ha8c3e7c_2  conda-forge
+r-base                         4.1.3      hb87df5d_4  conda-forge
+r-base                         4.1.3      hd930d0e_0  conda-forge
+r-base                         4.1.3      hfabd6f2_9  conda-forge
+r-base                         4.2.0      h1ae530e_0  pkgs/r
+r-base                         4.2.0      ha8c3e7c_0  conda-forge
+r-base                         4.2.1      h7880091_2  conda-forge
+r-base                         4.2.1      ha8c3e7c_0  conda-forge
+r-base                         4.2.1      ha8c3e7c_1  conda-forge
+r-base                         4.2.2      h15a6132_0  conda-forge
+r-base                         4.2.2      h6b4767f_2  conda-forge
+r-base                         4.2.2      ha7d60f8_3  conda-forge
+r-base                         4.2.2      hb87df5d_1  conda-forge
+r-base                         4.2.3      h062c8ea_1  conda-forge
+r-base                         4.2.3      h4a03800_2  conda-forge
+r-base                         4.2.3      ha7d60f8_0  conda-forge
+r-base                         4.2.3      hfabd6f2_3  conda-forge
+r-base                         4.3.0      h0fc540b_0  conda-forge
+r-base                         4.3.0      hfabd6f2_1  conda-forge
+[baponterolon@cypress01-033 svanbael]$ ls
+BC3_bac_tree  JC_GH   Mareli       rclone_logs     r-ver_latest.sif
+bolivar       Kim     modulefiles  rclone_scripts  slurm-idv28169.o
+candice       Lorena  programs     Rosi            slurm-idv29906.o
+[baponterolon@cypress01-033 svanbael]$ conda create -n virtual_env
+Collecting package metadata (current_repodata.json): done
+Solving environment: done
+ls
+
+
+==> WARNING: A newer version of conda exists. <==
+  current version: 4.8.3
+  latest version: 23.5.0
+
+Please update conda by running
+
+    $ conda update -n base -c defaults conda
+
+
+
+## Package Plan ##
+
+  environment location: /home/baponterolon/.conda/envs/virtual_env
+
+
+
+Proceed ([y]/n)? Invalid choice: ls
+Proceed ([y]/n)? y
+
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+#
+# To activate this environment, use
+#
+#     $ conda activate virtual_env
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+[baponterolon@cypress01-033 svanbael]$ source activate virtual_env
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ conda install
+Collecting package metadata (current_repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying wit
+Collecting package metadata (repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying wit
+
+PackagesNotFoundError: The following packages are not available fro
+
+  - cutadapt
+
+Current channels:
+
+  - https://conda.anaconda.org/conda-forge/linux-64
+  - https://conda.anaconda.org/conda-forge/noarch
+  - https://repo.anaconda.com/pkgs/main/linux-64
+  - https://repo.anaconda.com/pkgs/main/noarch
+  - https://repo.anaconda.com/pkgs/r/linux-64
+  - https://repo.anaconda.com/pkgs/r/noarch
+
+To search for alternate channels that may provide the conda package
+looking for, navigate to
+
+    https://anaconda.org
+
+and use the search bar at the top of the page.
+
+
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ conda install
+Collecting package metadata (current_repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying wit
+Collecting package metadata (repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying wit
+
+PackagesNotFoundError: The following packages are not available fro
+
+  - cutadapt
+
+Current channels:
+
+  - https://conda.anaconda.org/conda-forge/linux-64
+  - https://conda.anaconda.org/conda-forge/noarch
+  - https://repo.anaconda.com/pkgs/main/linux-64
+  - https://repo.anaconda.com/pkgs/main/noarch
+  - https://repo.anaconda.com/pkgs/r/linux-64
+  - https://repo.anaconda.com/pkgs/r/noarch
+
+To search for alternate channels that may provide the conda package
+looking for, navigate to
+
+    https://anaconda.org
+
+and use the search bar at the top of the page.
+
+
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ conda install
+Collecting package metadata (current_repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying wit
+Collecting package metadata (repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying wit
+
+PackagesNotFoundError: The following packages are not available fro
+
+  - cutadapt
+  - bioconda
+
+Current channels:
+
+  - https://conda.anaconda.org/conda-forge/linux-64
+  - https://conda.anaconda.org/conda-forge/noarch
+  - https://repo.anaconda.com/pkgs/main/linux-64
+  - https://repo.anaconda.com/pkgs/main/noarch
+  - https://repo.anaconda.com/pkgs/r/linux-64
+  - https://repo.anaconda.com/pkgs/r/noarch
+
+To search for alternate channels that may provide the conda package
+looking for, navigate to
+
+    https://anaconda.org
+
+and use the search bar at the top of the page.
+
+
+^[[A^[[D^[[B^[[B(virtual_env) [baponterolon@cypress01-033 svanbael]Collecting package metadata (current_repodata.json): done
+Solving environment: done
+
+
+==> WARNING: A newer version of conda exists. <==
+  current version: 4.8.3
+  latest version: 23.5.0
+
+Please update conda by running
+
+    $ conda update -n base -c defaults conda
+
+
+
+## Package Plan ##
+
+  environment location: /home/baponterolon/.conda/envs/virtual_env
+
+  added / updated specs:
+    - cutadapt
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    _libgcc_mutex-0.1          |      conda_forge           3 KB  c
+    _openmp_mutex-4.5          |            2_gnu          23 KB  c
+    bz2file-0.98               |             py_0           9 KB  c
+    ca-certificates-2023.5.7   |       hbcca054_0         145 KB  c
+    cutadapt-1.18              |   py37h14c3975_1         206 KB  b
+    ld_impl_linux-64-2.40      |       h41732ed_0         688 KB  c
+    libffi-3.4.2               |       h7f98852_5          57 KB  c
+    libgcc-ng-13.1.0           |       he5830b7_0         758 KB  c
+    libgomp-13.1.0             |       he5830b7_0         409 KB  c
+    libnsl-2.0.0               |       h7f98852_0          31 KB  c
+    libsqlite-3.42.0           |       h2797004_0         809 KB  c
+    libstdcxx-ng-13.1.0        |       hfd8a6a1_0         3.7 MB  c
+    libzlib-1.2.13             |       hd590300_5          60 KB  c
+    ncurses-6.4                |       hcb278e6_0         860 KB  c
+    openssl-3.1.1              |       hd590300_1         2.5 MB  c
+    pigz-2.6                   |       h27826a3_0          87 KB  c
+    pip-23.1.2                 |     pyhd8ed1ab_0         1.3 MB  c
+    python-3.7.12              |hf930737_100_cpython        57.3 MB
+    readline-8.2               |       h8228510_1         275 KB  c
+    setuptools-67.7.2          |     pyhd8ed1ab_0         569 KB  c
+    sqlite-3.42.0              |       h2c6b66d_0         799 KB  c
+    tk-8.6.12                  |       h27826a3_0         3.3 MB  c
+    wheel-0.40.0               |     pyhd8ed1ab_0          54 KB  c
+    xopen-0.7.3                |             py_0          11 KB  b
+    xz-5.2.6                   |       h166bdaf_0         409 KB  c
+    zlib-1.2.13                |       hd590300_5          91 KB  c
+    ------------------------------------------------------------
+                                           Total:        74.3 MB
+
+The following NEW packages will be INSTALLED:
+
+  _libgcc_mutex      conda-forge/linux-64::_libgcc_mutex-0.1-conda_
+  _openmp_mutex      conda-forge/linux-64::_openmp_mutex-4.5-2_gnu
+  bz2file            conda-forge/noarch::bz2file-0.98-py_0
+  ca-certificates    conda-forge/linux-64::ca-certificates-2023.5.7
+  cutadapt           bioconda/linux-64::cutadapt-1.18-py37h14c3975_
+  ld_impl_linux-64   conda-forge/linux-64::ld_impl_linux-64-2.40-h4
+  libffi             conda-forge/linux-64::libffi-3.4.2-h7f98852_5
+  libgcc-ng          conda-forge/linux-64::libgcc-ng-13.1.0-he5830b
+  libgomp            conda-forge/linux-64::libgomp-13.1.0-he5830b7_
+  libnsl             conda-forge/linux-64::libnsl-2.0.0-h7f98852_0
+  libsqlite          conda-forge/linux-64::libsqlite-3.42.0-h279700
+  libstdcxx-ng       conda-forge/linux-64::libstdcxx-ng-13.1.0-hfd8
+  libzlib            conda-forge/linux-64::libzlib-1.2.13-hd590300_
+  ncurses            conda-forge/linux-64::ncurses-6.4-hcb278e6_0
+  openssl            conda-forge/linux-64::openssl-3.1.1-hd590300_1
+  pigz               conda-forge/linux-64::pigz-2.6-h27826a3_0
+  pip                conda-forge/noarch::pip-23.1.2-pyhd8ed1ab_0
+  python             conda-forge/linux-64::python-3.7.12-hf930737_1
+  readline           conda-forge/linux-64::readline-8.2-h8228510_1
+  setuptools         conda-forge/noarch::setuptools-67.7.2-pyhd8ed1
+  sqlite             conda-forge/linux-64::sqlite-3.42.0-h2c6b66d_0
+  tk                 conda-forge/linux-64::tk-8.6.12-h27826a3_0
+  wheel              conda-forge/noarch::wheel-0.40.0-pyhd8ed1ab_0
+  xopen              bioconda/noarch::xopen-0.7.3-py_0
+  xz                 conda-forge/linux-64::xz-5.2.6-h166bdaf_0
+  zlib               conda-forge/linux-64::zlib-1.2.13-hd590300_5
+
+
+Proceed ([y]/n)? y
+
+
+Downloading and Extracting Packages
+bz2file-0.98         | 9 KB      | ################################
+libgomp-13.1.0       | 409 KB    | ################################
+python-3.7.12        | 57.3 MB   | ################################
+libsqlite-3.42.0     | 809 KB    | ################################
+readline-8.2         | 275 KB    | ################################
+libgcc-ng-13.1.0     | 758 KB    | ################################
+_openmp_mutex-4.5    | 23 KB     | ################################
+libzlib-1.2.13       | 60 KB     | ################################
+tk-8.6.12            | 3.3 MB    | ################################
+setuptools-67.7.2    | 569 KB    | ################################
+_libgcc_mutex-0.1    | 3 KB      | ################################
+xopen-0.7.3          | 11 KB     | ################################
+sqlite-3.42.0        | 799 KB    | ################################
+libffi-3.4.2         | 57 KB     | ################################
+libstdcxx-ng-13.1.0  | 3.7 MB    | ################################
+ncurses-6.4          | 860 KB    | ################################
+wheel-0.40.0         | 54 KB     | ################################
+zlib-1.2.13          | 91 KB     | ################################
+ld_impl_linux-64-2.4 | 688 KB    | ################################
+ca-certificates-2023 | 145 KB    | ################################
+pip-23.1.2           | 1.3 MB    | ################################
+openssl-3.1.1        | 2.5 MB    | ################################
+cutadapt-1.18        | 206 KB    | ################################
+pigz-2.6             | 87 KB     | ################################
+libnsl-2.0.0         | 31 KB     | ################################
+xz-5.2.6             | 409 KB    | ################################
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ conda list
+# packages in environment at /home/baponterolon/.conda/envs/virtual
+#
+# Name                    Version                   Build  Channel
+_libgcc_mutex             0.1                 conda_forge    conda-
+_openmp_mutex             4.5                       2_gnu    conda-
+bz2file                   0.98                       py_0    conda-
+ca-certificates           2023.5.7             hbcca054_0    conda-
+cutadapt                  1.18             py37h14c3975_1    biocon
+ld_impl_linux-64          2.40                 h41732ed_0    conda-
+libffi                    3.4.2                h7f98852_5    conda-
+libgcc-ng                 13.1.0               he5830b7_0    conda-
+libgomp                   13.1.0               he5830b7_0    conda-
+libnsl                    2.0.0                h7f98852_0    conda-
+libsqlite                 3.42.0               h2797004_0    conda-
+libstdcxx-ng              13.1.0               hfd8a6a1_0    conda-
+libzlib                   1.2.13               hd590300_5    conda-
+ncurses                   6.4                  hcb278e6_0    conda-
+openssl                   3.1.1                hd590300_1    conda-
+pigz                      2.6                  h27826a3_0    conda-
+pip                       23.1.2             pyhd8ed1ab_0    conda-
+python                    3.7.12          hf930737_100_cpython    c
+readline                  8.2                  h8228510_1    conda-
+setuptools                67.7.2             pyhd8ed1ab_0    conda-
+sqlite                    3.42.0               h2c6b66d_0    conda-
+tk                        8.6.12               h27826a3_0    conda-
+wheel                     0.40.0             pyhd8ed1ab_0    conda-
+xopen                     0.7.3                      py_0    biocon
+xz                        5.2.6                h166bdaf_0    conda-
+zlib                      1.2.13               hd590300_5    conda-
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ conda install
+Collecting package metadata (current_repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying wit
+Solving environment: failed with repodata from current_repodata.jsoodata source.
+Collecting package metadata (repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying wit
+Solving environment: done
+
+
+==> WARNING: A newer version of conda exists. <==
+  current version: 4.8.3
+  latest version: 23.5.0
+
+Please update conda by running
+
+    $ conda update -n base -c defaults conda
+
+
+
+## Package Plan ##
+
+  environment location: /home/baponterolon/.conda/envs/virtual_env
+
+  added / updated specs:
+    - r-base=4.3.0
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    _r-mutex-1.0.1             |      anacondar_1           3 KB  c
+    binutils_impl_linux-64-2.40|       hf600244_0         5.2 MB  c
+    bwidget-1.9.14             |       ha770c72_1         120 KB  c
+    bzip2-1.0.8                |       h7f98852_4         484 KB  c
+    c-ares-1.19.1              |       hd590300_0         111 KB  c
+    cairo-1.16.0               |    hbbf8b49_1016         1.1 MB  c
+    curl-8.1.2                 |       h409715c_0          89 KB  c
+    expat-2.5.0                |       hcb278e6_1         134 KB  c
+    font-ttf-dejavu-sans-mono-2.37|       hab24e00_0         388 KB
+    font-ttf-inconsolata-3.000 |       h77eed37_0          94 KB  c
+    font-ttf-source-code-pro-2.038|       h77eed37_0         684 KB
+    font-ttf-ubuntu-0.83       |       hab24e00_0         1.9 MB  c
+    fontconfig-2.14.2          |       h14ed4e7_0         266 KB  c
+    fonts-conda-ecosystem-1    |                0           4 KB  c
+    fonts-conda-forge-1        |                0           4 KB  c
+    freetype-2.12.1            |       hca18f0e_1         611 KB  c
+    fribidi-1.0.10             |       h36c2ea0_0         112 KB  c
+    gcc_impl_linux-64-13.1.0   |       hc4be1a9_0        51.7 MB  c
+    gettext-0.21.1             |       h27087fc_0         4.1 MB  c
+    gfortran_impl_linux-64-13.1.0|       hd511a9b_0        15.1 MB
+    graphite2-1.3.13           |    h58526e2_1001         102 KB  c
+    gsl-2.7                    |       he838d99_0         3.2 MB  c
+    gxx_impl_linux-64-13.1.0   |       hc4be1a9_0        12.6 MB  c
+    harfbuzz-7.3.0             |       hdb3a94d_0         1.4 MB  c
+    icu-72.1                   |       hcb278e6_0        11.4 MB  c
+    isa-l-2.30.0               |       ha770c72_4         192 KB  c
+    kernel-headers_linux-64-2.6.32|      he073ed8_15         707 KB
+    keyutils-1.6.1             |       h166bdaf_0         115 KB  c
+    krb5-1.20.1                |       h81ceb04_0         1.3 MB  c
+    lerc-4.0.0                 |       h27087fc_0         275 KB  c
+    libblas-3.9.0              |17_linux64_openblas          14 KB
+    libcblas-3.9.0             |17_linux64_openblas          14 KB
+    libcurl-8.1.2              |       h409715c_0         364 KB  c
+    libdeflate-1.18            |       h0b41bf4_0          64 KB  c
+    libedit-3.1.20191231       |       he28a2e2_2         121 KB  c
+    libev-4.33                 |       h516909a_1         104 KB  c
+    libexpat-2.5.0             |       hcb278e6_1          76 KB  c
+    libgcc-devel_linux-64-13.1.0|       he3cc6c4_0         2.3 MB
+    libgfortran-ng-13.1.0      |       h69a702a_0          23 KB  c
+    libgfortran5-13.1.0        |       h15d22d2_0         1.4 MB  c
+    libglib-2.76.3             |       hebfc3b9_0         2.6 MB  c
+    libiconv-1.17              |       h166bdaf_0         1.4 MB  c
+    libjpeg-turbo-2.1.5.1      |       h0b41bf4_0         479 KB  c
+    liblapack-3.9.0            |17_linux64_openblas          14 KB
+    libnghttp2-1.52.0          |       h61bc06f_0         608 KB  c
+    libopenblas-0.3.23         |pthreads_h80387f5_0         5.2 MB
+    libpng-1.6.39              |       h753d276_0         276 KB  c
+    libsanitizer-13.1.0        |       hfd8a6a1_0         3.9 MB  c
+    libssh2-1.11.0             |       h0841786_0         265 KB  c
+    libstdcxx-devel_linux-64-13.1.0|       he3cc6c4_0         8.7 M
+    libtiff-4.5.0              |       ha587672_6         398 KB  c
+    libuuid-2.38.1             |       h0b41bf4_0          33 KB  c
+    libwebp-base-1.3.0         |       h0b41bf4_0         348 KB  c
+    libxcb-1.15                |       h0b41bf4_0         375 KB  c
+    libxml2-2.11.4             |       h0d562d8_0         688 KB  c
+    make-4.3                   |       hd18ef5c_1         507 KB  c
+    pango-1.50.14              |       heaa33ce_1         433 KB  c
+    pbzip2-1.1.13              |                0         114 KB  c
+    pcre2-10.40                |       hc3806b6_0         2.3 MB  c
+    pixman-0.40.0              |       h36c2ea0_0         627 KB  c
+    pthread-stubs-0.4          |    h36c2ea0_1001           5 KB  c
+    python-isal-1.1.0          |   py37h540881e_0          47 KB  c
+    python_abi-3.7             |          3_cp37m           6 KB  c
+    r-base-4.3.0               |       hfabd6f2_1        24.5 MB  c
+    sed-4.8                    |       he412f7d_0         264 KB  c
+    sysroot_linux-64-2.12      |      he073ed8_15        31.4 MB  c
+    tktable-2.10               |       hb7b940f_3          89 KB  c
+    xopen-1.6.0                |   py37h89c1867_0          27 KB  c
+    xorg-kbproto-1.0.7         |    h7f98852_1002          27 KB  c
+    xorg-libice-1.0.10         |       h7f98852_0          58 KB  c
+    xorg-libsm-1.2.3           |    hd9c2040_1000          26 KB  c
+    xorg-libx11-1.8.5          |       h8ee46fc_0         812 KB  c
+    xorg-libxau-1.0.11         |       hd590300_0          14 KB  c
+    xorg-libxdmcp-1.1.3        |       h7f98852_0          19 KB  c
+    xorg-libxext-1.3.4         |       h0b41bf4_2          49 KB  c
+    xorg-libxrender-0.9.10     |    h7f98852_1003          32 KB  c
+    xorg-libxt-1.3.0           |       hd590300_0         371 KB  c
+    xorg-renderproto-0.11.1    |    h7f98852_1002           9 KB  c
+    xorg-xextproto-7.3.0       |    h0b41bf4_1003          30 KB  c
+    xorg-xproto-7.0.31         |    h7f98852_1007          73 KB  c
+    zstd-1.5.2                 |       h3eb15da_6         410 KB  c
+    ------------------------------------------------------------
+                                           Total:       205.2 MB
+
+The following NEW packages will be INSTALLED:
+
+  _r-mutex           conda-forge/noarch::_r-mutex-1.0.1-anacondar_1
+  binutils_impl_lin~ conda-forge/linux-64::binutils_impl_linux-64-2
+  bwidget            conda-forge/linux-64::bwidget-1.9.14-ha770c72_
+  bzip2              conda-forge/linux-64::bzip2-1.0.8-h7f98852_4
+  c-ares             conda-forge/linux-64::c-ares-1.19.1-hd590300_0
+  cairo              conda-forge/linux-64::cairo-1.16.0-hbbf8b49_10
+  curl               conda-forge/linux-64::curl-8.1.2-h409715c_0
+  expat              conda-forge/linux-64::expat-2.5.0-hcb278e6_1
+  font-ttf-dejavu-s~ conda-forge/noarch::font-ttf-dejavu-sans-mono-
+  font-ttf-inconsol~ conda-forge/noarch::font-ttf-inconsolata-3.000
+  font-ttf-source-c~ conda-forge/noarch::font-ttf-source-code-pro-2
+  font-ttf-ubuntu    conda-forge/noarch::font-ttf-ubuntu-0.83-hab24
+  fontconfig         conda-forge/linux-64::fontconfig-2.14.2-h14ed4
+  fonts-conda-ecosy~ conda-forge/noarch::fonts-conda-ecosystem-1-0
+  fonts-conda-forge  conda-forge/noarch::fonts-conda-forge-1-0
+  freetype           conda-forge/linux-64::freetype-2.12.1-hca18f0e
+  fribidi            conda-forge/linux-64::fribidi-1.0.10-h36c2ea0_
+  gcc_impl_linux-64  conda-forge/linux-64::gcc_impl_linux-64-13.1.0
+  gettext            conda-forge/linux-64::gettext-0.21.1-h27087fc_
+  gfortran_impl_lin~ conda-forge/linux-64::gfortran_impl_linux-64-1
+  graphite2          conda-forge/linux-64::graphite2-1.3.13-h58526e
+  gsl                conda-forge/linux-64::gsl-2.7-he838d99_0
+  gxx_impl_linux-64  conda-forge/linux-64::gxx_impl_linux-64-13.1.0
+  harfbuzz           conda-forge/linux-64::harfbuzz-7.3.0-hdb3a94d_
+  icu                conda-forge/linux-64::icu-72.1-hcb278e6_0
+  isa-l              conda-forge/linux-64::isa-l-2.30.0-ha770c72_4
+  kernel-headers_li~ conda-forge/noarch::kernel-headers_linux-64-2.
+  keyutils           conda-forge/linux-64::keyutils-1.6.1-h166bdaf_
+  krb5               conda-forge/linux-64::krb5-1.20.1-h81ceb04_0
+  lerc               conda-forge/linux-64::lerc-4.0.0-h27087fc_0
+  libblas            conda-forge/linux-64::libblas-3.9.0-17_linux64
+  libcblas           conda-forge/linux-64::libcblas-3.9.0-17_linux6
+  libcurl            conda-forge/linux-64::libcurl-8.1.2-h409715c_0
+  libdeflate         conda-forge/linux-64::libdeflate-1.18-h0b41bf4
+  libedit            conda-forge/linux-64::libedit-3.1.20191231-he2
+  libev              conda-forge/linux-64::libev-4.33-h516909a_1
+  libexpat           conda-forge/linux-64::libexpat-2.5.0-hcb278e6_
+  libgcc-devel_linu~ conda-forge/linux-64::libgcc-devel_linux-64-13
+  libgfortran-ng     conda-forge/linux-64::libgfortran-ng-13.1.0-h6
+  libgfortran5       conda-forge/linux-64::libgfortran5-13.1.0-h15d
+  libglib            conda-forge/linux-64::libglib-2.76.3-hebfc3b9_
+  libiconv           conda-forge/linux-64::libiconv-1.17-h166bdaf_0
+  libjpeg-turbo      conda-forge/linux-64::libjpeg-turbo-2.1.5.1-h0
+  liblapack          conda-forge/linux-64::liblapack-3.9.0-17_linux
+  libnghttp2         conda-forge/linux-64::libnghttp2-1.52.0-h61bc0
+  libopenblas        conda-forge/linux-64::libopenblas-0.3.23-pthre
+  libpng             conda-forge/linux-64::libpng-1.6.39-h753d276_0
+  libsanitizer       conda-forge/linux-64::libsanitizer-13.1.0-hfd8
+  libssh2            conda-forge/linux-64::libssh2-1.11.0-h0841786_
+  libstdcxx-devel_l~ conda-forge/linux-64::libstdcxx-devel_linux-64
+  libtiff            conda-forge/linux-64::libtiff-4.5.0-ha587672_6
+  libuuid            conda-forge/linux-64::libuuid-2.38.1-h0b41bf4_
+  libwebp-base       conda-forge/linux-64::libwebp-base-1.3.0-h0b41
+  libxcb             conda-forge/linux-64::libxcb-1.15-h0b41bf4_0
+  libxml2            conda-forge/linux-64::libxml2-2.11.4-h0d562d8_
+  make               conda-forge/linux-64::make-4.3-hd18ef5c_1
+  pango              conda-forge/linux-64::pango-1.50.14-heaa33ce_1
+  pbzip2             conda-forge/linux-64::pbzip2-1.1.13-0
+  pcre2              conda-forge/linux-64::pcre2-10.40-hc3806b6_0
+  pixman             conda-forge/linux-64::pixman-0.40.0-h36c2ea0_0
+  pthread-stubs      conda-forge/linux-64::pthread-stubs-0.4-h36c2e
+  python-isal        conda-forge/linux-64::python-isal-1.1.0-py37h5
+  python_abi         conda-forge/linux-64::python_abi-3.7-3_cp37m
+  r-base             conda-forge/linux-64::r-base-4.3.0-hfabd6f2_1
+  sed                conda-forge/linux-64::sed-4.8-he412f7d_0
+  sysroot_linux-64   conda-forge/noarch::sysroot_linux-64-2.12-he07
+  tktable            conda-forge/linux-64::tktable-2.10-hb7b940f_3
+  xorg-kbproto       conda-forge/linux-64::xorg-kbproto-1.0.7-h7f98
+  xorg-libice        conda-forge/linux-64::xorg-libice-1.0.10-h7f98
+  xorg-libsm         conda-forge/linux-64::xorg-libsm-1.2.3-hd9c204
+  xorg-libx11        conda-forge/linux-64::xorg-libx11-1.8.5-h8ee46
+  xorg-libxau        conda-forge/linux-64::xorg-libxau-1.0.11-hd590
+  xorg-libxdmcp      conda-forge/linux-64::xorg-libxdmcp-1.1.3-h7f9
+  xorg-libxext       conda-forge/linux-64::xorg-libxext-1.3.4-h0b41
+  xorg-libxrender    conda-forge/linux-64::xorg-libxrender-0.9.10-h
+  xorg-libxt         conda-forge/linux-64::xorg-libxt-1.3.0-hd59030
+  xorg-renderproto   conda-forge/linux-64::xorg-renderproto-0.11.1-
+  xorg-xextproto     conda-forge/linux-64::xorg-xextproto-7.3.0-h0b
+  xorg-xproto        conda-forge/linux-64::xorg-xproto-7.0.31-h7f98
+  zstd               conda-forge/linux-64::zstd-1.5.2-h3eb15da_6
+
+The following packages will be UPDATED:
+
+  xopen                   bioconda/noarch::xopen-0.7.3-py_0 --> con6.0-py37h89c1867_0
+
+
+Proceed ([y]/n)? y
+
+
+Downloading and Extracting Packages
+pthread-stubs-0.4    | 5 KB      | ################################
+c-ares-1.19.1        | 111 KB    | ################################
+krb5-1.20.1          | 1.3 MB    | ################################
+libexpat-2.5.0       | 76 KB     | ################################
+expat-2.5.0          | 134 KB    | ################################
+libev-4.33           | 104 KB    | ################################
+harfbuzz-7.3.0       | 1.4 MB    | ################################
+font-ttf-dejavu-sans | 388 KB    | ################################
+libssh2-1.11.0       | 265 KB    | ################################
+gettext-0.21.1       | 4.1 MB    | ################################
+pango-1.50.14        | 433 KB    | ################################
+libxml2-2.11.4       | 688 KB    | ################################
+font-ttf-source-code | 684 KB    | ################################
+python-isal-1.1.0    | 47 KB     | ################################
+libopenblas-0.3.23   | 5.2 MB    | ################################
+freetype-2.12.1      | 611 KB    | ################################
+zstd-1.5.2           | 410 KB    | ################################
+fonts-conda-forge-1  | 4 KB      | ################################
+python_abi-3.7       | 6 KB      | ################################
+fonts-conda-ecosyste | 4 KB      | ################################
+fontconfig-2.14.2    | 266 KB    | ################################
+font-ttf-ubuntu-0.83 | 1.9 MB    | ################################
+libjpeg-turbo-2.1.5. | 479 KB    | ################################
+libuuid-2.38.1       | 33 KB     | ################################
+pbzip2-1.1.13        | 114 KB    | ################################
+bwidget-1.9.14       | 120 KB    | ################################
+xorg-kbproto-1.0.7   | 27 KB     | ################################
+_r-mutex-1.0.1       | 3 KB      | ################################
+fribidi-1.0.10       | 112 KB    | ################################
+bzip2-1.0.8          | 484 KB    | ################################
+xorg-libxdmcp-1.1.3  | 19 KB     | ################################
+binutils_impl_linux- | 5.2 MB    | ################################
+libedit-3.1.20191231 | 121 KB    | ################################
+libwebp-base-1.3.0   | 348 KB    | ################################
+libpng-1.6.39        | 276 KB    | ################################
+libtiff-4.5.0        | 398 KB    | ################################
+libgfortran-ng-13.1. | 23 KB     | ################################
+r-base-4.3.0         | 24.5 MB   | ################################
+curl-8.1.2           | 89 KB     | ################################
+xorg-libxt-1.3.0     | 371 KB    | ################################
+gxx_impl_linux-64-13 | 12.6 MB   | ################################
+libstdcxx-devel_linu | 8.7 MB    | ################################
+make-4.3             | 507 KB    | ################################
+xorg-libsm-1.2.3     | 26 KB     | ################################
+xorg-renderproto-0.1 | 9 KB      | ################################
+xopen-1.6.0          | 27 KB     | ################################
+icu-72.1             | 11.4 MB   | ################################
+keyutils-1.6.1       | 115 KB    | ################################
+gcc_impl_linux-64-13 | 51.7 MB   | ################################
+libiconv-1.17        | 1.4 MB    | ################################
+pcre2-10.40          | 2.3 MB    | ################################
+xorg-libice-1.0.10   | 58 KB     | ################################
+sed-4.8              | 264 KB    | ################################
+pixman-0.40.0        | 627 KB    | ################################
+liblapack-3.9.0      | 14 KB     | ################################
+xorg-xextproto-7.3.0 | 30 KB     | ################################
+gfortran_impl_linux- | 15.1 MB   | ################################
+sysroot_linux-64-2.1 | 31.4 MB   | ################################
+tktable-2.10         | 89 KB     | ################################
+libglib-2.76.3       | 2.6 MB    | ################################
+libblas-3.9.0        | 14 KB     | ################################
+kernel-headers_linux | 707 KB    | ################################
+graphite2-1.3.13     | 102 KB    | ################################
+xorg-libx11-1.8.5    | 812 KB    | ################################
+libcblas-3.9.0       | 14 KB     | ################################
+xorg-libxext-1.3.4   | 49 KB     | ################################
+libcurl-8.1.2        | 364 KB    | ################################
+xorg-xproto-7.0.31   | 73 KB     | ################################
+libnghttp2-1.52.0    | 608 KB    | ################################
+libgfortran5-13.1.0  | 1.4 MB    | ################################
+isa-l-2.30.0         | 192 KB    | ################################
+libdeflate-1.18      | 64 KB     | ################################
+lerc-4.0.0           | 275 KB    | ################################
+libsanitizer-13.1.0  | 3.9 MB    | ################################
+font-ttf-inconsolata | 94 KB     | ################################
+xorg-libxrender-0.9. | 32 KB     | ################################
+libgcc-devel_linux-6 | 2.3 MB    | ################################
+xorg-libxau-1.0.11   | 14 KB     | ################################
+libxcb-1.15          | 375 KB    | ################################
+cairo-1.16.0         | 1.1 MB    | ################################
+gsl-2.7              | 3.2 MB    | ################################
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ conda list
+# packages in environment at /home/baponterolon/.conda/envs/virtual
+#
+# Name                    Version                   Build  Channel
+_libgcc_mutex             0.1                 conda_forge    conda-
+_openmp_mutex             4.5                       2_gnu    conda-
+_r-mutex                  1.0.1               anacondar_1    conda-
+binutils_impl_linux-64    2.40                 hf600244_0    conda-
+bwidget                   1.9.14               ha770c72_1    conda-
+bz2file                   0.98                       py_0    conda-
+bzip2                     1.0.8                h7f98852_4    conda-
+c-ares                    1.19.1               hd590300_0    conda-
+ca-certificates           2023.5.7             hbcca054_0    conda-
+cairo                     1.16.0            hbbf8b49_1016    conda-
+curl                      8.1.2                h409715c_0    conda-
+cutadapt                  1.18             py37h14c3975_1    biocon
+expat                     2.5.0                hcb278e6_1    conda-
+font-ttf-dejavu-sans-mono 2.37                 hab24e00_0    conda-
+font-ttf-inconsolata      3.000                h77eed37_0    conda-
+font-ttf-source-code-pro  2.038                h77eed37_0    conda-
+font-ttf-ubuntu           0.83                 hab24e00_0    conda-
+fontconfig                2.14.2               h14ed4e7_0    conda-
+fonts-conda-ecosystem     1                             0    conda-
+fonts-conda-forge         1                             0    conda-
+freetype                  2.12.1               hca18f0e_1    conda-
+fribidi                   1.0.10               h36c2ea0_0    conda-
+gcc_impl_linux-64         13.1.0               hc4be1a9_0    conda-
+gettext                   0.21.1               h27087fc_0    conda-
+gfortran_impl_linux-64    13.1.0               hd511a9b_0    conda-
+graphite2                 1.3.13            h58526e2_1001    conda-
+gsl                       2.7                  he838d99_0    conda-
+gxx_impl_linux-64         13.1.0               hc4be1a9_0    conda-
+harfbuzz                  7.3.0                hdb3a94d_0    conda-
+icu                       72.1                 hcb278e6_0    conda-
+isa-l                     2.30.0               ha770c72_4    conda-
+kernel-headers_linux-64   2.6.32              he073ed8_15    conda-
+keyutils                  1.6.1                h166bdaf_0    conda-
+krb5                      1.20.1               h81ceb04_0    conda-
+ld_impl_linux-64          2.40                 h41732ed_0    conda-
+lerc                      4.0.0                h27087fc_0    conda-
+libblas                   3.9.0           17_linux64_openblas    co
+libcblas                  3.9.0           17_linux64_openblas    co
+libcurl                   8.1.2                h409715c_0    conda-
+libdeflate                1.18                 h0b41bf4_0    conda-
+libedit                   3.1.20191231         he28a2e2_2    conda-
+libev                     4.33                 h516909a_1    conda-
+libexpat                  2.5.0                hcb278e6_1    conda-
+libffi                    3.4.2                h7f98852_5    conda-
+libgcc-devel_linux-64     13.1.0               he3cc6c4_0    conda-
+libgcc-ng                 13.1.0               he5830b7_0    conda-
+libgfortran-ng            13.1.0               h69a702a_0    conda-
+libgfortran5              13.1.0               h15d22d2_0    conda-
+libglib                   2.76.3               hebfc3b9_0    conda-
+libgomp                   13.1.0               he5830b7_0    conda-
+libiconv                  1.17                 h166bdaf_0    conda-
+libjpeg-turbo             2.1.5.1              h0b41bf4_0    conda-
+liblapack                 3.9.0           17_linux64_openblas    co
+libnghttp2                1.52.0               h61bc06f_0    conda-
+libnsl                    2.0.0                h7f98852_0    conda-
+libopenblas               0.3.23          pthreads_h80387f5_0    co
+libpng                    1.6.39               h753d276_0    conda-
+libsanitizer              13.1.0               hfd8a6a1_0    conda-
+libsqlite                 3.42.0               h2797004_0    conda-
+libssh2                   1.11.0               h0841786_0    conda-
+libstdcxx-devel_linux-64  13.1.0               he3cc6c4_0    conda-
+libstdcxx-ng              13.1.0               hfd8a6a1_0    conda-
+libtiff                   4.5.0                ha587672_6    conda-
+libuuid                   2.38.1               h0b41bf4_0    conda-
+libwebp-base              1.3.0                h0b41bf4_0    conda-
+libxcb                    1.15                 h0b41bf4_0    conda-
+libxml2                   2.11.4               h0d562d8_0    conda-
+libzlib                   1.2.13               hd590300_5    conda-
+make                      4.3                  hd18ef5c_1    conda-
+ncurses                   6.4                  hcb278e6_0    conda-
+openssl                   3.1.1                hd590300_1    conda-
+pango                     1.50.14              heaa33ce_1    conda-
+pbzip2                    1.1.13                        0    conda-
+pcre2                     10.40                hc3806b6_0    conda-
+pigz                      2.6                  h27826a3_0    conda-
+pip                       23.1.2             pyhd8ed1ab_0    conda-
+pixman                    0.40.0               h36c2ea0_0    conda-
+pthread-stubs             0.4               h36c2ea0_1001    conda-
+python                    3.7.12          hf930737_100_cpython    c
+python-isal               1.1.0            py37h540881e_0    conda-
+python_abi                3.7                     3_cp37m    conda-
+r-base                    4.3.0                hfabd6f2_1    conda-
+readline                  8.2                  h8228510_1    conda-
+sed                       4.8                  he412f7d_0    conda-
+setuptools                67.7.2             pyhd8ed1ab_0    conda-
+sqlite                    3.42.0               h2c6b66d_0    conda-
+sysroot_linux-64          2.12                he073ed8_15    conda-
+tk                        8.6.12               h27826a3_0    conda-
+tktable                   2.10                 hb7b940f_3    conda-
+wheel                     0.40.0             pyhd8ed1ab_0    conda-
+xopen                     1.6.0            py37h89c1867_0    conda-
+xorg-kbproto              1.0.7             h7f98852_1002    conda-
+xorg-libice               1.0.10               h7f98852_0    conda-
+xorg-libsm                1.2.3             hd9c2040_1000    conda-
+xorg-libx11               1.8.5                h8ee46fc_0    conda-
+xorg-libxau               1.0.11               hd590300_0    conda-
+xorg-libxdmcp             1.1.3                h7f98852_0    conda-
+xorg-libxext              1.3.4                h0b41bf4_2    conda-
+xorg-libxrender           0.9.10            h7f98852_1003    conda-
+xorg-libxt                1.3.0                hd590300_0    conda-
+xorg-renderproto          0.11.1            h7f98852_1002    conda-
+xorg-xextproto            7.3.0             h0b41bf4_1003    conda-
+xorg-xproto               7.0.31            h7f98852_1007    conda-
+xz                        5.2.6                h166bdaf_0    conda-
+zlib                      1.2.13               hd590300_5    conda-
+zstd                      1.5.2                h3eb15da_6    conda-
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ R --version
+R version 4.3.0 (2023-04-21) -- "Already Tomorrow"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-conda-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under the terms of the
+GNU General Public License versions 2 or 3.
+For more information about these matters see
+https://www.gnu.org/licenses/.
+
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ cutadapt --ver
+1.18
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ which cutadapt
+~/.conda/envs/virtual_env/bin/cutadapt
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ ~/.conda/envs/
+Run "cutadapt --help" to see command-line options.
+See https://cutadapt.readthedocs.io/ for full documentation.
+
+cutadapt: error: Please give me something to do!
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ ^C
+(virtual_env) [baponterolon@cypress01-033 svanbael]$

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+for i in *.fastq
+do
+ newname=$(basename $i .fastq).fq
+ mv $i $newname
+done
+
+##Script from HPC workshop 2 3/16/2023
+

@@ -1,0 +1,7 @@
+#!/bin/bash
+for i in *.fq
+do
+ newname=$(echo $i | cut -d_ -f1-3).fq
+ mv $i  $newname
+done
+##Script from HPC workshop 2 3/16/2023

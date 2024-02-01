@@ -1,0 +1,10 @@
+#!/bin/bash
+#Test FIGARO
+
+conda activate figaro
+
+cd 
+mkdir test_figaro
+cd test_figaro
+
+ python figaro.py -i test_figaro -o test_figaro -a 225 -m 20 -F illumina

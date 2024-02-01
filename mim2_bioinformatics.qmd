@@ -1,0 +1,1407 @@
+---
+title: "DADA2 bioinformatic pipeline for the Mimulus ITS sequence dataset"
+author: "Bolívar Aponte Rolón and Mareli Sánchez Juliá"
+date: "Last edited: `r format(Sys.time(), '%B %d, %Y')`"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 2
+    number-sections: true
+    number-depth: 1
+    theme: lumen
+    highlight-style: github
+    code-overflow: wrap
+    code-fold: false
+    code-copy: true
+    code-link: false
+    code-tools: false
+    code-block-border-left: "#0C3823"
+    code-block-bg: "#eeeeee"
+    fig-cap-location: margin
+    linestretch: 1.25
+    fontsize: "large"
+    embed-resources: true
+execute:
+  echo: true
+  keep-md: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup}
+knitr::opts_chunk$set(out.width ='70%', fig_align = 'center', echo = TRUE, collapse = TRUE, eval=FALSE)
+```
+
+
+# Van Bael bioinformatic pipeline: DADA2
+
+## Objective
+
+The objective of this document is to compile and streamline the NGS pipelines used in the Van Bael lab for ITS and 16S sequence data. 
+The pipeline below is mainly focused on DADA2 pipeline presented by Benjamin Callahan et al. in its [ITS](https://benjjneb.github.io/dada2/ITS_workflow.html) and [16S](https://benjjneb.github.io/dada2/tutorial.html) variants. The pipeline follows closely the DADA2 mentioned previously, the work of Mareli Sánchez Juliá for her MAMF project, and Farrer Lab at Tulane University. The USEARCH and VSEARCH steps or alternatives stem from the Arnold Lab at the University of Arizona.
+
+## Resources
+
+The list below is to help guide your search and aid your bioinformatics journey. Each project and sequencing run is different and should be treated as such. Determine the parameters to filter, cut, trim and truncate accordingly.
+
+### Van Bael Files
+   + [VBL_Bioinformatics](https://drive.google.com/open?id=1Z4jHQDcS4dOpG6hlkXVWMw72tZeCYYRH&usp=drive_fs) folder in the Google Drive were you can find scripts and notes on bioinfomatic pipelines from past graduate students and post-docs.
+   + [Farrer Lab](https://github.com/ecfarrer/LAmarshGradient2/blob/master/BioinformaticsITS.R) repository. They work on similar data sets.
+   
+### DADA2
+   + [DADA2](https://benjjneb.github.io/dada2/index.html) Main page for the DADA2 workflow. Other links are scattered through the document. 
+   + [Callahan, B., McMurdie, P., Rosen, M. et al. DADA2: High-resolution sample inference from Illumina amplicon data. Nat Methods 13, 581–583 (2016).](https://doi.org/10.1038/nmeth.3869)
+   + [Callahan, B., McMurdie, P. & Holmes, S. Exact sequence variants should replace operational taxonomic units in marker-gene data analysis. ISME J 11, 2639–2643 (2017).](https://doi.org/10.1038/ismej.2017.119)
+   + [Bioinformatics Cookbook](https://bioinformaticsworkbook.org/dataAnalysis/Metagenomics/Dada2.html#gsc.tab=0)
+
+### Bionformatic software tools
+#### Cutadapt
+   + [cutadapt](https://cutadapt.readthedocs.io/en/stable/index.html): Cutadapt finds and removes adapter sequences, primers, poly-A tails and other types of unwanted sequence from your high-throughput sequencing reads. Sequencing cores usually de multiplex your data but do no remove the primers and adapters. This is the tool for the job.
+
+#### FIGARO
+   + [FIGARO](https://github.com/Zymo-Research/figaro#figaro) "FIGARO will quickly analyze error rates in a directory of FASTQ files to determine optimal trimming parameters for high-resolution targeted microbiome sequencing pipelines, such as those utilizing DADA2 and Deblur."
+
+#### Bioconductor
+The Bioconductor project is to develop, support, and disseminate free open source software that facilitates rigorous and reproducible analysis of data from current and emerging biological assays.
+     + [Installation](https://www.bioconductor.org/install/)
+     
+#### USEARCH and VSEARCH search and clustering algorithms
+   + [VSEARCH](https://github.com/torognes/vsearch): From their website [...]"supports de novo and reference based chimera detection, clustering, full-length and prefix dereplication, rereplication, reverse complementation, masking, all-vs-all pairwise global alignment, exact and global alignment searching, shuffling, subsampling and sorting. It also supports FASTQ file analysis, filtering, conversion and merging of paired-end reads."
+   + [USEARCH](https://www.drive5.com/usearch/): From their website "USEARCH offers search and clustering algorithms that are often orders of magnitude faster than BLAST."
+   
+#### FastQC and MultiQC
+   + [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/: tool for reading the [fastq](https://en.wikipedia.org/wiki/FASTQ_format) file format and extracting the quality scores. 
+      + [Installation]: [conda](https://anaconda.org/bioconda/fastqc [video](https://www.youtube.com/watch?v=Umo1pRuT0OI)
+      + [How does FastQC work?](https://dnacore.missouri.edu/PDF/FastQC_Manual.pdf)
+   + [MultiQC](https://multiqc.info/): MultiQC doesn’t do any analysis for you - it just finds results from other tools that you have already run and generates nice reports.
+
+#### R and Python3
+
+A lot of the bioinformatic pipelines take place in a Unix/Linux environment. If you have Mac OS then half the troubles are gone. If you have Windows OS you will need to install a Virtual Machine to operate a linux platform (e.g. Ubuntu). Although various Unix-like environments and command-line interfaces for Windows exist they have limitations and not all packages or modules are supported by them.
+
+   + [Virtual Machine installation](https://www.virtualbox.org/)
+   + [Ubuntu installation](https://ubuntu.com/tutorials/how-to-run-ubuntu-desktop-on-a-virtual-machine-using-virtualbox#1-overview)
+   + [Virtual machine shared folders](https://averagelinuxuser.com/virtualbox-shared-folder/)
+   + [Python installation](https://www.python.org/downloads/)
+   + [Miniconda3](https://docs.conda.io/en/latest/miniconda.html#installing)
+      + [Windows OS](https://www.codecademy.com/article/install-python3)
+      + [Mac and Linux OS](https://engineeringfordatascience.com/posts/install_miniconda_from_the_command_line/)
+   
+   
+Python comes installed in most OS and different versions can coexist and are usually employed simultaneously by apps and software. Verify the minimum version needed for your application. FastQC, MultiQC, Bioconductor and other bioinformatics tools use Python3+ (e.g. > 3.7).
+If you are not familiar with the Python ecosystem, stop and take a step back. Think about where you want to install these tools. In your virtual machine, laptop, lab computer? What file paths (location in computer)?
+Try to think about these things before installing to avoid installing in random places and then not knowing where it is and being unable to call a command. It is best to execute the bioinformatic pipelines in a HPC cluster or local computer. Avoid having the files in the labs Google Drive and trying to access it this way. It is possible but the shortcuts provided by Google Drive make for long file paths and are not accessible through Virtual Machines. 
+
+### Other resources
+   + [Dr. Rachel Lappan's pipeline and workflow](https://rachaellappan.github.io/16S-analysis/index.html)
+
+# DADA2 Pipeline
+## Installation
+See https://benjjneb.github.io/dada2/dada-installation.html for more details.
+The main R script can be found [here](https://www.bioconductor.org/packages/devel/bioc/vignettes/dada2/inst/doc/dada2-intro.R)
+### Pre-requisites
+```{r, Pre-requisites, tidy=TRUE, eval=TRUE}
+# Activate commands as needed.
+# change the ref argument to get other versions
+# DADA2 package and associated
+# if (!require("BiocManager", quietly = TRUE)){
+#     install.packages("BiocManager", repo="http://cran.rstudio.com/")
+#   }
+# BiocManager::install(version = "3.17")
+# BiocManager::install(c("ShortRead", "Biostrings"))
+# 
+# install.packages("usethis")
+# install.packages("devtools")
+# install.packages("Rcpp")
+# devtools::install_github("benjjneb/dada2")
+# if (!require("BiocManager", quietly = TRUE)){ #Another way of installing the latest version of dada2
+#     install.packages("BiocManager")}
+# 
+#The following initializes usage of Bioconductor devel version
+# BiocManager::install(version='devel') #BiocManager developer version
+# BiocManager::install("dada2")
+
+# Loading packages
+library("usethis")
+library("devtools")
+library("Rcpp")
+library("dada2")
+packageVersion("dada2") #checking if it is the latest version
+library("ShortRead")
+packageVersion("ShortRead")
+library("Biostrings")  #This will install other packages and dependencies.
+packageVersion("Biostrings")
+```
+
+
+## File preparation: name clean-up
+
+The DADA2 pipeline has the capacity to work with unzipped ".fastq" files. It is good practice to ensure that all your files names have the same amount of fields and characters in there names. This ensures that scripts treat your files equally and you don't accidentally merge files (e.g. R1.fastq + R2.fastq = R1.fastq). Note that DNA extraction controls and PCR controls are a little bit different than field samples and treated as such by using a slightly different script. For this I have prepared the following scripts.
+
+Samples
+
+```{bash}
+#!/bin/bash
+for file in *.fastq.gz
+do
+ echo "Unziping"
+ gzip -d  "$file"
+done
+
+#Rename the files
+for file in *.fastq
+do
+ echo "Renaming"
+ newname=$(echo $file | cut -d_ -f1,2,5).fastq
+ echo "Renaming $file as $newname"
+ mv $file $newname
+done
+##Script from HPC workshop 2 3/16/2023
+##Updated on 6/7/2023 with troubleshooting with ChatGPT. 
+#Various iterations offered were not exactly what
+# I needed.-BAR
+```
+
+Controls
+
+```{bash}
+#!/bin/bash
+for file in *.fastq.gz
+do
+ echo "Unziping"
+ gzip -d  "$file"
+done
+
+#Rename the files
+for file in *.fastq
+do
+ echo "Renaming"
+ newname=$(echo $file | cut -d_ -f1,4 | sed 's/-//g').fastq
+ echo "Renaming $file as $newname"
+ mv $file $newname
+done
+##Script from HPC workshop 2 3/16/2023
+##Updated on 6/7/2023 with troubleshooting with ChatGPT. 
+#Various iterations offered were not exactly what
+# I needed.-BAR
+```
+
+When working from Mac OS **bash** and Linux **console** make the shell scripts executable
+
+
+```{bash}
+chmod +x FILENAME.sh
+```
+
+Put them in your PATH by placing it in my ~/bin directory and adding the following line to ~/.bashrc:
+
+```{bash}
+export PATH=$HOME/bin:$PATH
+```
+
+This can also be done through the `miniconda3` command-prompt.
+
+These files live in the same directory as the samples and controls, respectively. The were executed through the MinGW-64 terminal that RStudio provides. It emulates a UNIX/POSIX environment on Windows. This is an alternative in Windows OS or you can establish a virtual machine with [Virtual Box](https://www.virtualbox.org/) and install a Linux OS (i.e. Ubuntu) and proceed the same. In Mac OS this is not necessary. 
+
+
+## Pre-Processing
+
+Following DADA2 ITS Pipeline tutorial, [v1.18](https://benjjneb.github.io/dada2/ITS_workflow.html. Also Emily Farrer's [code](https://github.com/ecfarrer/LAmarshGradient2/blob/master/BioinformaticsITS.R) on github "LAmarshGradient2 ITS code.
+
+### File Paths
+Make various directories beforehand to keep your file output organized. Starting with `fastqfiles`. This is were the raw sequence files are. The file names have already been cleaned, see sections above. Create `filtN` as a sub-directory of `fastqfiles`. The final directories: `ASV_tables`. `cutadapted`, `Preprocess`, and `Taxonomy`. As you work through this tutorial the files will be saved in their respective directories.
+```{r, Paths, tidy=TRUE, eval=TRUE, include=FALSE}
+path <- "H:/.shortcut-targets-by-id/0BxMkA7i6_TOxRmxxWEtTdEREYnM/VBL_admin/Protocols/Bioinformatics_pipelines/NGS_Sequence_editing/VBL_DADA2_tutorial/fastqfiles"
+out_dir <- "H:/.shortcut-targets-by-id/0BxMkA7i6_TOxRmxxWEtTdEREYnM/VBL_admin/Protocols/Bioinformatics_pipelines/NGS_Sequence_editing/VBL_DADA2_tutorial"
+
+
+list.files(path)
+fnFs <- sort(list.files(path, pattern = "R1.fastq", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern = "R2.fastq", full.names = TRUE))
+```
+
+### FastQC reports: raw
+Inspect your sequence data before jumping in to cut and trim. You want to get a sense of how the sequencing run went and what you need to do in downstream processes. [Why do quality control?](https://www.bioinformatics.babraham.ac.uk/training/Sequence_QC_Course/Sequencing%20Quality%20Control.pdf)
+
+Assuming you have installed FastQC and MultiQC, go to the directory were your sequence files (.fastaq.gz) are and generate reports. This can be through the bash command-line in Mac and Linux or the Miniconda3 command-prompt.
+
+   + [FastQC how to:](https://www.youtube.com/watch?v=9_l_hWESuCQ)
+Mac and Linux OS
+
+
+```{bash}
+#!/bin/bash
+mkdir fastq_check #Change to  your preferred directory name.
+
+#Concatenate all forward (R1) and reverse (R2) reads 
+cat raw_seq/*_R1.fastq >> fastqc_check/all_R1_rawreads.fastq
+cat raw_seq/*_R2.fastq >> fastqc_raw_check/all_R2_rawreads.fastq
+
+#Execute fastqc on files
+fastqc fastqc_check/all_R1_reads.fastq -o fastqc_check/all_R1_rawreads
+fastqc fastqc_raw_check/all_R2_rawreads.fastq -o fastqc_check/all_R2_rawreads
+
+#This can take a while. It is generating .html reports and associated compressed files. Execute within the directory or from.
+```
+
+
+Windows (miniconda3)
+In windows you can use a GUI to select the file you want to create a report. It is not fully support through the command-line. Make sure to use the `miniconda3` command-prompt and that it is installed properly.
+
+
+```{bash}
+fastqc *.fastq.gz
+```
+
+
+How do can we interpret these reports? What kind of sequence data do I have? Does this look ok? 
+See here:
+   + Galaxy Training!: [Quality Control](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-control/tutorial.html)
+   + [EDAMAME tutorial](https://github.com/edamame-course/FastQC/blob/master/for_review/2016-06-22_FastQC_tutorial.md)
+   
+In the Van Bael lab we produce 16S and ITS amplicon sequence data, for the most part. Amplicon sequences are considered "low" diversity due thei enriched proportion of nucleotides (per base sequence). Hence, when the sequence platform calls nucleotides it tends to be poor in the intiall base pairs. 
+
+### MultiQC: raw
+
+This command will search for all FastQC reports and create summary report of all of them. You can create a shell script and execute in a similar way as `fastqc`.
+
+```{bash}
+#In the directory that you have the reports, execute:
+ multiqc .
+
+# To execute in a subdirectory 
+multiqc FOLDER_NAME
+```
+
+ If successful your command prompt will look like [this]("C:/Users/boloq/Desktop/multiQC_example.JPG")
+ Your report will be something like [this](https://drive.google.com/open?id=1PlwdRO9Yk6-Y50VbprwAGFajCjki9FWh&usp=drive_fs)
+
+
+### Identifiying primers
+
+Each project and organism type will have its own set of primers and adapters. Take the time to figure out which ones you used and their proper bases and lengths. You should received the data from the sequencing core demultiplexed since the barcodes (indexes **i5** and **i7**) are submitted with the order. Here is a list of the most commonly used in the Van Bael Lab. 
+
+   + [VBL Culture primers](https://drive.google.com/open?id=0B9v0CdUUCqU5YVhJck1zT1VTZ28&resourcekey=0-1Nyzv3mGzpJLqDvoo-ls9A&usp=drive_fs)
+   + [VBL NGS primers](https://drive.google.com/open?id=1bUY7dy_JNlkpvzcXcW1ImQAMSckexeSj&usp=drive_fs)
+
+```{r, ITS1f_adapt and ITS2r_adapt, tidy=TRUE, eval=TRUE}
+FWD<-"CACTCTTTCCCTACACGACGCTCTTCCGATCTCTTGGTCATTTAGAGGAAGTAA" # Forward ITS1f_adapt from IDT 
+nchar(FWD) #Number of primer nucleotides.
+REV<-"GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCTGCTGCGTTCTTCATCGATGC" # Reverse primer ITS2r_adapt from IDT
+nchar(REV)
+```
+
+### Verifying the orientation of the primers
+
+```{r, Orientation of primers, tidy=TRUE, eval=TRUE}
+allOrients <- function(primer){# Create all orientations of the input sequence
+                   require(Biostrings)
+                   dna <- DNAString(primer)  # The Biostrings works w/ DNAString objects rather than character vectors
+                   orients <- c(Forward = dna, 
+                                Complement = Biostrings::complement(dna), 
+                                Reverse = Biostrings::reverse(dna),
+                                RevComp = Biostrings::reverseComplement(dna))
+                   return(sapply(orients, toString))  # Convert back to character vector
+}
+FWD.orients <- allOrients(FWD)
+REV.orients <- allOrients(REV)
+#FWD2 <- FWD.orients[["Complement"]] #Use if you suspect an orientation mix-up.
+#REV2 <- REV.orients[["Complement"]]
+
+```
+
+### Filter Reads for ambiguous bases (N)
+
+We are filtering sequences for presence of ambiguous bases (N) before cutting primerd off. This pre-filtering step iomproves mmaping of short primer sequences. No other filtering is performed.
+
+```{r, Filtering ambiguous bases N, tidy=TRUE, eval=TRUE}
+fnFs.filtN <- file.path(path, "filtN", basename(fnFs)) # Put N-filtered forward read files in filtN/ subdirectory
+fnRs.filtN <- file.path(path, "filtN", basename(fnRs)) #Reverse reads
+
+#filterAndTrim(fnFs, fnFs.filtN, fnRs, fnRs.filtN, maxN = 0, multithread = FALSE)
+```
+
+### Checking for primer hits
+
+Have primers been removed?
+```{r, Primer hits, tidy=TRUE, eval=TRUE}
+set.seed(123)
+#Once this has been completed there is no need to run again when working on the script
+primerHits <- function(primer, fn) {
+    # Counts number of reads in which the primer is found
+    nhits <- vcountPattern(primer, sread(readFastq(fn)), fixed = FALSE)
+    return(sum(nhits > 0))
+}
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.filtN[[1]]),
+      FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.filtN[[1]]),
+      REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs.filtN[[1]]),
+      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.filtN[[1]]))
+```
+
+
+We see the reverse complement of primers present in the FWD.ReverseReads and the Rev.ForwardReads.
+
+### Cutadapt: removal of primers
+ Write section of how to install the latest version of [Python (3.11)](https://www.python.org/downloads/windows/), Visual Studio Build Tools 2022 and install [`cutadapt`](https://cutadapt.readthedocs.io/en/stable/installation.html#installation-on-windows) to have it work in this pipeline. The `cutadapt` package can be used directly in the command-line also. That is it's most basic use. If working from Windows OS you can use Git Bash with the added utility of [`wget`](https://gist.github.com/evanwill/0207876c3243bbb6863e65ec5dc3f058) to install [Python 3.11](https://programmingwithjim.wordpress.com/2020/09/08/installing-python-3-in-git-bash-on-windows-10/)
+```{r, Location and version of cutadapt, tidy=TRUE, eval=TRUE}
+#Once this has been completed there is no need to run again when working on the script
+cutadapt <-  "C:/Users/boloq/AppData/Roaming/Python/Python311/Scripts/cutadapt.exe" # CHANGE ME to the cutadapt path on your machine
+system2(cutadapt, args = "--version") # Run shell commands from R
+```
+
+```{r, Establishing the paths and parameters for cutting, tidy = TRUE, eval=TRUE}
+path.cut <- file.path(out_dir, "cutadapted") #Remember where this "out" directory path leads to.
+#all.cut <- file.path(out_dir, "FastQC") # Path to concatenated files 
+print(path.cut) #Checking if the path is correct.
+if(!dir.exists(path.cut)) dir.create(path.cut)
+fnFs.cut <- file.path(path.cut, basename(fnFs))
+fnRs.cut <- file.path(path.cut, basename(fnRs))
+
+FWD.RC <- dada2:::rc(FWD)
+REV.RC <- dada2:::rc(REV)
+
+# Trim FWD and the reverse-complement of REV off of R1 (forward reads)
+R1.flags <- paste("-g", FWD, "-a", REV.RC) 
+# Trim REV and the reverse-complement of FWD off of R2 (reverse reads)
+R2.flags <- paste("-G", REV, "-A", FWD.RC) 
+```
+
+```{r, Running cutadapt, tidy=TRUE}
+# Run Cutadapt
+#Once this has been completed there is no need to run again when working on the script.
+#
+  
+for(i in seq_along(fnFs)) {
+  system2(cutadapt, args = c(R1.flags, R2.flags, 
+                             "-n", 2, # -n 2 removes FWD and REV from reads
+                             "-o", fnFs.cut[i], "-p", fnRs.cut[i], # output files
+                             fnFs.filtN[i], fnRs.filtN[i])) #input files
+}
+
+# String for changing file extension (i.e. .fastq > .fa)
+# new_extension <- ".fa"
+# for (i in seq_along(fnFs)) {
+#   output_file1 <- str_replace(fnFs.cut[i], "\\.fastq", new_extension)
+#   output_file2 <- str_replace(fnRs.cut[i], "\\.fastq", new_extension) This can be added in the code above if desired.
+```
+
+### Re-inspecting if all primers were removed.  
+
+```{r, Re-inspect primer presence, tidy = TRUE }
+#Once this has been completed there is no need to run again when working on the script
+#
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.cut[[1]]), 
+      FWD.ReverseReads = sapply(FWD.orients,
+      primerHits, fn = fnRs.cut[[1]]), 
+      REV.ForwardReads = sapply(REV.orients, primerHits,fn = fnFs.cut[[1]]), 
+      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.cut[[1]]))
+```
+
+
+```{r, eval=TRUE}
+# Forward and reverse fastq filenames have the format:
+cutFs <- sort(list.files(path.cut, pattern = "R1.fastq", full.names = TRUE))
+cutRs <- sort(list.files(path.cut, pattern = "R2.fastq", full.names = TRUE))
+#allcutF <- sort(list.files(all.cut, pattern = "R1.fastq", full.names = TRUE))
+
+# Extract sample names, assuming filenames have format:
+get.sample.name <- function(fname) strsplit(basename(fname), "_R")[[1]][1] #String in commas needs to be updated according to naming convention. If you have multiple underscores in the name then select the underscore next to the "R", like above, or any other unique identifier in the character string.
+
+sample.namesF <- unname(sapply(cutFs, get.sample.name))
+sample.namesR <- unname(sapply(cutRs, get.sample.name))
+head(sample.namesF)
+head(sample.namesR)
+```
+
+### Inspect the read quality
+
+The `dada2` package provides a way to visualize this with the `plotQualityProfile()`function. This will plot the quality scores of reads per sample. You can also create a concatenated file of all the forward or reverse reads to evaluate them in one plot. Plotting a concatenated file may take a while to plot or it may fail. 
+Another way of inspecting the quality of the reads if using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) which has a GUI options or a command-line approach. Both ways are good. The FastQC approach works better with concatenated files and outputs a lot more information. This step is to inform you of the quality of the reads and decide how to cut, trim and truncate your samples.  [FastQC in Linux environment](https://www.youtube.com/watch?v=5nth7o_-f0Q)
+
+```{r}
+plotQualityProfile(cutFs[1:2])
+plotQualityProfile(cutRs[1:2])
+```
+
+### FastQC reports: mismatches (Ns) filtered and cut
+
+See previous FastQC section. The output should show an improvement in the quality of the reads.
+
+### MultiQC repots: mismatches (Ns) filtered and cut
+Se previous MultiQC section. The out put should include all cut and trimmed FastQC report. It will inform the following steps: trimming and truncating.
+
+### FIGARO: tool for deciding what parameters to use for filtering, trimming and truncation
+This step can be performed on the raw reads as well. Here we focus on the cut, filtered and trimmed reads. 
+
+```{python}
+
+# from figaro import figaro
+# resultTable, forwardCurve, reverseCurve = figaro.runAnalysis(
+#   sequenceFolder = path.cut, 
+#   ampliconLength = 500, #Maximum expected size of the amplicon
+#   forwardPrimerLength= 54,
+#   reversePrimerLength = 54, 
+#   minimumOverlap = 20, 
+#   fileNamingStandard, 
+#   trimParameterDownsample, 
+#   trimParameterPercentile)
+```
+
+## Filter and trim
+
+```{r, Assign file names, tidy=TRUE, eval=TRUE}
+filtFs <- file.path(out_dir, "Filtered", basename(cutFs))
+filtRs <- file.path(out_dir, "Filtered", basename(cutRs))
+names(filtFs) <- sample.namesF
+names(filtRs) <- sample.namesR
+head(filtFs, 10)
+head(filtRs, 10)
+```
+
+Results from MultiQC and FIGARO inform parameter selection.
+```{r, Truncating, tidy=TRUE }
+#Truncating Forward and Reverse reads to 230 and 180 respectively. The reverse maxEE is relaxed due to overall low quality of reads
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
+                     truncLen=c(230,180),
+                     maxN=0,
+                     maxEE=c(2,3),
+                     truncQ=2,
+                     minLen=50,
+                     rm.phix=TRUE,
+                     compress=TRUE,
+                     multithread=FALSE) # minLen: Remove reads with length less than minLen. minLen is enforced after trimming and truncation. #enforce min length of 50 bp
+
+#Once it is completed there is no need to run again unless you are changing parameters.
+
+#Saving file
+saveRDS(out, file.path(out_dir, "Preprocess", "/out.rds"))
+#out <- readRDS(file.path(out_dir, "Preprocess", "/out.rds"))
+```
+
+```{r}
+head(out)
+```
+
+### Dereplication
+Dereplication combines all identical reads into one unique sequence with a corresponding abundance equal to the number of reads with that unique sequence. It is done because it reduces computation time by eliminating redundancy -- From DADA2 tutorial, v1.8
+```{r, Dereplication, tidy=TRUE, eval=TRUE}
+derepFs <- derepFastq(filtFs, n = 1000, verbose=TRUE) #n prevents it from reading more than 1000 reads at the same time. This controls the peak memory requirement so that large fastq files are supported. 
+derepRs <- derepFastq(filtRs, n = 1000, verbose=TRUE)
+
+saveRDS(derepFs, file.path(out_dir, "Preprocess", "/derepFs.rds"))
+saveRDS(derepFs, file.path(out_dir, "Preprocess", "/derepFs.rds"))
+#derepFS <- readRDS(file.path(out_dir, "Preprocess", "/derepFs.rds"))
+#derepRS <- readRDS(file.path(out_dir, "Preprocess", "/derepRs.rds"))
+
+# #name the dereplicated reads by the sample names
+names(derepFs) <- sample.namesF
+names(derepRs) <- sample.namesR
+```
+
+### Learn error rates from dereplicated reads
+```{r, Error rates, tidy=TRUE, eval=TRUE}
+set.seed(123)
+errF <- learnErrors(derepFs, randomize = TRUE, multithread=FALSE) #multithread is set to FALSE in Windows. Unix OS is =TRUE.
+# 
+errR <- learnErrors(derepRs, randomize = TRUE, multithread=FALSE)
+
+#Save file
+saveRDS(errF, file.path(out_dir, "Preprocess", "/errF.rds"))
+saveRDS(errR, file.path(out_dir, "Preprocess", "/errR.rds"))
+#errF <- readRDS(file.path(out_dir, "Preprocess", "/errF.rds"))
+#errR <- readRDS(file.path(out_dir, "Preprocess", "/errR.rds"))
+#Plot errors
+plotErrors(errF, nominalQ=TRUE)
+```
+
+
+### Sample Inference
+
+```{r, Inference, tidy=TRUE }
+dadaFs <- dada(derepFs, err=errF, multithread=TRUE)
+dadaRs <- dada(derepRs, err=errR, multithread=TRUE)
+saveRDS(dadaFs, file.path(out_dir, "Preprocess", "/dadaFs.rds"))
+saveRDS(dadaFs, file.path(out_dir, "Preprocess", "/dadaFs.rds"))
+#dadaFS <- readRDS(file.path(out_dir, "Preprocess", "/dadaFs.rds"))
+#dadaRS <- readRDS(file.path(out_dir, "Preprocess", "/dadaRs.rds"))
+```
+
+
+### Merge paired reads
+
+```{r, Merge, tidy=TRUE }
+mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, minOverlap = 20, maxMismatch = 0, verbose=TRUE)
+saveRDS(mergers, file.path(out_dir, "Preprocess", "/mergers.rds"))
+
+#mergers <- readRDS(file.path(out_dir, "Preprocess", "/mergers.rds"))
+# Inspect the merger data.frame from the first sample
+head(mergers[[1]])
+```
+
+
+### Construct ASV Sequence Table
+We can now construct an amplicon sequence variant table (ASV) table, a higher-resolution version of the OTU table produced by traditional methods.
+
+```{r, ASV, tidy=TRUE, eval=TRUE}
+seqtab <- makeSequenceTable(mergers)
+dim(seqtab)
+
+# Inspect distribution of sequence lengths
+table(nchar(getSequences(seqtab)))
+
+#Save file R object, and .csv
+#saveRDS(seqtab, file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds")) #Functions to write a single R object to a file, and to restore it.
+#write.csv(seqtab, file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds"))
+
+#Open from here in case R crashes
+#seqtab<- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds"))
+```
+
+### Remove chimeras
+The core `dada` method corrects substitution and indel errors, but chimeras remain. 
+```{r, Chimeras, tidy=TRUE, eval=TRUE}
+seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread = FALSE, verbose=TRUE) #Multithread = FALSE in Windows
+
+#Frequency of chimeras
+sum(seqtab.nochim)/sum(seqtab)
+
+#Save file
+saveRDS(seqtab.nochim, file.path(out_dir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
+#write.csv(seqtab.nochim, file.path(out_dir, "ASV_tables", "/ASV_nochim_denoise_filt.csv")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
+
+#seqtab.nochim <- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
+```
+
+Inspect distribution of sequence lengths
+
+```{r, eval=TRUE}
+table(nchar(getSequences(seqtab.nochim)))
+```
+
+
+### Track reads through the pipeline
+We now inspect the the number of reads that made it through each step in the pipeline to verify everything worked as expected.
+
+```{r, tidy=TRUE, eval=TRUE}
+getN <- function(x) sum(getUniques(x))
+track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN),
+    rowSums(seqtab.nochim))
+# If processing a single sample, remove the sapply calls: e.g. replace
+# sapply(dadaFs, getN) with getN(dadaFs)
+colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
+rownames(track) <- sample.namesF
+head(track)
+
+# Save file
+saveRDS(track, file.path(out_dir, "Preprocess", "/track.rds"))
+```
+
+::: callout-warning
+<font size="4"> **Note from DADA2 tutorial**.
+
+**Considerations for your own data:** This is a great place to do a last
+sanity check. Outside of filtering (depending on how stringent you want
+to be) there should no step in which a majority of reads are lost. If a
+majority of reads were removed as chimeric, you may need to revisit the
+removal of primers, as the ambiguous nucleotides in un-removed primers
+interfere with chimera identification. If a majority of reads failed to
+merge, the culprit could also be un-removed primers, but could also be
+due to biological length variation in the sequenced ITS region that
+sometimes extends beyond the total read length resulting in no overlap.
+:::
+
+# Taxonomy assignment
+
+Congratulations! You've made it to a checkpoint in the pipeline.  If you have save the ASV tables, specially after removing chimeras, if not go and do that. This section can take a big toll on your local machine. It is best to perform in the Van Bael Lab Mac or HPC Cypress.
+
+Download the latest "full" [UNITE release](https://unite.ut.ee/repository.php). This will serve as your reference for assigning taxonomy. Use the appropriate data base to assing taxonomy to your data or project! 
+
+
+```{r, Taxonomy, tidy=TRUE }
+unite.ref <- file.path(out_dir, "Taxonomy", "sh_general_release_dynamic_29.11.2022.fasta")  # CHANGE ME to location on your machine
+taxa <- assignTaxonomy(seqtab.nochim, unite.ref, multithread = FALSE, tryRC = TRUE) #Multithread = FALSE in Windows. TRUE in Mac/Linux.
+
+
+#Loading from the files saved. In case it crashes, we start from here.
+#seqtab.nochim2 <- readLines(file.path(out_dir, "output.txt")) 
+#seqtab.nochim2 <- read.csv(file.path(out_dir, "ASV_tables", "/ASV_nochim_denoise_filt.csv")) 
+#seqtab.matrix <- as.matrix(seqtab.nochim2) #assignTaxonomy needs a vector matrix
+## unqs <- lapply(fn, getUniques)
+# seqtab <- makeSequenceTable(unqs)
+# dim(seqtab)
+```
+
+Inspecting the taxonomic assignments:
+
+```{r}
+taxa.print <- taxa  # Removing sequence rownames for display only
+rownames(taxa.print) <- NULL
+head(taxa.print)
+```
+
+Done!
+
+You have successfully taken the sequences through the DADA2 pipeline. You can do the same for your samples. 
+This was a small number of samples and your local machine can handle it. When you obtain your sequence files from the sequencing core it is about 25 Gb of data. It is best to work on this through the Cypress HPC cluster. Let's move on to that.
+
+# Cypress: How to submit this as a SLURM job. 
+See general guidelines from [Adrià Auladell Martín](https://github.com/adriaaula/dada2_guidelines)
+
+## Setting up a virtual environment with anaconda3
+See instructions for login into Cypress HPC here:
+
+1. Navigate to /lustre/project/<your group name>/
+
+Example
+```{bash}
+[home@cypress01 baponterolonl]$cd /lustre/project/svanbael/
+```
+
+Result
+```{bash}
+[baponterolon@cypress01 svanbael]$ 
+```
+
+2. Initiate a job node and create a "virtual" environment
+```{bash}
+[baponterolon@cypress01 svanbael]$ idev --partition=centos7 #Access one working node for 60 minutes.
+
+[baponterolon@cypress01-033 svanbael]$module load anaconda3/2020.07
+
+[baponterolon@cypress01-033 svanbael]$conda create -n virtual_env #<name however you want
+
+[baponterolon@cypress01-033 svanbael]$source activate virtual_env #Activate environment
+
+(virtual_env) [baponterolon@cypress01-033 svanbael]$  
+```
+
+Notice the change in the username of your session indicating that you are operating inside the "virtual" environment. Creating this environment allows you to install new packages and dependencies that are not available in Cypress. In this self-contained environment you can install a new version of R or any other program necessary for analyses. 
+
+# Software and packages on Cypress
+Once you are in you desired environment you can proceed to install the packages and modules necessary. Check the available modules with:
+```{bash}
+conda list
+```
+
+You will see waht is available and your environment and decide what need to be installed. 
+
+## Cutadapt
+See [Shared installation (on a cluster)](https://cutadapt.readthedocs.io/en/stable/installation.html#shared-installation-on-a-cluster) for details. Yoi have already created the virtual environment. Install using `pip` command:
+```{bash}
+pip install cutadapt==4.4 #Select version
+```
+
+Cutadapt can also be installed using the `bioconda` channel:
+```{bash}
+conda install -c bioconda cutadapt
+```
+**Note**:<p class="text-danger"> Careful. This will result in the installation of `cutadapt` version 1.18.</p>
+
+## R and packages
+
+installation:
+```{bash}
+conda search r-base #Search available versions
+conda install r-base=4.3.0 #Select version
+```
+
+Initiate R session
+```{bash}
+(virtual_env) [baponterolon@cypress01-033 svanbael]$R #Just type "R"  
+
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ 
+R version 4.3.0 (2023-04-21) -- "Already Tomorrow"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-conda-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under the terms of the
+GNU General Public License versions 2 or 3.
+For more information about these matters see
+https://www.gnu.org/licenses/.
+>
+```
+
+Your command-line should look like an R session.
+
+## Packages
+You can install packages in R like you do in your computer with `install.packages()`. The script below is to install then in an interactive session on the HPC cluster or through a BATCH job.
+
+```{r}
+# Installation of packages requires for DADA2 pipeline
+# Bolívar Aponte Rolón
+# 14 June 2023
+
+
+# Activate commands as needed.
+# DADA2 package and associated
+
+#install.packages("gert", repos = c(
+#  ropensci = 'https://ropensci.r-universe.dev',
+#  CRAN = 'https://cloud.r-project.org')) #usethis needs gert Doesn't install on the HPC cluster for some reason.
+#install.packages("usethis") #Doesn't install on the HPC cluster for some reason.
+#install.packages("devtools") #Doesn't install on the HPC cluster for some reason.
+#devtools::install_github("benjjneb/dada2") #change the ref argument to get other versions
+
+install.packages("Rcpp")
+
+# if (!require("BiocManager", quietly = TRUE)){
+#   install.packages("BiocManager", repo="http://cran.rstudio.com/")}
+# BiocManager::install(version = "3.17") #Version 3.17
+# BiocManager::install(c("dada2", "ShortRead", "Biostrings"))
+
+if (!require("BiocManager", quietly = TRUE)){ #Another way of installing the latest version of dada2
+  install.packages("BiocManager", repo="http://cran.rstudio.com/")}
+
+BiocManager::install(version='devel', ask = FALSE) #BiocManager 3.17 (dada2 1.28.0) or developer version (dada2 1.29.0)
+BiocManager::install(c("dada2", "ShortRead", "BioStrings"))
+
+packageVersion("dada2") #checking if it is the latest version
+packageVersion("ShortRead")
+packageVersion("Biostrings")
+```
+
+The script for a batch job goes something like this:
+Ex. 1
+```{bash}
+#!/bin/bash
+
+#SBATCH --qos=normal
+#SBATCH --job-name MIM2_8450
+#SBATCH --error DIRECTORY/<FILENAME>.error          
+#SBATCH --output DIRECTORY/<FILENAME>.output  
+#SBATCH --time=23:00:00
+#SBATCH --mem=64000 #Up to 256000K
+#SBATCH --nodes=1              # One is enough. When running MPIs,anywhere from 2-4 should be good.
+#SBATCH --ntasks-per-node=20    # Number of Tasks per Node
+#SBATCH --cpus-per-task=20`
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=<USER>@tulane.edu
+#SBATCH --partition=centos7    # This is important to run the latest software versions
+
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK #$SLURM_CPUS_PER_TASK stores whatever value we assign to cpus-per-task, and is therefore our candidate for passing to OMP_NUM_THREADS
+
+##Modules/Singularity
+module load anaconda3/2020.07
+source activate virtual_env
+
+#Run R script
+R CMD BATCH dada2_mim_pipeline.R # Add your script here
+
+module purge
+
+```
+
+Because each project has different number of samples or target organisms each SLURM job is different and will have different memory and processing parameters. Adjust accordingly. See this resource: [dada2HPC_worload](https://github.com/erictleung/dada2HPCPipe#slurm-workload-manager)
+
+# Streamlined script.
+Remember to change the file paths to your files and directories. As well, as to where `cutadapt` is installed in your local machine or HPC cluster. Use the appropriate data base to assigning taxonomy to your data or project! 
+Notice that `multithread = TRUE` here to take advantage of HPC's capacity to run jobs in parallel. 
+```{r}
+#DADA2 pipeline
+#Modified by Bolívar Aponte Rolón for bioinformatic analyses of ITS amplicon sequences
+#14/june/2023
+
+# Loading packages
+# Activate commands as needed.
+# DADA2 package and associated
+#library("usethis") #Doesn't install on the HPC cluster for some reason.
+#library("devtools") #Doesn't install on the HPC cluster for some reason.
+library("Rcpp")
+library("dada2")
+library("ShortRead")
+library("Biostrings")  #This will install other packages and dependencies.
+
+
+### File Paths
+path <- "/lustre/project/svanbael/bolivar/CH2_sequences/Aponte_8450_23052601"
+out_dir <- "/lustre/project/svanbael/bolivar/CH2_sequences" #An "out" directory to avoid crowding main directory of new files. Also keeps intact raw files.
+
+list.files(path)
+fnFs <- sort(list.files(path, pattern = "R1.fastq", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern = "R2.fastq", full.names = TRUE))
+
+# Identifying primers
+#CHANGE primers accordingly
+FWD<-"CACTCTTTCCCTACACGACGCTCTTCCGATCTCTTGGTCATTTAGAGGAAGTAA"# Forward ITS1f_adapt from IDT 
+nchar(FWD) #Number of primer nucleotides.
+REV<-"GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCTGCTGCGTTCTTCATCGATGC"# Reverse primer ITS2r_adapt from IDT
+nchar(REV)
+
+### Verifying the orientation of the primers
+allOrients <- function(primer) {# Create all orientations of the input sequence
+                   require(Biostrings)
+                   dna <- DNAString(primer)  # The Biostrings works w/ DNAString objects rather than character vectors
+                   orients <- c(Forward = dna, 
+                                Complement = Biostrings::complement(dna), 
+                                Reverse = Biostrings::reverse(dna),
+                                RevComp = Biostrings::reverseComplement(dna))
+                   return(sapply(orients, toString))  # Convert back to character vector
+}
+FWD.orients <- allOrients(FWD)
+REV.orients <- allOrients(REV)
+#FWD2 <- FWD.orients[["Complement"]] #Use if you suspect an orientation mix-up.
+#REV2 <- REV.orients[["Complement"]]
+
+### Filter Reads for ambiguous bases (N)
+fnFs.filtN <- file.path(path, "filtN", basename(fnFs)) # Put N-filtered forward read files in filtN/ subdirectory
+fnRs.filtN <- file.path(path, "filtN", basename(fnRs)) #Reverse reads
+filterAndTrim(fnFs, fnFs.filtN, fnRs, fnRs.filtN, maxN = 0, multithread = TRUE) #multithread = TRUE on Mac OS, FALSE in Windows
+
+### Checking for primer hits
+set.seed(123)
+primerHits <- function(primer, fn) {
+  # Counts number of reads in which the primer is found
+  nhits <- vcountPattern(primer, sread(readFastq(fn)), fixed = FALSE)
+  return(sum(nhits > 0))
+}
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.filtN[[1]]),
+      FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.filtN[[1]]),
+      REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs.filtN[[1]]),
+      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.filtN[[1]]))
+
+### Cutadapt: removal of primers
+#Once this has been completed there is no need to run again when working on the script
+cutadapt <-  "/home/baponterolon/.conda/envs/virtual_env/bin/cutadapt" # CHANGE ME to the cutadapt path on your machine
+system2(cutadapt, args = "--version") # Run shell commands from R
+
+path.cut <- file.path(out_dir, "cutadapted") #Remember where this "out" directory path leads to.
+#all.cut <- file.path(out_dir, "FastQC") # Path to concatenated files 
+print(path.cut) #Checking if the path is correct.
+if(!dir.exists(path.cut)) dir.create(path.cut)
+fnFs.cut <- file.path(path.cut, basename(fnFs))
+fnRs.cut <- file.path(path.cut, basename(fnRs))
+
+FWD.RC <- dada2:::rc(FWD)
+REV.RC <- dada2:::rc(REV)
+
+# Trim FWD and the reverse-complement of REV off of R1 (forward reads)
+R1.flags <- paste("-g", FWD, "-a", REV.RC) 
+# Trim REV and the reverse-complement of FWD off of R2 (reverse reads)
+R2.flags <- paste("-G", REV, "-A", FWD.RC) 
+
+### Run Cutadapt
+for(i in seq_along(fnFs)) {
+  system2(cutadapt, args = c(R1.flags, R2.flags, "-n", 2, # -n 2 removes FWD and REV from reads
+                             "-o", fnFs.cut[i], "-p", fnRs.cut[i], # output files
+                             fnFs.filtN[i], fnRs.filtN[i])) #input files
+}
+
+#Re-inspecting if all primers were removed.  
+#Once this has been completed there is no need to run again when working on the script
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.cut[[1]]), 
+      FWD.ReverseReads = sapply(FWD.orients,
+      primerHits, fn = fnRs.cut[[1]]), 
+      REV.ForwardReads = sapply(REV.orients, primerHits,fn = fnFs.cut[[1]]), 
+      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.cut[[1]]))
+                                                                                                        
+#Forward and reverse fastq filenames have the format:
+cutFs <- sort(list.files(path.cut, pattern = "R1.fastq", full.names = TRUE))
+cutRs <- sort(list.files(path.cut, pattern = "R2.fastq", full.names = TRUE))
+                                          
+#Extract sample names, assuming filenames have format:
+get.sample.name <- function(fname) strsplit(basename(fname), "_R")[[1]][1] #String in commas needs to be updated according to naming convention. If you have multiple underscores in the name then select the underscore next to the "R", like above, or any other unique identifier in the character string.
+              
+sample.namesF <- unname(sapply(cutFs, get.sample.name))
+sample.namesR <- unname(sapply(cutRs, get.sample.name))
+          
+### Inspect the read quality
+#plotQualityProfile(cutFs[20:21])
+#plotQualityProfile(cutRs[20:21])
+
+### Filter and trim
+filtFs <- file.path(out_dir, "Filtered", basename(cutFs))
+filtRs <- file.path(out_dir, "Filtered", basename(cutRs))
+names(filtFs) <- sample.namesF
+names(filtRs) <- sample.namesR
+
+#Truncating Forward and Reverse reads to 230 and 180 respectively. The reverse maxEE is relaxed due to overall low quality of reads
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
+                             truncLen=c(230,180),
+                             maxN=0,
+                             maxEE=c(2,3),
+                             truncQ=2,
+                             minLen=50,
+                             rm.phix=TRUE,
+                             compress=TRUE,
+                             multithread=TRUE) # minLen: Remove reads with length less than minLen. minLen is enforced after trimming and truncation. #enforce min length of 50 bp
+
+#Once it is completed there is no need to run again unless you are changing parameters.
+#Save file
+saveRDS(out, file.path(out_dir, "Preprocess", "/out.rds"))
+
+### Dereplication
+# Dereplication combines all identical reads into one unique sequence with a corresponding abundance equal to the number of reads with that unique sequence. It is done because it reduces computation time by eliminating redundancy -- From DADA2 tutorial, v1.8
+derepFs <- derepFastq(filtFs, n = 1000, verbose=TRUE) #n prevents it from reading more than 1000 reads at the same time. This controls the peak memory requirement so that large fastq files are supported. 
+derepRs <- derepFastq(filtRs, n = 1000, verbose=TRUE)
+saveRDS(derepFs, file.path(out_dir, "Preprocess", "/derepFs.rds"))
+saveRDS(derepFs, file.path(out_dir, "Preprocess", "/derepFs.rds"))
+
+#derepFS <- readRDS(file.path(out_dir, "Preprocess", "/derepFs.rds"))
+#derepRS <- readRDS(file.path(out_dir, "Preprocess", "/derepRs.rds"))
+
+# name the dereplicated reads by the sample names
+names(derepFs) <- sample.namesF
+names(derepRs) <- sample.namesR
+
+### Learn error rates from dereplicated reads
+set.seed(123)
+errF <- learnErrors(derepFs, randomize = TRUE, multithread=TRUE) #multithread is set to FALSE in Windows. Unix OS is =TRUE.
+errR <- learnErrors(derepRs, randomize = TRUE, multithread=TRUE)
+
+# Save file
+saveRDS(errF, file.path(out_dir, "Preprocess", "/errF.rds"))
+saveRDS(errR, file.path(out_dir, "Preprocess", "/errR.rds"))
+
+#errF <- readRDS(file.path(out_dir, "Preprocess", "/errF.rds"))
+#errR <- readRDS(file.path(out_dir, "Preprocess", "/errR.rds"))
+
+### Plot errors
+#plotErrors(errF, nominalQ=TRUE)
+
+### Sample Inference
+dadaFs <- dada(derepFs, err=errF, multithread=TRUE)
+dadaRs <- dada(derepRs, err=errR, multithread=TRUE)
+saveRDS(dadaFs, file.path(out_dir, "Preprocess", "/dadaFs.rds"))
+saveRDS(dadaFs, file.path(out_dir, "Preprocess", "/dadaFs.rds"))
+
+#dadaFS <- readRDS(file.path(out_dir, "Preprocess", "/dadaFs.rds"))
+#dadaRS <- readRDS(file.path(out_dir, "Preprocess", "/dadaRs.rds"))
+
+### Merge paired reads
+mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, minOverlap = 20, maxMismatch = 0, verbose=TRUE)
+saveRDS(mergers, file.path(out_dir, "Preprocess", "/mergers.rds"))
+
+#mergers <- readRDS(file.path(out_dir, "Preprocess", "/mergers.rds"))
+# Inspect the merger data.frame from the first sample
+head(mergers[[1]])
+
+### Construct ASV Sequence Table
+seqtab <- makeSequenceTable(mergers)
+dim(seqtab)
+
+# Inspect distribution of sequence lengths
+table(nchar(getSequences(seqtab)))
+
+# Save file R object, and .csv
+saveRDS(seqtab, file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds")) #Functions to write a single R object to a file, and to restore it.
+write.csv(seqtab, file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds"))
+
+# Open from here in case R crashes
+#seqtab<- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds"))
+
+### Remove chimeras
+seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread = FALSE, verbose=TRUE) #Multithread = FALSE in Windows
+
+# Frequency of chimeras
+sum(seqtab.nochim)/sum(seqtab)
+
+# Save file
+saveRDS(seqtab.nochim, file.path(out_dir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
+write.csv(seqtab.nochim, file.path(out_dir, "ASV_tables", "/ASV_nochim_denoise_filt.csv")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
+#seqtab.nochim <- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
+
+# Inspect distribution of sequence lengths
+table(nchar(getSequences(seqtab.nochim)))
+
+### Track reads through the pipeline
+getN <- function(x) sum(getUniques(x))
+track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN),
+rowSums(seqtab.nochim))
+colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
+rownames(track) <- sample.namesF
+head(track)
+
+# Save file
+saveRDS(track, file.path(out_dir, "Preprocess", "/track.rds"))
+
+### Taxonomy
+unite.ref <- file.path(out_dir, "Taxonomy", "sh_general_release_dynamic_29.11.2022.fasta")  # CHANGE ME to location on your machine
+taxa <- assignTaxonomy(seqtab.nochim, unite.ref, multithread = TRUE, tryRC = TRUE) #Multithread = FALSE in Windows. TRUE in Mac/Linux.
+
+#Loading from the files saved. In case it crashes, we start from here.
+#seqtab.nochim2 <- read.csv(file.path(out_dir, "ASV_tables", "/ASV_nochim_denoise_filt.csv")) 
+#seqtab.matrix <- as.matrix(seqtab.nochim2) #assignTaxonomy needs a vector matrix
+
+# Inspecting the taxonomic assignments:
+taxa.print <- taxa  # Removing sequence rownames for display only
+rownames(taxa.print) <- NULL
+head(taxa.print)
+write.csv(taxa.print, file.path(out_dir, "Taxonomy", "/assign_tax_mim2.csv"))
+
+
+#Done
+```
+
+# Assigning Taxonomy
+
+The last step in this pipeline can be consume a lot of processing memory, even for the HPC cluster. If your job fails at the last step, assigning taxonomy, consider submitting this part as separate job. 
+
+## Taxonomy batch job
+With these parameters it took about ~4.5 hrs. Maybe tasks per node can be increase to 10, hence 2 CPU's per task. 
+```{bash}
+#!/bin/bash
+
+#SBATCH --qos=normal
+#SBATCH --job-name MIM2_8450_tax
+#SBATCH --error /lustre/project/svanbael/bolivar/CH2_sequences/MIM2_8450_tax.error     
+#SBATCH --output /lustre/project/svanbael/bolivar/CH2_sequences/MIM2_8450_tax.output  
+#SBATCH --time=23:00:00
+#SBATCH --mem=256000 #Up to 256000
+#SBATCH --nodes=2               # One is enough. When running MPIs,anywhere from 2-4 should be good.
+#SBATCH --ntasks-per-node=1    # Number of Tasks per Node
+#SBATCH --cpus-per-task=20      # Number of threads per task (OMP threads)
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=baponterolon@tulane.edu
+#SBATCH --partition=centos7    #This is important to run the latest software versions
+
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK #$SLURM_CPUS_PER_TASK stores whatever value we assign to cpus-per-task, and is therefore our candidate for passing to OMP_NUM_THREADS
+
+##Modules/Singularity
+module load anaconda3/2020.07
+source activate virtual_env
+
+#Run R script
+R CMD BATCH dada2_tax_pipeline.R
+
+module purge
+```
+
+The memory requirements are different than the batch job submitted for the whole pipeline. It has increased RAM memory core (256000k), 20 CPUs per task, and 1 task per node. This means that one task has a lost of processing memory to operate with. The previous batch job example carried out 20 tasks at a time in 20 CPUs, throughout 4 nodes. This make the computation of the pipeline quite fast (~2hrs), but it fails to locate enough processing memory for the `assingTaxonomy()` step. Another way of going about this issue is submitting a [job array](https://wiki.hpc.tulane.edu/trac/wiki/Workshops/cypress/ManyTaskComputing). 
+
+# Decontamination of samples
+
+Let's clean and "decontaminate" our samples. Hopefully you have sequenced your samples with DNA extraction controls and PCR controls. We will remove from our samples the average reads count from controls. Then any ASV that is less than 10% of the abundance per sample on the assumption that it originates from contamination throughout handling of samples in the DNA and PCR processes. Now is when we put these to use. We are also going to use the `decontam` package to statistically determine which ASVs are likely contaminants and remove them. 
+
+## Formatting ASV table
+
+```{r, Tax table for Phyloseq, tidy=TRUE}
+library("phyloseq")
+library("decontam")
+library("data.table")
+library("tidyverse")
+newdir <- file.path("H:/.shortcut-targets-by-id/0B9v0CdUUCqU5VVR4a3BvNHM1Z28/VBL_users/Grad_Students/Bolivar/Dissertation/Mimulus/Data/CH2_sequences")
+taxa <- read.csv(file.path(newdir, "Taxonomy", "/assign_tax_mim2.csv"))
+#saveRDS(taxa, file.path(newdir, "Taxonomy", "/assign_tax_mim2.rds"))
+
+# Adding ASV_ to the taxonomical assignment
+rownames(taxa)<-paste0("ASV_",1:nrow(taxa))
+taxa <- taxa %>% 
+  select(!X) %>%
+  setDT(keep.rownames = "ASV_ID")
+
+#saveRDS(taxa, file.path(newdir, "Taxonomy", "/assign_tax_mim2.rds"))
+
+#Sequences (ASV) per sample table 
+seqtab.nochim <- readRDS(file.path(newdir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
+samples.out <- rownames(seqtab.nochim)
+
+#Code from Astrobiomike
+#Giving our sequences header names (e.g. ASV...)
+asv_seqs <- colnames(seqtab.nochim)
+asv_headers <- vector(dim(seqtab.nochim)[2], mode="character")
+
+ for (i in 1:dim(seqtab.nochim)[2]) {
+  asv_headers[i] <- paste(">ASV", i, sep="_")
+}
+
+# Making and writing out a fasta of our final ASV seqs:
+asv_fasta <- c(rbind(asv_headers, asv_seqs))
+#write(asv_fasta, file.path(newdir, "ASV_tables", "ASVs_mim2_8450.fa"))
+
+# count table:
+asv_tab <- t(seqtab.nochim) #Transposing
+row.names(asv_tab) <- sub(">", "", asv_headers) #Substituting sequences for shorthand ASV identifier.
+#write.table(asv_tab, file.path(newdir, "ASV_tables", "ASVs_mim2_8450_counts.tsv") , sep="\t", quote=F, col.names=NA) #Also saved as a .csv
+#saveRDS(asv_tab, file.path(newdir, "ASV_tables", "ASVs_mim2_8450_counts.rds"))
+```
+
+We now have a table with ASV ID's for each of our samples. Now we clean and decontaminate 
+
+
+
+## Preparing our data
+
+It is important to remove contaminants from the corresponding sample batch (e.g. PCR plate). Each DNA extraction and PCR plate have their "contamination" events (i.e. people coughing or mishandling of samples). 
+Here we will remove contaminants of a PCR plate basis. This meas that all the DNA controls in the plate and the negative PCR control will be used to remove contaminant from the whole plate. Another way of doing it is removing the contamination found in each control and matching it to the samples it was extracted with. 
+
+```{r, Cleaning and reshaping DNA and PCR controls, tidy=TRUE}
+#
+controls <- asv_tab %>%
+  data.frame() %>%
+  select(c(31:41, 120:123)) #Subset of controls from DNA extraction and PCR
+
+#Make subset tables from each sequence plate run
+#This way we check if all our samples are in the dataset and remove contamination according to PCR plate.
+## Plate1 ##
+filter_table1<- read.csv(file.path(newdir, "ASV_tables", "P1_Mim8450_filter.csv"))
+names(filter_table1)
+str(filter_table1)
+
+tasv_tab <- t(asv_tab) #Transposing ASV table
+# colnames(tasv_tab) <- as.character(tasv_tab[1, ])
+# tasv_tab <- tasv_tab[-1,]
+tasv_tab <- tasv_tab %>%
+  data.frame() %>%
+  setDT(keep.rownames = "Sample_ID")
+
+plate1 <- semi_join(tasv_tab, filter_table1, by= "Sample_ID") #Somehow plate1 ends up with 95 row instead of 96.
+
+plate1 <- plate1 %>%
+  mutate(across(!Sample_ID, as.numeric))
+
+filter_filter <- anti_join(filter_table1, plate1, by = c("Sample_ID" = "Sample_ID")) #Corroborating if indeed all match. Supposed to be ZERO. 
+
+
+## Plate2 ##
+
+filter_table2<- read.csv(file.path(newdir, "ASV_tables", "P2_Mim8450_filter.csv"))
+
+names(filter_table2)
+
+plate2 <- semi_join(tasv_tab, filter_table2, by= c("Sample_ID" = "Sample_ID"))
+
+plate2 <- plate2 %>%
+  mutate(across(!Sample_ID, as.numeric))
+
+filter_filter2 <- anti_join( filter_table2, plate2, by = c("Sample_ID"="Sample_ID")) #Corroborating if indeed all match.
+```
+
+
+
+## Contaminant removal from DNA and PCR controls
+### In-house decontamination protocol 
+
+*Adapted from Marie and Shuzo Oita fron the Arnold Lab, U.of Arizona*
+
+This is a good way to approach removal of contaminants. It works by substracting the SUM of contaminants from each ASV cell. If the value is negative it replaces it with 0. It substracts the sum of the average of the DNA controls and PCR negative controls per plate, then removes control rows.
+
+```{r, Plate 1, tidy=TRUE}
+###PLATE 1####
+as.data.frame(plate1)
+plate1 <- column_to_rownames(plate1, var = "Sample_ID")
+
+#add column with sums for each OTU
+
+cont <- row.names(plate1)
+cont <- cont[c(15:19,56:57)] #change accordingly to your data - these are the negative controls
+contamination <- c()
+for(c in 1:ncol(plate1)){
+  contamination[c]<- mean(plate1[rownames(plate1) %in% cont, c], na.rm = TRUE)#uses data.table syntax
+}
+plate1 <-rbind(plate1, contamination)
+row.names(plate1)[96] <- "contamination" #change the name of row 104
+
+# Subtract total contaminants from each ASV, if it is a negative number make it 0
+cont2 <- c(cont, "contamination")
+row <- which(!rownames(plate1) %in% cont2)
+for(r in row){
+  for(c in 1:ncol(plate1)){
+    if(plate1[r,c] > plate1["contamination",c]) {
+      new_reads <- plate1[r,c] - plate1["contamination",c]
+      plate1[r,c] <- new_reads
+    } else {plate1[r,c] <- 0}
+  }
+}
+
+# Remove controls from dataframe and makes a text file to paste into existing excel sheet
+decontaminated_p1 <- plate1[!rownames(plate1) %in% cont2, ]
+write.table(decontaminated_p1, file.path(newdir,"ASV_tables", "P1_Mim8450_negsblanks.tsv"), sep="\t") 
+```
+
+
+```{r, Plate 2, tidy=TRUE}
+# PLATE 2
+
+as.data.frame(plate2)
+plate2 <- column_to_rownames(plate2, var = "Sample_ID")
+
+#add column with sums for each OTU
+
+cont <- row.names(plate2)
+cont <- cont[c(15:21, 63:64)] #change accordingly to your data - these are the negative controls
+contamination <- c()
+for(c in 1:ncol(plate2)){
+  contamination[c]<- mean(plate2[rownames(plate2) %in% cont, c], na.rm = TRUE)
+}
+plate2 <-rbind(plate2, contamination)
+row.names(plate2)[97] <- "contamination" #change the name of row
+
+###subtract total contaminants from each ASV, if it is a negative number make it 0
+
+cont2 <- c(cont, "contamination")
+row <- which(!rownames(plate2) %in% cont2)
+for(r in row){
+  for(c in 1:ncol(plate2)){
+    if(plate2[r,c] > plate2["contamination",c]) {
+      new_reads <- plate2[r,c] - plate2["contamination",c]
+      plate2[r,c] <- new_reads
+    } else {plate2[r,c] <- 0}
+  }
+}
+
+
+# Remove controls from dataframe and makes a text file to paste into exisitng excel sheet
+
+decontaminated_p2 <- plate2[!rownames(plate2) %in% cont2, ]
+#write.table(decontaminated_p2, file.path(newdir,"ASV_tables", "P2_Mim8450_negsblanks.tsv"), sep="\t")
+```
+
+## Removal ASV sequences that are represent less than 10% of the read in samples. 
+```{r, removing 10%, tidy=TRUE}
+##Saving decontaminated files as one. ####
+
+all_decontaminated <- bind_rows(decontaminated_p1, decontaminated_p2)
+write.csv(all_decontaminated,file.path(newdir , "ASV_tables", "/ASVs_mim2_8450_decont_blankandnegs.csv"))
+
+asv.decon <- t(all_decontaminated)
+asv.decon <- as.data.frame(asv.decon)
+write.csv(asv.decon, file.path(newdir , "ASV_tables", "/SVs_mim2_8450_toFilt_10_percent.csv")) ## in the format to remove <10% OTUs -- see below
+
+#### Script to remove < 0.10% abundance per sample #### From Shuzo Oita
+####################################################
+## csv file should have row = OTU, col = sample
+
+
+asv.data <- apply(asv.decon, 2, function(x) ifelse({100*x/sum(x)} < 0.10, 0, x))
+asv.data <- as.data.frame(asv.data)
+
+
+asv_10 <- asv.decon[rowSums(asv.decon)>1,]
+#otu.10 <- otu.def[,colSums(otu.def) > 10] #Removes ASV's with less than 10 reads. The other code removes ASVs based on 10% of all the reads in the sample
+
+#Rounding columns. ASV reads are either there or not there, not half there. Hence the use of integer. An ASV that has 1.5 reads doesn't make sense. 
+
+i <- colnames(asv_10)
+asv_10[ , i] <- apply(asv_10[ , i],2,
+                    function(x) round(x, digits = 0))
+
+#write.csv(asv_10, file.path(newdir, "ASV_tables", "ASVs_mim2_8450_cleaned_10_percent.csv"))
+#saveRDS(asv_10, file.path(newdir, "ASV_tables", "ASVs_mim2_8450_cleaned_10_percent.rds"))
+```
+
+
+## Decontam and Phyloseq
+
+###Joining cleaned ASV table with taxonomy
+
+We join the ASV, taxonomy and leaf trait data sets.
+```{r, ASV and taxonomy, tidy=TRUE}
+# #Joint ASV and taxonomy table:
+#asv_10 <- readRDS(file.path(newdir, "ASV_tables", "ASVs_mim2_8450_cleaned_10_percent.rds")) # If loaded from this point, asv_10 will need new header for ASV_ID
+# 
+#asv_10 <- setDT(asv_10, keep.rownames = "ASV_ID")
+# 
+#asv_tax <- right_join(taxa, asv_10, by = "ASV_ID")
+# 
+ #write.table(asv_tax, file.path(newdir, "ASV_tables", "ASVs_mim2_8450_taxonomy.tsv"), sep = "\t", quote=F, col.names=NA) #Also save as a .csv
+#saveRDS(asv_tax, file.path(newdir, "ASV_tables", "asv_tax.rds"))
+```
+
+```{r, Leaf trait data set, tidy=TRUE}
+#From Mim2_stat_analyses.Rmd
+ptraits <- readRDS(file.path(newdir, "Statistics", "/ptraits.rds"))
+all_decontaminated <-read.csv(file.path(newdir , "ASV_tables", "ASVs_mim2_8450_decont_blankandnegs.csv"))
+```
+
+### Phyloseq objects
+Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data.
+
+```{r, PQ objects , tidy=TRUE}
+#ASV table
+asv_10 <- asv_10 %>%
+  as.matrix()
+ASV <- otu_table(asv_10, taxa_are_rows = TRUE)
+
+class(asv_10) #Should be matrix
+taxa_names(ASV) #Should be ASV_#
+
+#Taxonomixc table
+taxa <- taxa %>%
+  column_to_rownames(var = "ASV_ID") %>%
+  as.matrix()
+TAX <- tax_table(taxa) #1141 ASVs (raw)
+
+class(asv_10) #Should be matrix
+taxa_names(ASV) #Should be ASV_#
+
+#Sample data. Only keeping samples that have sequence data for ASV analyses.
+#getting rownmes to filter
+names <- column_to_rownames(all_decontaminated, var = "X")
+samples <- rownames(names) #Using the colname to filter out 
+
+ftraits <- ptraits %>%
+  filter(Unique_ID %in% samples) %>%
+  column_to_rownames(var = "Unique_ID")%>%
+  slice(-c(29,105:106)) #Some control that are still there.
+#saveRDS(ftraits, file.path(newdir, "Statistics", "/ftraits.rds"))
+
+SAMP <- sample_data(ftraits)
+class(SAMP)
+sample.names(SAMP)
+
+#Phyloseq main
+pq <- phyloseq(ASV, TAX, SAMP)
+
+#saveRDS(pq, file.path(newdir, "Taxonomy", "/phyloseq_8450.rds"))
+```
+
+**Check which sample are actually lost in the cleaning and decontaminating process. Some samples don't have enough reads. It's worth knowing which samples are those.** 
+
+
+### Removal of singletons
+
+Code modified from Mareli Sánchez Juliá.
+```{r, Mareli code, tidy = TRUE}
+# Are there any taxa with no (0) reads?
+#
+pq2 <- prune_taxa(taxa_sums(pq) > 0, pq)
+ntaxa(pq2) #There are 2 taxa with 0 reads.
+
+# Filtering Taxa: Removal of singletons ####
+ # Removal of  singletons
+pq3 <- filter_taxa(pq2, function (x) {sum(x > 0) > 1}, prune=TRUE)
+ntaxa(pq3) # The result is 337 taxa in 169 samples.
+#saveRDS(pq3, file.path(newdir, "Taxonomy", "/ASV_mim2_8450_assigned_nonsingletons.rds"))
+
+
+# Relative abundance calculation ####
+relpq <- transform_sample_counts(pq3, function(x)x/sum(x))
+relpq <- prune_samples(sample_sums(relpq) > 0, relpq) #Eliminatin samples that have 0 reads  of any taxa
+#saveRDS(relpq, file.path(newdir, "Taxonomy", "/relative_abund_phyloseq.rds"))
+
+
+# Phyloseq object to data frames 
+# Cleaned: no singletons
+library("metagMisc")
+
+relpqDF <- phyloseq_to_df(relpq, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
+#relpqDF <- replace(relpqDF, relpqDF == "NaN", 0) #Replacing forced NaNs when mturned into df
+#write.csv(relpqDF, file.path(newdir, "Taxonomy", "ASV_mim2_8450_relabun_nonsingletons.csv"))
+pq3DF <- phyloseq_to_df(pq3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
+# write.csv(pq3DF,file.path(newdir, "Taxonomy", "ASV_mim2_8450_assigned_nonsingletons.csv"))
+
+```
+
+Now we have the objects from Phyloseq saved as R objects as well as CSVs. You can treat the data set like any other and visualize with ggplot. Phyloseq does provide the means of doings this also, but that is beyond the scope of this tutorial. 
+
+
+### Exploring the data set
+
+Bar plots
+```{r}
+plot_bar(pq3, x = "sample_Species", fill="Phylum")
+  facet_wrap(~sample_Species)
+```
+
+Richness
+```{r}
+plot_richness(pq, x="Species", measures=c("Shannon", "Simpson"), color="Site", scales = "free")
+```
+
+### Decontam
+
+
+
