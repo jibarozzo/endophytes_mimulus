@@ -34,17 +34,22 @@ editor:
 knitr::opts_chunk$set(out.width ='70%', fig_align = 'center', echo = TRUE, collapse = TRUE, eval=FALSE)
 ```
 
-
 # DADA2 Pipeline
 
 ## Installation
-See https://benjjneb.github.io/dada2/dada-installation.html for more details.
-The main R script can be found [here](https://www.bioconductor.org/packages/devel/bioc/vignettes/dada2/inst/doc/dada2-intro.R)
 
-Following DADA2 ITS Pipeline tutorial, [v1.18](https://benjjneb.github.io/dada2/ITS_workflow.html. Also Emily Farrer's [code](https://github.com/ecfarrer/LAmarshGradient2/blob/master/BioinformaticsITS.R) on github "LAmarshGradient2 ITS code.
+See https://benjjneb.github.io/dada2/dada-installation.html for more
+details. The main R script can be found
+[here](https://www.bioconductor.org/packages/devel/bioc/vignettes/dada2/inst/doc/dada2-intro.R)
 
+Following DADA2 ITS Pipeline tutorial,
+\[v1.18\](https://benjjneb.github.io/dada2/ITS_workflow.html. Also Emily
+Farrer's
+[code](https://github.com/ecfarrer/LAmarshGradient2/blob/master/BioinformaticsITS.R)
+on github "LAmarshGradient2 ITS code.
 
 ### Packages required
+
 ```{r, Pre-requisites, tidy=TRUE, eval=TRUE}
 # Activate commands as needed.
 # change the ref argument to get other versions
@@ -81,12 +86,18 @@ packageVersion("ShortRead")
 packageVersion("Biostrings")
 ```
 
-
 ## File preparation: name clean-up
 
-The DADA2 pipeline has the capacity to work with unzipped ".fastq" files. It is good practice to ensure that all your files names have the same amount of fields and characters in there names. This ensures that scripts treat your files equally and you don't accidentally merge files (e.g. R1.fastq + R2.fastq = R1.fastq). Note that DNA extraction controls and PCR controls are a little bit different than field samples and treated as such by using a slightly different script. For this I have prepared the following scripts.
+The DADA2 pipeline has the capacity to work with unzipped ".fastq"
+files. It is good practice to ensure that all your files names have the
+same amount of fields and characters in there names. This ensures that
+scripts treat your files equally and you don't accidentally merge files
+(e.g. *R1.fastq* + *R2.fastq* = *R1.fastq*). Note that DNA extraction
+controls and PCR controls are a little bit different than field samples
+and treated as such by using a slightly different script. For this I
+have prepared the following scripts.
 
-Samples
+**Samples**
 
 ```{bash}
 #!/bin/bash
@@ -110,7 +121,19 @@ done
 # I needed.-BAR
 ```
 
-Controls
+**Notes on the name clean-up for Aponte_8756_23110702 run:**
+
+-   Repeated samples were concatenated.
+
+    -   SPLB_L004_1_R1.fastq
+
+    -   SPLB_L004_2_R1.fastq
+
+    -   SPLB_L004_1_R2.fastq
+
+    -   SPLB_L004_2_R2.fastq
+
+**Controls**
 
 ```{bash}
 #!/bin/bash
@@ -134,14 +157,15 @@ done
 # I needed.-BAR
 ```
 
-When working from Mac OS **bash** and Linux **console** make the shell scripts executable
-
+When working from Mac OS **bash** and Linux **console** make the shell
+scripts executable
 
 ```{bash}
 chmod +x FILENAME.sh
 ```
 
-Put them in your PATH by placing it in my ~/bin directory and adding the following line to ~/.bashrc:
+Put them in your PATH by placing it in my \~/bin directory and adding
+the following line to \~/.bashrc:
 
 ```{bash}
 export PATH=$HOME/bin:$PATH
@@ -149,13 +173,29 @@ export PATH=$HOME/bin:$PATH
 
 This can also be done through the `miniconda3` command-prompt.
 
-These files live in the same directory as the samples and controls, respectively. The were executed through the MinGW-64 terminal that RStudio provides. It emulates a UNIX/POSIX environment on Windows. This is an alternative in Windows OS or you can establish a virtual machine with [Virtual Box](https://www.virtualbox.org/) and install a Linux OS (i.e. Ubuntu) and proceed the same. In Mac OS this is not necessary. 
-
+These files live in the same directory as the samples and controls,
+respectively. The were executed through the MinGW-64 terminal that
+RStudio provides. It emulates a UNIX/POSIX environment on Windows. This
+is an alternative in Windows OS or you can establish a virtual machine
+with [Virtual Box](https://www.virtualbox.org/) and install a Linux OS
+(i.e. Ubuntu) and proceed the same. In Mac OS this is not necessary.
 
 ## Repository and file paths
-Make various directories beforehand to keep your file output organized. Starting with `raw_sequences`, where *raw_sequences* is the directory name of where the main `fastq` or `fasta` files are. This is were the raw sequence files are. The file names have already been cleaned, see sections above. Create `filtN` as a sub-directory of `raw_sequences`. The final directories: `ASV_tables`. `cutadapted`, `Preprocess`, `qc_reports`, and `Taxonomy`. As you work through this tutorial the files will be saved in their respective directories.
 
-For this project, I will be working with two separate sequencing runs: *Aponte_8450_23052601* and *Aponte_8756_23110702*. Both contain samples. They had to be split due to a large number of samples and how laboratory work was conducted. The document will be structure by the two run numbers.
+Make various directories beforehand to keep your file output organized.
+Starting with `raw_sequences`, where *raw_sequences* is the directory
+name of where the main `fastq` or `fasta` files are. This is were the
+raw sequence files are. The file names have already been cleaned, see
+sections above. Create `filtN` as a sub-directory of `raw_sequences`.
+The final directories: `ASV_tables`. `cutadapted`, `Preprocess`,
+`qc_reports`, and `Taxonomy`. As you work through this tutorial the
+files will be saved in their respective directories.
+
+For this project, I will be working with two separate sequencing runs:
+*Aponte_8450_23052601* and *Aponte_8756_23110702*. Both contain samples.
+They had to be split due to a large number of samples and how laboratory
+work was conducted. The document will be structure by the two run
+numbers.
 
 ```{r, Paths}
 #| eval: true
@@ -169,7 +209,7 @@ out_dir <- "/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics"
 
 list.files(path_1)
 fnFs_seq1 <- sort(list.files(path_1, pattern = "R1.fastq", full.names = TRUE))
-fnRs_seq1_seq1 <- sort(list.files(path_1, pattern = "R2.fastq", full.names = TRUE))
+fnRs_seq1 <- sort(list.files(path_1, pattern = "R2.fastq", full.names = TRUE))
 
 #Aponte_8756_23110702
 path_2 <- "/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics/Aponte_8756_23110702"
@@ -180,23 +220,29 @@ fnFs_seq2 <- sort(list.files(path_2, pattern = "R1.fastq", full.names = TRUE))
 fnRs_seq2 <- sort(list.files(path_2, pattern = "R2.fastq", full.names = TRUE))
 ```
 
-
 # Aponte_8450_23052601
 
-Software and package versions used as of 03/FEB/2024:
--   FastQC (v0.12.1-4) -> installed through [BioArchLinux repository](https://github.com/BioArchLinux/Packages)
--   MultiQC (v1.19-1) -> install through the Arch Linux User Repository (AUR). 
--   Cutadapt (v4.6-1) -> installed through [BioArchLinux repository](https://github.com/BioArchLinux/Packages)
-
+Software and package versions used as of 03/FEB/2024: - FastQC
+(v0.12.1-4) -\> installed through [BioArchLinux
+repository](https://github.com/BioArchLinux/Packages) - MultiQC
+(v1.19-1) -\> install through the Arch Linux User Repository (AUR). -
+Cutadapt (v4.6-1) -\> installed through [BioArchLinux
+repository](https://github.com/BioArchLinux/Packages)
 
 ### FastQC reports: raw sequences
-Inspect your sequence data before jumping in to cut and trim. You want to get a sense of how the sequencing run went and what you need to do in downstream processes. [Why do quality control?](https://www.bioinformatics.babraham.ac.uk/training/Sequence_QC_Course/Sequencing%20Quality%20Control.pdf)
 
-Assuming you have installed FastQC and MultiQC, go to the directory were your sequence files (.fastaq.gz) are and generate reports. This can be through the bash command-line in Mac and Linux or the Miniconda3 command-prompt.
+Inspect your sequence data before jumping in to cut and trim. You want
+to get a sense of how the sequencing run went and what you need to do in
+downstream processes. [Why do quality
+control?](https://www.bioinformatics.babraham.ac.uk/training/Sequence_QC_Course/Sequencing%20Quality%20Control.pdf)
 
-   + [FastQC how to:](https://www.youtube.com/watch?v=9_l_hWESuCQ)
-Mac and Linux OS
+Assuming you have installed FastQC and MultiQC, go to the directory were
+your sequence files (.fastaq.gz) are and generate reports. This can be
+through the bash command-line in Mac and Linux or the Miniconda3
+command-prompt.
 
+-   [FastQC how to:](https://www.youtube.com/watch?v=9_l_hWESuCQ) Mac
+    and Linux OS
 
 ```{bash}
 #!/bin/bash
@@ -213,27 +259,34 @@ fastqc qc_reports/all_R2_rawreads.fastq -o qc_reports/all_R2_rawreads
 #This can take a while. It is generating .html reports and associated compressed files. Execute within the directory or from.
 ```
 
-- Repeat as necessary for number of sequencing runs.
+-   Repeat as necessary for number of sequencing runs.
 
-Windows (miniconda3)
-In windows you can use a GUI to select the file you want to create a report. It is not fully support through the command-line. Make sure to use the `miniconda3` command-prompt and that it is installed properly.
-
+Windows (miniconda3) In windows you can use a GUI to select the file you
+want to create a report. It is not fully support through the
+command-line. Make sure to use the `miniconda3` command-prompt and that
+it is installed properly.
 
 ```{bash}
 fastqc *.fastq.gz
 ```
 
+How do can we interpret these reports? What kind of sequence data do I
+have? Does this look OK? See here: + Galaxy Training!: [Quality
+Control](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-control/tutorial.html) +
+[EDAMAME
+tutorial](https://github.com/edamame-course/FastQC/blob/master/for_review/2016-06-22_FastQC_tutorial.md)
 
-How do can we interpret these reports? What kind of sequence data do I have? Does this look OK? 
-See here:
-   + Galaxy Training!: [Quality Control](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-control/tutorial.html)
-   + [EDAMAME tutorial](https://github.com/edamame-course/FastQC/blob/master/for_review/2016-06-22_FastQC_tutorial.md)
-   
-In the Van Bael lab we produce 16S and ITS amplicon sequence data, for the most part. Amplicon sequences are considered "low" diversity due thei enriched proportion of nucleotides (per base sequence). Hence, when the sequence platform calls nucleotides it tends to be poor in the intiall base pairs. 
+In the Van Bael lab we produce 16S and ITS amplicon sequence data, for
+the most part. Amplicon sequences are considered "low" diversity due
+thei enriched proportion of nucleotides (per base sequence). Hence, when
+the sequence platform calls nucleotides it tends to be poor in the
+intiall base pairs.
 
 ### MultiQC: raw sequences
 
-This command will search for all FastQC reports and create summary report of all of them. You can create a shell script and execute in a similar way as `fastqc`.
+This command will search for all FastQC reports and create summary
+report of all of them. You can create a shell script and execute in a
+similar way as `fastqc`.
 
 ```{bash}
 #In the directory that you have the reports, execute:
@@ -243,13 +296,19 @@ This command will search for all FastQC reports and create summary report of all
 multiqc directory/
 ```
 
-
 ### Identifiying primers
 
-Each project and organism type will have its own set of primers and adapters. Take the time to figure out which ones you used and their proper bases and lengths. You should received the data from the sequencing core demultiplexed since the barcodes (indexes **i5** and **i7**) are submitted with the order. Here is a list of the most commonly used in the Van Bael Lab. 
+Each project and organism type will have its own set of primers and
+adapters. Take the time to figure out which ones you used and their
+proper bases and lengths. You should received the data from the
+sequencing core demultiplexed since the barcodes (indexes **i5** and
+**i7**) are submitted with the order. Here is a list of the most
+commonly used in the Van Bael Lab.
 
-   + [VBL Culture primers](https://drive.google.com/open?id=0B9v0CdUUCqU5YVhJck1zT1VTZ28&resourcekey=0-1Nyzv3mGzpJLqDvoo-ls9A&usp=drive_fs)
-   + [VBL NGS primers](https://drive.google.com/open?id=1bUY7dy_JNlkpvzcXcW1ImQAMSckexeSj&usp=drive_fs)
+-   [VBL Culture
+    primers](https://drive.google.com/open?id=0B9v0CdUUCqU5YVhJck1zT1VTZ28&resourcekey=0-1Nyzv3mGzpJLqDvoo-ls9A&usp=drive_fs)
+-   [VBL NGS
+    primers](https://drive.google.com/open?id=1bUY7dy_JNlkpvzcXcW1ImQAMSckexeSj&usp=drive_fs)
 
 ```{r, ITS1f_adapt_ITS2r_adapt}
 #| eval: true
@@ -287,7 +346,9 @@ REV.orients <- allOrients(REV)
 
 ### Filter Reads for ambiguous bases (N)
 
-We are filtering sequences for presence of ambiguous bases (N) before cutting primerd off. This pre-filtering step iomproves mmaping of short primer sequences. No other filtering is performed.
+We are filtering sequences for presence of ambiguous bases (N) before
+cutting primerd off. This pre-filtering step iomproves mmaping of short
+primer sequences. No other filtering is performed.
 
 ```{r, filtering_ambiguous_bases_N}
 #| eval: true
@@ -297,12 +358,15 @@ We are filtering sequences for presence of ambiguous bases (N) before cutting pr
 fnFs_seq1_filtN <- file.path(path_1, "filtN", basename(fnFs_seq1)) # Put N-filtered forward read files in filtN/ subdirectory
 fnRs_seq1_filtN <- file.path(path_1, "filtN", basename(fnRs_seq1)) #Reverse reads
 
-filterAndTrim(fnFs_seq1, fnFs_seq1_filtN, fnRs_seq1, fnRs_seq1_filtN, maxN = 0, multithread = TRUE)
+#filterAndTrim(fnFs_seq1, fnFs_seq1_filtN, 
+#              fnRs_seq1, fnRs_seq1_filtN, 
+#              maxN = 0, multithread = TRUE)
 ```
 
 ### Checking for primer hits
 
 Have primers been removed?
+
 ```{r, primer_hits}
 #| eval: true
 #| echo: false
@@ -322,12 +386,22 @@ rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq1_filtN[[1
       REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs_seq1_filtN[[1]]))
 ```
 
+We see the reverse complement of primers present in the FWD.ReverseReads
+and the Rev.ForwardReads.
 
-We see the reverse complement of primers present in the FWD.ReverseReads and the Rev.ForwardReads.
+ ### Cutadapt: removal of primers
 
-### Cutadapt: removal of primers
- Write section of how to install the latest version of [Python (3.11)](https://www.python.org/downloads/windows/), Visual Studio Build Tools 2022 and install [`cutadapt`](https://cutadapt.readthedocs.io/en/stable/installation.html#installation-on-windows) to have it work in this pipeline. The `cutadapt` package can be used directly in the command-line also. That is it's most basic use. If working from Windows OS you can use Git Bash with the added utility of [`wget`](https://gist.github.com/evanwill/0207876c3243bbb6863e65ec5dc3f058) to install [Python 3.11](https://programmingwithjim.wordpress.com/2020/09/08/installing-python-3-in-git-bash-on-windows-10/)
- 
+Write section of how to install the latest version of [Python
+(3.11)](https://www.python.org/downloads/windows/), Visual Studio Build
+Tools 2022 and install
+[`cutadapt`](https://cutadapt.readthedocs.io/en/stable/installation.html#installation-on-windows)
+to have it work in this pipeline. The `cutadapt` package can be used
+directly in the command-line also. That is it's most basic use. If
+working from Windows OS you can use Git Bash with the added utility of
+[`wget`](https://gist.github.com/evanwill/0207876c3243bbb6863e65ec5dc3f058)
+to install [Python
+3.11](https://programmingwithjim.wordpress.com/2020/09/08/installing-python-3-in-git-bash-on-windows-10/)
+
 ```{r, cutadapt}
 #| eval: true
 #| echo: false
@@ -346,6 +420,7 @@ path.cut_1 <- file.path(out_dir, "cutadapted/cut_8450") #Remember where this "ou
 print(path.cut_1) #Checking if the path is correct.
 
 if(!dir.exists(path.cut_1)) dir.create(path.cut_1)
+
 fnFs_seq1_cut <- file.path(path.cut_1, basename(fnFs_seq1))
 fnRs_seq1_cut <- file.path(path.cut_1, basename(fnRs_seq1))
 
@@ -364,13 +439,14 @@ R2.flags <- paste("-G", REV, "-A", FWD.RC)
 #| tidy: true
 # Run Cutadapt
 #Once this has been completed there is no need to run again when working on the script.
-#
-  
+
 for(i in seq_along(fnFs_seq1)) {
   system2(cutadapt, args = c(R1.flags, R2.flags, 
                              "-n", 2, # -n 2 removes FWD and REV from reads
-                             "-o", fnFs_seq1_cut[i], "-p", fnRs_seq1_cut[i], # output files
-                             fnFs_seq1_filtN[i], fnRs_seq1_filtN[i])) #input files
+                             "-o", fnFs_seq1_cut[i], 
+                             "-p", fnRs_seq1_cut[i], # output files
+                             fnFs_seq1_filtN[i], 
+                             fnRs_seq1_filtN[i])) #input files
 }
 
 # String for changing file extension (i.e. .fastq > .fa)
@@ -380,7 +456,7 @@ for(i in seq_along(fnFs_seq1)) {
 #   output_file2 <- str_replace(fnRs_seq1_cut[i], "\\.fastq", new_extension) This can be added in the code above if desired.
 ```
 
-### Re-inspecting if all primers were removed.  
+### Re-inspecting if all primers were removed.
 
 ```{r, Re-inspect_primer_presence}
 #| eval: true
@@ -411,8 +487,18 @@ head(sample.namesR)
 
 ### Inspect the read quality
 
-The `dada2` package provides a way to visualize this with the `plotQualityProfile()`function. This will plot the quality scores of reads per sample. You can also create a concatenated file of all the forward or reverse reads to evaluate them in one plot. Plotting a concatenated file may take a while to plot or it may fail. 
-Another way of inspecting the quality of the reads if using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) which has a GUI options or a command-line approach. Both ways are good. The FastQC approach works better with concatenated files and outputs a lot more information. This step is to inform you of the quality of the reads and decide how to cut, trim and truncate your samples.  [FastQC in Linux environment](https://www.youtube.com/watch?v=5nth7o_-f0Q)
+The `dada2` package provides a way to visualize this with the
+`plotQualityProfile()`function. This will plot the quality scores of
+reads per sample. You can also create a concatenated file of all the
+forward or reverse reads to evaluate them in one plot. Plotting a
+concatenated file may take a while to plot or it may fail. Another way
+of inspecting the quality of the reads if using
+[FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+which has a GUI options or a command-line approach. Both ways are good.
+The FastQC approach works better with concatenated files and outputs a
+lot more information. This step is to inform you of the quality of the
+reads and decide how to cut, trim and truncate your samples. [FastQC in
+Linux environment](https://www.youtube.com/watch?v=5nth7o_-f0Q)
 
 ```{r}
 #| eval: true
@@ -423,13 +509,19 @@ plotQualityProfile(cutFs_seq1[1:2])
 
 ### FastQC reports: mismatches (Ns) filtered and cut
 
-See previous FastQC section. The output should show an improvement in the quality of the reads.
+See previous FastQC section. The output should show an improvement in
+the quality of the reads.
 
 ### MultiQC repots: mismatches (Ns) filtered and cut
-Se previous MultiQC section. The out put should include all cut and trimmed FastQC report. It will inform the following steps: trimming and truncating.
+
+Se previous MultiQC section. The out put should include all cut and
+trimmed FastQC report. It will inform the following steps: trimming and
+truncating.
 
 ### FIGARO: tool for deciding what parameters to use for filtering, trimming and truncation
-This step can be performed on the raw reads as well. Here we focus on the cut, filtered and trimmed reads. 
+
+This step can be performed on the raw reads as well. Here we focus on
+the cut, filtered and trimmed reads.
 
 ```{python}
 
@@ -460,6 +552,7 @@ head(filtRs_seq1, 10)
 ```
 
 Results from MultiQC and FIGARO inform parameter selection.
+
 ```{r, truncating}
 #| eval: true
 #| echo: false
@@ -487,7 +580,12 @@ head(out)
 ```
 
 ### Dereplication
-Dereplication combines all identical reads into one unique sequence with a corresponding abundance equal to the number of reads with that unique sequence. It is done because it reduces computation time by eliminating redundancy -- From DADA2 tutorial, v1.8
+
+Dereplication combines all identical reads into one unique sequence with
+a corresponding abundance equal to the number of reads with that unique
+sequence. It is done because it reduces computation time by eliminating
+redundancy -- From DADA2 tutorial, v1.8
+
 ```{r, dereplication}
 #| eval: true
 #| echo: false
@@ -506,6 +604,7 @@ names(derepRs_seq1) <- sample.namesR
 ```
 
 ### Learn error rates from dereplicated reads
+
 ```{r, error_rates}
 #| eval: true
 #| echo: false
@@ -525,7 +624,6 @@ saveRDS(errR_seq1, file.path(out_dir, "preprocess/pre_8450/errR_8450.rds"))
 plotErrors(errF, nominalQ=TRUE)
 ```
 
-
 ### Sample Inference
 
 ```{r, inference1}
@@ -540,7 +638,6 @@ saveRDS(dadaFs, file.path(out_dir, "Preprocess", "/dadaFs.rds"))
 #dadaFS <- readRDS(file.path(out_dir, "Preprocess", "/dadaFs.rds"))
 #dadaRS <- readRDS(file.path(out_dir, "Preprocess", "/dadaRs.rds"))
 ```
-
 
 ### Merge paired reads
 
@@ -561,9 +658,11 @@ saveRDS(mergers_seq1, file.path(out_dir, "preprocess/pre_8450/mergers_8450.rds")
 head(mergers_seq1[[1]])
 ```
 
-
 ### Construct ASV Sequence Table
-We can now construct an amplicon sequence variant table (ASV) table, a higher-resolution version of the OTU table produced by traditional methods.
+
+We can now construct an amplicon sequence variant table (ASV) table, a
+higher-resolution version of the OTU table produced by traditional
+methods.
 
 ```{r, ASV}
 #| eval: true
@@ -585,7 +684,10 @@ table(nchar(getSequences(seqtab_seq1)))
 ```
 
 ### Remove chimeras
-The core `dada` method corrects substitution and indel errors, but chimeras remain. 
+
+The core `dada` method corrects substitution and indel errors, but
+chimeras remain.
+
 ```{r, chimeras}
 #| eval: true
 #| echo: false
@@ -609,9 +711,10 @@ Inspect distribution of sequence lengths
 table(nchar(getSequences(seqtab.nochim)))
 ```
 
-
 ### Track reads through the pipeline
-We now inspect the the number of reads that made it through each step in the pipeline to verify everything worked as expected.
+
+We now inspect the the number of reads that made it through each step in
+the pipeline to verify everything worked as expected.
 
 ```{r, pipeline_tracking}
 #| eval: true
@@ -647,10 +750,15 @@ sometimes extends beyond the total read length resulting in no overlap.
 
 ## Taxonomy assignment
 
-Congratulations! You've made it to a checkpoint in the pipeline.  If you have save the ASV tables, specially after removing chimeras, if not go and do that. This section can take a big toll on your local machine. It is best to perform in the Van Bael Lab Mac or HPC Cypress.
+Congratulations! You've made it to a checkpoint in the pipeline. If you
+have save the ASV tables, specially after removing chimeras, if not go
+and do that. This section can take a big toll on your local machine. It
+is best to perform in the Van Bael Lab Mac or HPC Cypress.
 
-Download the latest "full" [UNITE release](https://unite.ut.ee/repository.php). This will serve as your reference for assigning taxonomy. Use the appropriate data base to assing taxonomy to your data or project! 
-
+Download the latest "full" [UNITE
+release](https://unite.ut.ee/repository.php). This will serve as your
+reference for assigning taxonomy. Use the appropriate data base to
+assing taxonomy to your data or project!
 
 ```{r, taxonomy}
 #| eval: true
@@ -686,15 +794,19 @@ head(taxa.print_seq1)
 
 Done!
 
-You have successfully taken the sequences through the DADA2 pipeline. You can do the same for your samples. 
-This was a small number of samples and your local machine can handle it. When you obtain your sequence files from the sequencing core it is about 25 Gb of data. It is best to work on this through the Cypress HPC cluster. Let's move on to that.
-
-
+You have successfully taken the sequences through the DADA2 pipeline.
+You can do the same for your samples. This was a small number of samples
+and your local machine can handle it. When you obtain your sequence
+files from the sequencing core it is about 25 Gb of data. It is best to
+work on this through the Cypress HPC cluster. Let's move on to that.
 
 # Aponte_8756_23110702
 
-Remember to change the file paths to your files and directories. As well, as to where `cutadapt` is installed in your local machine or HPC cluster. Use the appropriate data base to assigning taxonomy to your data or project! 
-Notice that `multithread = TRUE` here to take advantage of HPC's capacity to run jobs in parallel. 
+Remember to change the file paths to your files and directories. As
+well, as to where `cutadapt` is installed in your local machine or HPC
+cluster. Use the appropriate data base to assigning taxonomy to your
+data or project! Notice that `multithread = TRUE` here to take advantage
+of HPC's capacity to run jobs in parallel.
 
 ```{r}
 #DADA2 pipeline
@@ -950,28 +1062,31 @@ write.csv(taxa.print_seq2, file.path(out_dir, "Taxonomy/assign_tax_8756.csv"))
 #Done
 ```
 
+# Cypress: How to submit this as a SLURM job.
 
-
-
-# Cypress: How to submit this as a SLURM job. 
-See general guidelines from [Adrià Auladell Martín](https://github.com/adriaaula/dada2_guidelines)
+See general guidelines from [Adrià Auladell
+Martín](https://github.com/adriaaula/dada2_guidelines)
 
 ## Setting up a virtual environment with anaconda3
+
 See instructions for login into Cypress HPC here:
 
-1. Navigate to /lustre/project/<your group name>/
+1.  Navigate to /lustre/project/<your group name>/
 
 Example
+
 ```{bash}
 [home@cypress01 baponterolonl]$cd /lustre/project/svanbael/
 ```
 
 Result
+
 ```{bash}
 [baponterolon@cypress01 svanbael]$ 
 ```
 
-2. Initiate a job node and create a "virtual" environment
+2.  Initiate a job node and create a "virtual" environment
+
 ```{bash}
 [baponterolon@cypress01 svanbael]$ idev --partition=centos7 #Access one working node for 60 minutes.
 
@@ -984,37 +1099,61 @@ Result
 (virtual_env) [baponterolon@cypress01-033 svanbael]$  
 ```
 
-Notice the change in the username of your session indicating that you are operating inside the "virtual" environment. Creating this environment allows you to install new packages and dependencies that are not available in Cypress. In this self-contained environment you can install a new version of R or any other program necessary for analyses. 
+Notice the change in the username of your session indicating that you
+are operating inside the "virtual" environment. Creating this
+environment allows you to install new packages and dependencies that are
+not available in Cypress. In this self-contained environment you can
+install a new version of R or any other program necessary for analyses.
 
 ## Software and packages on Cypress
-Once you are in you desired environment you can proceed to install the packages and modules necessary. Check the available modules with:
+
+Once you are in you desired environment you can proceed to install the
+packages and modules necessary. Check the available modules with:
+
 ```{bash}
 conda list
 ```
 
-You will see what is available and your environment and decide what need to be installed. 
+You will see what is available and your environment and decide what need
+to be installed.
 
 ## Cutadapt
-See [Shared installation (on a cluster)](https://cutadapt.readthedocs.io/en/stable/installation.html#shared-installation-on-a-cluster) for details. Yoi have already created the virtual environment. Install using `pip` command:
+
+See [Shared installation (on a
+cluster)](https://cutadapt.readthedocs.io/en/stable/installation.html#shared-installation-on-a-cluster)
+for details. Yoi have already created the virtual environment. Install
+using `pip` command:
+
 ```{bash}
 pip install cutadapt==4.4 #Select version
 ```
 
 Cutadapt can also be installed using the `bioconda` channel:
+
 ```{bash}
 conda install -c bioconda cutadapt
 ```
-**Note**:<p class="text-danger"> Careful. This will result in the installation of `cutadapt` version 1.18.</p>
+
+**Note**:
+
+<p class="text-danger">
+
+Careful. This will result in the installation of `cutadapt` version
+1.18.
+
+</p>
 
 ## R and packages
 
 installation:
+
 ```{bash}
 conda search r-base #Search available versions
 conda install r-base=4.3.0 #Select version
 ```
 
 Initiate R session
+
 ```{bash}
 (virtual_env) [baponterolon@cypress01-033 svanbael]$R #Just type "R"  
 
@@ -1034,7 +1173,10 @@ https://www.gnu.org/licenses/.
 Your command-line should look like an R session.
 
 ## Packages
-You can install packages in R like you do in your computer with `install.packages()`. The script below is to install then in an interactive session on the HPC cluster or through a BATCH job.
+
+You can install packages in R like you do in your computer with
+`install.packages()`. The script below is to install then in an
+interactive session on the HPC cluster or through a BATCH job.
 
 ```{r}
 # Installation of packages requires for DADA2 pipeline
@@ -1070,8 +1212,8 @@ packageVersion("ShortRead")
 packageVersion("Biostrings")
 ```
 
-The script for a batch job goes something like this:
-Ex. 1
+The script for a batch job goes something like this: Ex. 1
+
 ```{bash}
 #!/bin/bash
 
@@ -1101,14 +1243,22 @@ module purge
 
 ```
 
-Because each project has different number of samples or target organisms each SLURM job is different and will have different memory and processing parameters. Adjust accordingly. See this resource: [dada2HPC_worload](https://github.com/erictleung/dada2HPCPipe#slurm-workload-manager)
+Because each project has different number of samples or target organisms
+each SLURM job is different and will have different memory and
+processing parameters. Adjust accordingly. See this resource:
+[dada2HPC_worload](https://github.com/erictleung/dada2HPCPipe#slurm-workload-manager)
 
 ## Assigning Taxonomy
 
-The last step in this pipeline can be consume a lot of processing memory, even for the HPC cluster. If your job fails at the last step, assigning taxonomy, consider submitting this part as separate job. 
+The last step in this pipeline can be consume a lot of processing
+memory, even for the HPC cluster. If your job fails at the last step,
+assigning taxonomy, consider submitting this part as separate job.
 
 ### Taxonomy batch job
-With these parameters it took about ~4.5 hrs. Maybe tasks per node can be increase to 10, hence 2 CPU's per task. 
+
+With these parameters it took about \~4.5 hrs. Maybe tasks per node can
+be increase to 10, hence 2 CPU's per task.
+
 ```{bash}
 #!/bin/bash
 
@@ -1137,14 +1287,26 @@ R CMD BATCH dada2_tax_pipeline.R
 module purge
 ```
 
-The memory requirements are different than the batch job submitted for the whole pipeline. It has increased RAM memory core (256000k), 20 CPUs per task, and 1 task per node. This means that one task has a lot of processing memory to operate with. The previous batch job example carried out 20 tasks at a time in 20 CPUs, throughout 4 nodes. This makes the computation of the pipeline quite fast (~2hrs), but it fails to locate enough processing memory for the `assingTaxonomy()` step. Another way of going about this issue is submitting a [job array](https://wiki.hpc.tulane.edu/trac/wiki/Workshops/cypress/ManyTaskComputing). 
-
-
-
+The memory requirements are different than the batch job submitted for
+the whole pipeline. It has increased RAM memory core (256000k), 20 CPUs
+per task, and 1 task per node. This means that one task has a lot of
+processing memory to operate with. The previous batch job example
+carried out 20 tasks at a time in 20 CPUs, throughout 4 nodes. This
+makes the computation of the pipeline quite fast (\~2hrs), but it fails
+to locate enough processing memory for the `assingTaxonomy()` step.
+Another way of going about this issue is submitting a [job
+array](https://wiki.hpc.tulane.edu/trac/wiki/Workshops/cypress/ManyTaskComputing).
 
 # Decontamination of samples
 
-Let's clean and "decontaminate" our samples. Hopefully you have sequenced your samples with DNA extraction controls and PCR controls. We will remove from our samples the average reads count from controls. Then any ASV that is less than 10% of the abundance per sample on the assumption that it originates from contamination throughout handling of samples in the DNA and PCR processes. Now is when we put these to use. We are also going to use the `decontam` package to statistically determine which ASVs are likely contaminants and remove them. 
+Let's clean and "decontaminate" our samples. Hopefully you have
+sequenced your samples with DNA extraction controls and PCR controls. We
+will remove from our samples the average reads count from controls. Then
+any ASV that is less than 10% of the abundance per sample on the
+assumption that it originates from contamination throughout handling of
+samples in the DNA and PCR processes. Now is when we put these to use.
+We are also going to use the `decontam` package to statistically
+determine which ASVs are likely contaminants and remove them.
 
 ## Formatting ASV table
 
@@ -1189,14 +1351,19 @@ row.names(asv_tab) <- sub(">", "", asv_headers) #Substituting sequences for shor
 #saveRDS(asv_tab, file.path(newdir, "ASV_tables", "ASVs_mim2_8450_counts.rds"))
 ```
 
-We now have a table with ASV ID's for each of our samples. Now we clean and decontaminate 
-
-
+We now have a table with ASV ID's for each of our samples. Now we clean
+and decontaminate
 
 ## Preparing our data
 
-It is important to remove contaminants from the corresponding sample batch (e.g. PCR plate). Each DNA extraction and PCR plate have their "contamination" events (i.e. people coughing or mishandling of samples). 
-Here we will remove contaminants of a PCR plate basis. This meas that all the DNA controls in the plate and the negative PCR control will be used to remove contaminant from the whole plate. Another way of doing it is removing the contamination found in each control and matching it to the samples it was extracted with. 
+It is important to remove contaminants from the corresponding sample
+batch (e.g. PCR plate). Each DNA extraction and PCR plate have their
+"contamination" events (i.e. people coughing or mishandling of samples).
+Here we will remove contaminants of a PCR plate basis. This meas that
+all the DNA controls in the plate and the negative PCR control will be
+used to remove contaminant from the whole plate. Another way of doing it
+is removing the contamination found in each control and matching it to
+the samples it was extracted with.
 
 ```{r, Cleaning and reshaping DNA and PCR controls, tidy=TRUE}
 #
@@ -1240,14 +1407,17 @@ plate2 <- plate2 %>%
 filter_filter2 <- anti_join( filter_table2, plate2, by = c("Sample_ID"="Sample_ID")) #Corroborating if indeed all match.
 ```
 
-
-
 ## Contaminant removal from DNA and PCR controls
-### In-house decontamination protocol 
+
+### In-house decontamination protocol
 
 *Adapted from Marie and Shuzo Oita fron the Arnold Lab, U.of Arizona*
 
-This is a good way to approach removal of contaminants. It works by substracting the SUM of contaminants from each ASV cell. If the value is negative it replaces it with 0. It substracts the sum of the average of the DNA controls and PCR negative controls per plate, then removes control rows.
+This is a good way to approach removal of contaminants. It works by
+substracting the SUM of contaminants from each ASV cell. If the value is
+negative it replaces it with 0. It substracts the sum of the average of
+the DNA controls and PCR negative controls per plate, then removes
+control rows.
 
 ```{r, Plate 1, tidy=TRUE}
 ###PLATE 1####
@@ -1281,7 +1451,6 @@ for(r in row){
 decontaminated_p1 <- plate1[!rownames(plate1) %in% cont2, ]
 write.table(decontaminated_p1, file.path(newdir,"ASV_tables", "P1_Mim8450_negsblanks.tsv"), sep="\t") 
 ```
-
 
 ```{r, Plate 2, tidy=TRUE}
 # PLATE 2
@@ -1320,7 +1489,8 @@ decontaminated_p2 <- plate2[!rownames(plate2) %in% cont2, ]
 #write.table(decontaminated_p2, file.path(newdir,"ASV_tables", "P2_Mim8450_negsblanks.tsv"), sep="\t")
 ```
 
-## Removal ASV sequences that are represent less than 10% of the read in samples. 
+## Removal ASV sequences that are represent less than 10% of the read in samples.
+
 ```{r, removing 10%, tidy=TRUE}
 ##Saving decontaminated files as one. ####
 
@@ -1353,12 +1523,12 @@ asv_10[ , i] <- apply(asv_10[ , i],2,
 #saveRDS(asv_10, file.path(newdir, "ASV_tables", "ASVs_mim2_8450_cleaned_10_percent.rds"))
 ```
 
-
 ## Decontam and Phyloseq
 
 ###Joining cleaned ASV table with taxonomy
 
 We join the ASV, taxonomy and leaf trait data sets.
+
 ```{r, ASV and taxonomy, tidy=TRUE}
 # #Joint ASV and taxonomy table:
 #asv_10 <- readRDS(file.path(newdir, "ASV_tables", "ASVs_mim2_8450_cleaned_10_percent.rds")) # If loaded from this point, asv_10 will need new header for ASV_ID
@@ -1378,7 +1548,9 @@ all_decontaminated <-read.csv(file.path(newdir , "ASV_tables", "ASVs_mim2_8450_d
 ```
 
 ### Phyloseq objects
-Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data.
+
+Phyloseq joins various objects that we have already prepare: taxonomic
+table, ASV table and our sample data.
 
 ```{r, PQ objects , tidy=TRUE}
 #ASV table
@@ -1419,12 +1591,14 @@ pq <- phyloseq(ASV, TAX, SAMP)
 #saveRDS(pq, file.path(newdir, "Taxonomy", "/phyloseq_8450.rds"))
 ```
 
-**Check which sample are actually lost in the cleaning and decontaminating process. Some samples don't have enough reads. It's worth knowing which samples are those.** 
-
+**Check which sample are actually lost in the cleaning and
+decontaminating process. Some samples don't have enough reads. It's
+worth knowing which samples are those.**
 
 ### Removal of singletons
 
 Code modified from Mareli Sánchez Juliá.
+
 ```{r, Mareli code, tidy = TRUE}
 # Are there any taxa with no (0) reads?
 #
@@ -1456,23 +1630,24 @@ pq3DF <- phyloseq_to_df(pq3, addtax = T, addtot = F, addmaxrank = F, sorting = "
 
 ```
 
-Now we have the objects from Phyloseq saved as R objects as well as CSVs. You can treat the data set like any other and visualize with ggplot. Phyloseq does provide the means of doings this also, but that is beyond the scope of this tutorial. 
-
+Now we have the objects from Phyloseq saved as R objects as well as
+CSVs. You can treat the data set like any other and visualize with
+ggplot. Phyloseq does provide the means of doings this also, but that is
+beyond the scope of this tutorial.
 
 ### Exploring the data set
 
 Bar plots
+
 ```{r}
 plot_bar(pq3, x = "sample_Species", fill="Phylum")
   facet_wrap(~sample_Species)
 ```
 
 Richness
+
 ```{r}
 plot_richness(pq, x="Species", measures=c("Shannon", "Simpson"), color="Site", scales = "free")
 ```
 
 ### Decontam
-
-
-

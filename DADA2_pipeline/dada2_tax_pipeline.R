@@ -9,7 +9,7 @@ out_dir <- "/lustre/project/svanbael/bolivar/Mimulus_sequences" #An "out" direct
 
 set.seed(755) #random number generator for reproducibility
 seqtab.nochim <- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
-unite.ref <- file.path(out_dir, "Taxonomy", "sh_general_release_dynamic_29.11.2022.fasta")  # CHANGE ME to location on your machine
+unite.ref <- file.path(out_dir, "Taxonomy", "sh_general_release_dynamic_29.11.2022.fasta")  #DOI: 10.15156/BIO/2483911 # CHANGE ME to location on your machine
 taxa <- assignTaxonomy(seqtab.nochim, unite.ref, multithread = TRUE, minBoot = 50, tryRC = TRUE) #Multithread = FALSE in Windows. TRUE in Mac/Linux.
 
 # Inspecting the taxonomic assignments:
