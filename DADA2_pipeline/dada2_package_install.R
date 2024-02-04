@@ -9,11 +9,13 @@
 #install.packages("gert", repos = c(
 #  ropensci = 'https://ropensci.r-universe.dev',
 #  CRAN = 'https://cloud.r-project.org')) #usethis needs gert Doesn't install on the HPC cluster for some reason.
+
+
 #install.packages("usethis") #Doesn't install on the HPC cluster for some reason.
 #install.packages("devtools") #Doesn't install on the HPC cluster for some reason.
+#install.packages("Rcpp")
 #devtools::install_github("benjjneb/dada2") #change the ref argument to get other versions
 
-install.packages("Rcpp")
 
 # if (!require("BiocManager", quietly = TRUE)){
 #   install.packages("BiocManager", repo="http://cran.rstudio.com/")}

@@ -41,7 +41,10 @@ knitr::opts_chunk$set(out.width ='70%', fig_align = 'center', echo = TRUE, colla
 See https://benjjneb.github.io/dada2/dada-installation.html for more details.
 The main R script can be found [here](https://www.bioconductor.org/packages/devel/bioc/vignettes/dada2/inst/doc/dada2-intro.R)
 
-### Pre-requisites
+Following DADA2 ITS Pipeline tutorial, [v1.18](https://benjjneb.github.io/dada2/ITS_workflow.html. Also Emily Farrer's [code](https://github.com/ecfarrer/LAmarshGradient2/blob/master/BioinformaticsITS.R) on github "LAmarshGradient2 ITS code.
+
+
+### Packages required
 ```{r, Pre-requisites, tidy=TRUE, eval=TRUE}
 # Activate commands as needed.
 # change the ref argument to get other versions
@@ -50,28 +53,31 @@ The main R script can be found [here](https://www.bioconductor.org/packages/deve
 #     install.packages("BiocManager", repo="http://cran.rstudio.com/")
 #   }
 # BiocManager::install(version = "3.17")
-# BiocManager::install(c("ShortRead", "Biostrings"))
+# BiocManager::install(c("dada2","ShortRead", "Biostrings"))
 # 
 # install.packages("usethis")
 # install.packages("devtools")
 # install.packages("Rcpp")
 # devtools::install_github("benjjneb/dada2")
+
 # if (!require("BiocManager", quietly = TRUE)){ #Another way of installing the latest version of dada2
 #     install.packages("BiocManager")}
 # 
 #The following initializes usage of Bioconductor devel version
-# BiocManager::install(version='devel') #BiocManager developer version
-# BiocManager::install("dada2")
+#BiocManager::install(version='devel', ask = FALSE) #BiocManager 3.17 (dada2 1.28.0) or developer version (dada2 1.29.0)
+#BiocManager::install(c("dada2", "ShortRead", "BioStrings"))
+
 
 # Loading packages
 library("usethis")
 library("devtools")
 library("Rcpp")
 library("dada2")
-packageVersion("dada2") #checking if it is the latest version
 library("ShortRead")
-packageVersion("ShortRead")
 library("Biostrings")  #This will install other packages and dependencies.
+
+packageVersion("dada2") #checking if it is the latest version
+packageVersion("ShortRead")
 packageVersion("Biostrings")
 ```
 
@@ -146,23 +152,44 @@ This can also be done through the `miniconda3` command-prompt.
 These files live in the same directory as the samples and controls, respectively. The were executed through the MinGW-64 terminal that RStudio provides. It emulates a UNIX/POSIX environment on Windows. This is an alternative in Windows OS or you can establish a virtual machine with [Virtual Box](https://www.virtualbox.org/) and install a Linux OS (i.e. Ubuntu) and proceed the same. In Mac OS this is not necessary. 
 
 
-## Pre-Processing
+## Repository and file paths
+Make various directories beforehand to keep your file output organized. Starting with `raw_sequences`, where *raw_sequences* is the directory name of where the main `fastq` or `fasta` files are. This is were the raw sequence files are. The file names have already been cleaned, see sections above. Create `filtN` as a sub-directory of `raw_sequences`. The final directories: `ASV_tables`. `cutadapted`, `Preprocess`, `qc_reports`, and `Taxonomy`. As you work through this tutorial the files will be saved in their respective directories.
 
-Following DADA2 ITS Pipeline tutorial, [v1.18](https://benjjneb.github.io/dada2/ITS_workflow.html. Also Emily Farrer's [code](https://github.com/ecfarrer/LAmarshGradient2/blob/master/BioinformaticsITS.R) on github "LAmarshGradient2 ITS code.
+For this project, I will be working with two separate sequencing runs: *Aponte_8450_23052601* and *Aponte_8756_23110702*. Both contain samples. They had to be split due to a large number of samples and how laboratory work was conducted. The document will be structure by the two run numbers.
 
-### File Paths
-Make various directories beforehand to keep your file output organized. Starting with `fastqfiles`. This is were the raw sequence files are. The file names have already been cleaned, see sections above. Create `filtN` as a sub-directory of `fastqfiles`. The final directories: `ASV_tables`. `cutadapted`, `Preprocess`, and `Taxonomy`. As you work through this tutorial the files will be saved in their respective directories.
-```{r, Paths, tidy=TRUE, eval=TRUE, include=FALSE}
-path <- "H:/.shortcut-targets-by-id/0BxMkA7i6_TOxRmxxWEtTdEREYnM/VBL_admin/Protocols/Bioinformatics_pipelines/NGS_Sequence_editing/VBL_DADA2_tutorial/fastqfiles"
-out_dir <- "H:/.shortcut-targets-by-id/0BxMkA7i6_TOxRmxxWEtTdEREYnM/VBL_admin/Protocols/Bioinformatics_pipelines/NGS_Sequence_editing/VBL_DADA2_tutorial"
+```{r, Paths}
+#| eval: true
+#| echo: false
+#| tidy: true
+
+#Aponte_8450_23052601
+path_1 <- "/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics/Aponte_8450_23052601"
+out_dir <- "/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics"
 
 
-list.files(path)
-fnFs <- sort(list.files(path, pattern = "R1.fastq", full.names = TRUE))
-fnRs <- sort(list.files(path, pattern = "R2.fastq", full.names = TRUE))
+list.files(path_1)
+fnFs_seq1 <- sort(list.files(path_1, pattern = "R1.fastq", full.names = TRUE))
+fnRs_seq1_seq1 <- sort(list.files(path_1, pattern = "R2.fastq", full.names = TRUE))
+
+#Aponte_8756_23110702
+path_2 <- "/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics/Aponte_8756_23110702"
+
+
+list.files(path_2)
+fnFs_seq2 <- sort(list.files(path_2, pattern = "R1.fastq", full.names = TRUE))
+fnRs_seq2 <- sort(list.files(path_2, pattern = "R2.fastq", full.names = TRUE))
 ```
 
-### FastQC reports: raw
+
+# Aponte_8450_23052601
+
+Software and package versions used as of 03/FEB/2024:
+-   FastQC (v0.12.1-4) -> installed through [BioArchLinux repository](https://github.com/BioArchLinux/Packages)
+-   MultiQC (v1.19-1) -> install through the Arch Linux User Repository (AUR). 
+-   Cutadapt (v4.6-1) -> installed through [BioArchLinux repository](https://github.com/BioArchLinux/Packages)
+
+
+### FastQC reports: raw sequences
 Inspect your sequence data before jumping in to cut and trim. You want to get a sense of how the sequencing run went and what you need to do in downstream processes. [Why do quality control?](https://www.bioinformatics.babraham.ac.uk/training/Sequence_QC_Course/Sequencing%20Quality%20Control.pdf)
 
 Assuming you have installed FastQC and MultiQC, go to the directory were your sequence files (.fastaq.gz) are and generate reports. This can be through the bash command-line in Mac and Linux or the Miniconda3 command-prompt.
@@ -173,19 +200,20 @@ Mac and Linux OS
 
 ```{bash}
 #!/bin/bash
-mkdir fastq_check #Change to  your preferred directory name.
+mkdir qc_reports #Change to  your preferred directory name.
 
 #Concatenate all forward (R1) and reverse (R2) reads 
-cat raw_seq/*_R1.fastq >> fastqc_check/all_R1_rawreads.fastq
-cat raw_seq/*_R2.fastq >> fastqc_raw_check/all_R2_rawreads.fastq
+cat in_directory/*_R1.fastq >> out_directory/all_R1_rawreads.fastq
+cat in_directory/*_R2.fastq >> in_directory/all_R2_rawreads.fastq
 
 #Execute fastqc on files
-fastqc fastqc_check/all_R1_reads.fastq -o fastqc_check/all_R1_rawreads
-fastqc fastqc_raw_check/all_R2_rawreads.fastq -o fastqc_check/all_R2_rawreads
+fastqc qc_reports/all_R1_rawreads.fastq -o qc_reports/all_R1_rawreads
+fastqc qc_reports/all_R2_rawreads.fastq -o qc_reports/all_R2_rawreads
 
 #This can take a while. It is generating .html reports and associated compressed files. Execute within the directory or from.
 ```
 
+- Repeat as necessary for number of sequencing runs.
 
 Windows (miniconda3)
 In windows you can use a GUI to select the file you want to create a report. It is not fully support through the command-line. Make sure to use the `miniconda3` command-prompt and that it is installed properly.
@@ -196,14 +224,14 @@ fastqc *.fastq.gz
 ```
 
 
-How do can we interpret these reports? What kind of sequence data do I have? Does this look ok? 
+How do can we interpret these reports? What kind of sequence data do I have? Does this look OK? 
 See here:
    + Galaxy Training!: [Quality Control](https://training.galaxyproject.org/training-material/topics/sequence-analysis/tutorials/quality-control/tutorial.html)
    + [EDAMAME tutorial](https://github.com/edamame-course/FastQC/blob/master/for_review/2016-06-22_FastQC_tutorial.md)
    
 In the Van Bael lab we produce 16S and ITS amplicon sequence data, for the most part. Amplicon sequences are considered "low" diversity due thei enriched proportion of nucleotides (per base sequence). Hence, when the sequence platform calls nucleotides it tends to be poor in the intiall base pairs. 
 
-### MultiQC: raw
+### MultiQC: raw sequences
 
 This command will search for all FastQC reports and create summary report of all of them. You can create a shell script and execute in a similar way as `fastqc`.
 
@@ -212,11 +240,8 @@ This command will search for all FastQC reports and create summary report of all
  multiqc .
 
 # To execute in a subdirectory 
-multiqc FOLDER_NAME
+multiqc directory/
 ```
-
- If successful your command prompt will look like [this]("C:/Users/boloq/Desktop/multiQC_example.JPG")
- Your report will be something like [this](https://drive.google.com/open?id=1PlwdRO9Yk6-Y50VbprwAGFajCjki9FWh&usp=drive_fs)
 
 
 ### Identifiying primers
@@ -226,7 +251,11 @@ Each project and organism type will have its own set of primers and adapters. Ta
    + [VBL Culture primers](https://drive.google.com/open?id=0B9v0CdUUCqU5YVhJck1zT1VTZ28&resourcekey=0-1Nyzv3mGzpJLqDvoo-ls9A&usp=drive_fs)
    + [VBL NGS primers](https://drive.google.com/open?id=1bUY7dy_JNlkpvzcXcW1ImQAMSckexeSj&usp=drive_fs)
 
-```{r, ITS1f_adapt and ITS2r_adapt, tidy=TRUE, eval=TRUE}
+```{r, ITS1f_adapt_ITS2r_adapt}
+#| eval: true
+#| echo: false
+#| tidy: true
+
 FWD<-"CACTCTTTCCCTACACGACGCTCTTCCGATCTCTTGGTCATTTAGAGGAAGTAA" # Forward ITS1f_adapt from IDT 
 nchar(FWD) #Number of primer nucleotides.
 REV<-"GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCTGCTGCGTTCTTCATCGATGC" # Reverse primer ITS2r_adapt from IDT
@@ -235,7 +264,11 @@ nchar(REV)
 
 ### Verifying the orientation of the primers
 
-```{r, Orientation of primers, tidy=TRUE, eval=TRUE}
+```{r, orientation_primers}
+#| eval: true
+#| echo: false
+#| tidy: true
+
 allOrients <- function(primer){# Create all orientations of the input sequence
                    require(Biostrings)
                    dna <- DNAString(primer)  # The Biostrings works w/ DNAString objects rather than character vectors
@@ -256,28 +289,37 @@ REV.orients <- allOrients(REV)
 
 We are filtering sequences for presence of ambiguous bases (N) before cutting primerd off. This pre-filtering step iomproves mmaping of short primer sequences. No other filtering is performed.
 
-```{r, Filtering ambiguous bases N, tidy=TRUE, eval=TRUE}
-fnFs.filtN <- file.path(path, "filtN", basename(fnFs)) # Put N-filtered forward read files in filtN/ subdirectory
-fnRs.filtN <- file.path(path, "filtN", basename(fnRs)) #Reverse reads
+```{r, filtering_ambiguous_bases_N}
+#| eval: true
+#| echo: false
+#| tidy: true
 
-#filterAndTrim(fnFs, fnFs.filtN, fnRs, fnRs.filtN, maxN = 0, multithread = FALSE)
+fnFs_seq1_filtN <- file.path(path_1, "filtN", basename(fnFs_seq1)) # Put N-filtered forward read files in filtN/ subdirectory
+fnRs_seq1_filtN <- file.path(path_1, "filtN", basename(fnRs_seq1)) #Reverse reads
+
+filterAndTrim(fnFs_seq1, fnFs_seq1_filtN, fnRs_seq1, fnRs_seq1_filtN, maxN = 0, multithread = TRUE)
 ```
 
 ### Checking for primer hits
 
 Have primers been removed?
-```{r, Primer hits, tidy=TRUE, eval=TRUE}
+```{r, primer_hits}
+#| eval: true
+#| echo: false
+#| tidy: true
+
 set.seed(123)
 #Once this has been completed there is no need to run again when working on the script
+
 primerHits <- function(primer, fn) {
     # Counts number of reads in which the primer is found
     nhits <- vcountPattern(primer, sread(readFastq(fn)), fixed = FALSE)
     return(sum(nhits > 0))
 }
-rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.filtN[[1]]),
-      FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.filtN[[1]]),
-      REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs.filtN[[1]]),
-      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.filtN[[1]]))
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq1_filtN[[1]]),
+      FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs_seq1_filtN[[1]]),
+      REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs_seq1_filtN[[1]]),
+      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs_seq1_filtN[[1]]))
 ```
 
 
@@ -285,19 +327,27 @@ We see the reverse complement of primers present in the FWD.ReverseReads and the
 
 ### Cutadapt: removal of primers
  Write section of how to install the latest version of [Python (3.11)](https://www.python.org/downloads/windows/), Visual Studio Build Tools 2022 and install [`cutadapt`](https://cutadapt.readthedocs.io/en/stable/installation.html#installation-on-windows) to have it work in this pipeline. The `cutadapt` package can be used directly in the command-line also. That is it's most basic use. If working from Windows OS you can use Git Bash with the added utility of [`wget`](https://gist.github.com/evanwill/0207876c3243bbb6863e65ec5dc3f058) to install [Python 3.11](https://programmingwithjim.wordpress.com/2020/09/08/installing-python-3-in-git-bash-on-windows-10/)
-```{r, Location and version of cutadapt, tidy=TRUE, eval=TRUE}
+ 
+```{r, cutadapt}
+#| eval: true
+#| echo: false
+#| tidy: true
 #Once this has been completed there is no need to run again when working on the script
-cutadapt <-  "C:/Users/boloq/AppData/Roaming/Python/Python311/Scripts/cutadapt.exe" # CHANGE ME to the cutadapt path on your machine
+cutadapt <-  "/usr/bin/cutadapt" # CHANGE ME to the cutadapt path on your machine
 system2(cutadapt, args = "--version") # Run shell commands from R
 ```
 
-```{r, Establishing the paths and parameters for cutting, tidy = TRUE, eval=TRUE}
-path.cut <- file.path(out_dir, "cutadapted") #Remember where this "out" directory path leads to.
+```{r, path_parameters_cuttting}
+#| eval: true
+#| echo: false
+#| tidy: true
+path.cut_1 <- file.path(out_dir, "cutadapted/cut_8450") #Remember where this "out" directory path leads to.
 #all.cut <- file.path(out_dir, "FastQC") # Path to concatenated files 
-print(path.cut) #Checking if the path is correct.
-if(!dir.exists(path.cut)) dir.create(path.cut)
-fnFs.cut <- file.path(path.cut, basename(fnFs))
-fnRs.cut <- file.path(path.cut, basename(fnRs))
+print(path.cut_1) #Checking if the path is correct.
+
+if(!dir.exists(path.cut_1)) dir.create(path.cut_1)
+fnFs_seq1_cut <- file.path(path.cut_1, basename(fnFs_seq1))
+fnRs_seq1_cut <- file.path(path.cut_1, basename(fnRs_seq1))
 
 FWD.RC <- dada2:::rc(FWD)
 REV.RC <- dada2:::rc(REV)
@@ -308,49 +358,53 @@ R1.flags <- paste("-g", FWD, "-a", REV.RC)
 R2.flags <- paste("-G", REV, "-A", FWD.RC) 
 ```
 
-```{r, Running cutadapt, tidy=TRUE}
+```{r, Running_cutadapt}
+#| eval: true
+#| echo: false
+#| tidy: true
 # Run Cutadapt
 #Once this has been completed there is no need to run again when working on the script.
 #
   
-for(i in seq_along(fnFs)) {
+for(i in seq_along(fnFs_seq1)) {
   system2(cutadapt, args = c(R1.flags, R2.flags, 
                              "-n", 2, # -n 2 removes FWD and REV from reads
-                             "-o", fnFs.cut[i], "-p", fnRs.cut[i], # output files
-                             fnFs.filtN[i], fnRs.filtN[i])) #input files
+                             "-o", fnFs_seq1_cut[i], "-p", fnRs_seq1_cut[i], # output files
+                             fnFs_seq1_filtN[i], fnRs_seq1_filtN[i])) #input files
 }
 
 # String for changing file extension (i.e. .fastq > .fa)
 # new_extension <- ".fa"
-# for (i in seq_along(fnFs)) {
-#   output_file1 <- str_replace(fnFs.cut[i], "\\.fastq", new_extension)
-#   output_file2 <- str_replace(fnRs.cut[i], "\\.fastq", new_extension) This can be added in the code above if desired.
+# for (i in seq_along(fnFs_seq1)) {
+#   output_file1 <- str_replace(fnFs_seq1_cut[i], "\\.fastq", new_extension)
+#   output_file2 <- str_replace(fnRs_seq1_cut[i], "\\.fastq", new_extension) This can be added in the code above if desired.
 ```
 
 ### Re-inspecting if all primers were removed.  
 
-```{r, Re-inspect primer presence, tidy = TRUE }
+```{r, Re-inspect_primer_presence}
+#| eval: true
+#| echo: false
+#| tidy: true
 #Once this has been completed there is no need to run again when working on the script
 #
-rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.cut[[1]]), 
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq1_cut[[1]]), 
       FWD.ReverseReads = sapply(FWD.orients,
-      primerHits, fn = fnRs.cut[[1]]), 
-      REV.ForwardReads = sapply(REV.orients, primerHits,fn = fnFs.cut[[1]]), 
-      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.cut[[1]]))
-```
+      primerHits, fn = fnRs_seq1_cut[[1]]), 
+      REV.ForwardReads = sapply(REV.orients, primerHits,fn = fnFs_seq1_cut[[1]]), 
+      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs_seq1_cut[[1]]))
 
 
-```{r, eval=TRUE}
 # Forward and reverse fastq filenames have the format:
-cutFs <- sort(list.files(path.cut, pattern = "R1.fastq", full.names = TRUE))
-cutRs <- sort(list.files(path.cut, pattern = "R2.fastq", full.names = TRUE))
+cutFs_seq1 <- sort(list.files(path.cut_1, pattern = "R1.fastq", full.names = TRUE))
+cutFs_seq1 <- sort(list.files(path.cut_1, pattern = "R2.fastq", full.names = TRUE))
 #allcutF <- sort(list.files(all.cut, pattern = "R1.fastq", full.names = TRUE))
 
 # Extract sample names, assuming filenames have format:
 get.sample.name <- function(fname) strsplit(basename(fname), "_R")[[1]][1] #String in commas needs to be updated according to naming convention. If you have multiple underscores in the name then select the underscore next to the "R", like above, or any other unique identifier in the character string.
 
-sample.namesF <- unname(sapply(cutFs, get.sample.name))
-sample.namesR <- unname(sapply(cutRs, get.sample.name))
+sample.namesF <- unname(sapply(cutFs_seq1, get.sample.name))
+sample.namesR <- unname(sapply(cutFs_seq1, get.sample.name))
 head(sample.namesF)
 head(sample.namesR)
 ```
@@ -361,8 +415,10 @@ The `dada2` package provides a way to visualize this with the `plotQualityProfil
 Another way of inspecting the quality of the reads if using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) which has a GUI options or a command-line approach. Both ways are good. The FastQC approach works better with concatenated files and outputs a lot more information. This step is to inform you of the quality of the reads and decide how to cut, trim and truncate your samples.  [FastQC in Linux environment](https://www.youtube.com/watch?v=5nth7o_-f0Q)
 
 ```{r}
-plotQualityProfile(cutFs[1:2])
-plotQualityProfile(cutRs[1:2])
+#| eval: true
+#| echo: false
+plotQualityProfile(cutFs_seq1[1:2])
+plotQualityProfile(cutFs_seq1[1:2])
 ```
 
 ### FastQC reports: mismatches (Ns) filtered and cut
@@ -391,19 +447,25 @@ This step can be performed on the raw reads as well. Here we focus on the cut, f
 
 ## Filter and trim
 
-```{r, Assign file names, tidy=TRUE, eval=TRUE}
-filtFs <- file.path(out_dir, "Filtered", basename(cutFs))
-filtRs <- file.path(out_dir, "Filtered", basename(cutRs))
-names(filtFs) <- sample.namesF
-names(filtRs) <- sample.namesR
-head(filtFs, 10)
-head(filtRs, 10)
+```{r, assign_file_names}
+#| eval: true
+#| echo: false
+#| tidy: true
+filtFs_seq1 <- file.path(out_dir, "filtered/filt_8450", basename(cutFs_seq1))
+filtRs_seq1 <- file.path(out_dir, "filtered/filt_8450", basename(cutFs_seq1))
+names(filtFs_seq1) <- sample.namesF
+names(filtRs_seq1) <- sample.namesR
+head(filtFs_seq1, 10)
+head(filtRs_seq1, 10)
 ```
 
 Results from MultiQC and FIGARO inform parameter selection.
-```{r, Truncating, tidy=TRUE }
+```{r, truncating}
+#| eval: true
+#| echo: false
+#| tidy: true
 #Truncating Forward and Reverse reads to 230 and 180 respectively. The reverse maxEE is relaxed due to overall low quality of reads
-out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
+out_seq1 <- filterAndTrim(fnFs_seq1, filtFs_seq1, fnRs_seq1, filtRs_seq1,
                      truncLen=c(230,180),
                      maxN=0,
                      maxEE=c(2,3),
@@ -416,8 +478,8 @@ out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
 #Once it is completed there is no need to run again unless you are changing parameters.
 
 #Saving file
-saveRDS(out, file.path(out_dir, "Preprocess", "/out.rds"))
-#out <- readRDS(file.path(out_dir, "Preprocess", "/out.rds"))
+saveRDS(out_seq1, file.path(out_dir, "preprocess/pre_8450/out_8450.rds"))
+#out <- readRDS(file.path(out_dir, "preprocess/pre_8450", "/out.rds"))
 ```
 
 ```{r}
@@ -426,30 +488,37 @@ head(out)
 
 ### Dereplication
 Dereplication combines all identical reads into one unique sequence with a corresponding abundance equal to the number of reads with that unique sequence. It is done because it reduces computation time by eliminating redundancy -- From DADA2 tutorial, v1.8
-```{r, Dereplication, tidy=TRUE, eval=TRUE}
-derepFs <- derepFastq(filtFs, n = 1000, verbose=TRUE) #n prevents it from reading more than 1000 reads at the same time. This controls the peak memory requirement so that large fastq files are supported. 
-derepRs <- derepFastq(filtRs, n = 1000, verbose=TRUE)
+```{r, dereplication}
+#| eval: true
+#| echo: false
+#| tidy: true
+derepFs_seq1 <- derepFastq(filtFs_seq1, n = 1000, verbose=TRUE) #n prevents it from reading more than 1000 reads at the same time. This controls the peak memory requirement so that large fastq files are supported. 
+derepRs_seq1 <- derepFastq(filtRs_seq1, n = 1000, verbose=TRUE)
 
-saveRDS(derepFs, file.path(out_dir, "Preprocess", "/derepFs.rds"))
-saveRDS(derepFs, file.path(out_dir, "Preprocess", "/derepFs.rds"))
-#derepFS <- readRDS(file.path(out_dir, "Preprocess", "/derepFs.rds"))
-#derepRS <- readRDS(file.path(out_dir, "Preprocess", "/derepRs.rds"))
+saveRDS(derepFs_seq1, file.path(out_dir, "preprocess/pre_8450/derepFs_8450.rds"))
+saveRDS(derepFs_seq1, file.path(out_dir, "preprocess/pre_8450/derepFs_8450.rds"))
+#derepFs_seq1 <- readRDS(file.path(out_dir, "Ppreprocess/pre_8450", "/derepFs_8450.rds"))
+#derepRs_seq1 <- readRDS(file.path(out_dir, "preprocess/pre_8450", "/derepRs_8450.rds"))
 
 # #name the dereplicated reads by the sample names
-names(derepFs) <- sample.namesF
-names(derepRs) <- sample.namesR
+names(derepFs_seq1) <- sample.namesF
+names(derepRs_seq1) <- sample.namesR
 ```
 
 ### Learn error rates from dereplicated reads
-```{r, Error rates, tidy=TRUE, eval=TRUE}
+```{r, error_rates}
+#| eval: true
+#| echo: false
+#| tidy: true
+
 set.seed(123)
-errF <- learnErrors(derepFs, randomize = TRUE, multithread=FALSE) #multithread is set to FALSE in Windows. Unix OS is =TRUE.
+errF_seq1 <- learnErrors(derepFs_seq1, randomize = TRUE, multithread=TRUE) #multithread is set to FALSE in Windows. Unix OS is =TRUE.
 # 
-errR <- learnErrors(derepRs, randomize = TRUE, multithread=FALSE)
+errR_seq1 <- learnErrors(derepRs_seq1, randomize = TRUE, multithread=TRUE)
 
 #Save file
-saveRDS(errF, file.path(out_dir, "Preprocess", "/errF.rds"))
-saveRDS(errR, file.path(out_dir, "Preprocess", "/errR.rds"))
+saveRDS(errF_seq1, file.path(out_dir, "preprocess/pre_8450/errF_8450.rds"))
+saveRDS(errR_seq1, file.path(out_dir, "preprocess/pre_8450/errR_8450.rds"))
 #errF <- readRDS(file.path(out_dir, "Preprocess", "/errF.rds"))
 #errR <- readRDS(file.path(out_dir, "Preprocess", "/errR.rds"))
 #Plot errors
@@ -459,9 +528,13 @@ plotErrors(errF, nominalQ=TRUE)
 
 ### Sample Inference
 
-```{r, Inference, tidy=TRUE }
-dadaFs <- dada(derepFs, err=errF, multithread=TRUE)
-dadaRs <- dada(derepRs, err=errR, multithread=TRUE)
+```{r, inference1}
+#| eval: true
+#| echo: false
+#| tidy: true
+
+dadaFs_seq1 <- dada(derepFs_seq1, err=errF_seq, multithread=TRUE)
+dadaRs_seq1 <- dada(derepRs_seq1, err=errR_seq1, multithread=TRUE)
 saveRDS(dadaFs, file.path(out_dir, "Preprocess", "/dadaFs.rds"))
 saveRDS(dadaFs, file.path(out_dir, "Preprocess", "/dadaFs.rds"))
 #dadaFS <- readRDS(file.path(out_dir, "Preprocess", "/dadaFs.rds"))
@@ -471,47 +544,63 @@ saveRDS(dadaFs, file.path(out_dir, "Preprocess", "/dadaFs.rds"))
 
 ### Merge paired reads
 
-```{r, Merge, tidy=TRUE }
-mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, minOverlap = 20, maxMismatch = 0, verbose=TRUE)
-saveRDS(mergers, file.path(out_dir, "Preprocess", "/mergers.rds"))
+```{r, merge}
+#| eval: true
+#| echo: false
+#| tidy: true
+mergers_seq1 <- mergePairs(dadaFs_seq1, filtFs_seq1, 
+                           dadaRs_seq1, filtRs_seq1, 
+                           minOverlap = 20, 
+                           maxMismatch = 0,
+                           verbose=TRUE)
+
+saveRDS(mergers_seq1, file.path(out_dir, "preprocess/pre_8450/mergers_8450.rds"))
 
 #mergers <- readRDS(file.path(out_dir, "Preprocess", "/mergers.rds"))
 # Inspect the merger data.frame from the first sample
-head(mergers[[1]])
+head(mergers_seq1[[1]])
 ```
 
 
 ### Construct ASV Sequence Table
 We can now construct an amplicon sequence variant table (ASV) table, a higher-resolution version of the OTU table produced by traditional methods.
 
-```{r, ASV, tidy=TRUE, eval=TRUE}
-seqtab <- makeSequenceTable(mergers)
-dim(seqtab)
+```{r, ASV}
+#| eval: true
+#| echo: false
+#| tidy: true
+
+seqtab_seq1 <- makeSequenceTable(mergers_seq1)
+dim(seqtab_seq1)
 
 # Inspect distribution of sequence lengths
-table(nchar(getSequences(seqtab)))
+table(nchar(getSequences(seqtab_seq1)))
 
 #Save file R object, and .csv
-#saveRDS(seqtab, file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds")) #Functions to write a single R object to a file, and to restore it.
-#write.csv(seqtab, file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds"))
+#saveRDS(seqtab_seq1, file.path(out_dir, "ASV_tables/ASV_seqtab_8450.rds")) #Functions to write a single R object to a file, and to restore it.
+#write.csv(seqtab, file.path(out_dir, "ASV_tables/ASV_seqtab_8450.rds"))
 
 #Open from here in case R crashes
-#seqtab<- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds"))
+#seqtab <- readRDS(file.path(out_dir, "ASV_tables/ASV_seqtab_8450.rds"))
 ```
 
 ### Remove chimeras
 The core `dada` method corrects substitution and indel errors, but chimeras remain. 
-```{r, Chimeras, tidy=TRUE, eval=TRUE}
-seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread = FALSE, verbose=TRUE) #Multithread = FALSE in Windows
+```{r, chimeras}
+#| eval: true
+#| echo: false
+#| tidy: true
+
+seqtab_seq1_nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread = FALSE, verbose=TRUE) #Multithread = FALSE in Windows
 
 #Frequency of chimeras
-sum(seqtab.nochim)/sum(seqtab)
+sum(seqtab_seq1_nochim)/sum(seqtab_seq1)
 
 #Save file
-saveRDS(seqtab.nochim, file.path(out_dir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
-#write.csv(seqtab.nochim, file.path(out_dir, "ASV_tables", "/ASV_nochim_denoise_filt.csv")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
+saveRDS(seqtab_seq1_nochim, file.path(out_dir, "ASV_tables/ASV_seqtab_nochim_8450.rds"))
+#write.csv(seqtab_seq1_nochim, file.path(out_dir, "ASV_tables/ASV_seqtab_nochim_denoise_filt.rds")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
 
-#seqtab.nochim <- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
+#seqtab_seq1_nochim <- readRDS(file.path(out_dir, "ASV_tables/ASV_seqtab_8450_nochim.rds"))
 ```
 
 Inspect distribution of sequence lengths
@@ -524,10 +613,14 @@ table(nchar(getSequences(seqtab.nochim)))
 ### Track reads through the pipeline
 We now inspect the the number of reads that made it through each step in the pipeline to verify everything worked as expected.
 
-```{r, tidy=TRUE, eval=TRUE}
-getN <- function(x) sum(getUniques(x))
-track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN),
-    rowSums(seqtab.nochim))
+```{r, pipeline_tracking}
+#| eval: true
+#| echo: false
+#| tidy: true
+
+getN_seq1 <- function(x) sum(getUniques(x))
+track_seq1 <- cbind(out, sapply(dadaFs_seq1, getN_seq1), sapply(dadaRs_seq1, getN_seq1), sapply(mergers_seq1, getN_seq1),
+    rowSums(seqtab_seq1_nochim))
 # If processing a single sample, remove the sapply calls: e.g. replace
 # sapply(dadaFs, getN) with getN(dadaFs)
 colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
@@ -535,7 +628,7 @@ rownames(track) <- sample.namesF
 head(track)
 
 # Save file
-saveRDS(track, file.path(out_dir, "Preprocess", "/track.rds"))
+saveRDS(track, file.path(out_dir, "preprocess/pre_8450/track_8450.rds"))
 ```
 
 ::: callout-warning
@@ -552,16 +645,22 @@ due to biological length variation in the sequenced ITS region that
 sometimes extends beyond the total read length resulting in no overlap.
 :::
 
-# Taxonomy assignment
+## Taxonomy assignment
 
 Congratulations! You've made it to a checkpoint in the pipeline.  If you have save the ASV tables, specially after removing chimeras, if not go and do that. This section can take a big toll on your local machine. It is best to perform in the Van Bael Lab Mac or HPC Cypress.
 
 Download the latest "full" [UNITE release](https://unite.ut.ee/repository.php). This will serve as your reference for assigning taxonomy. Use the appropriate data base to assing taxonomy to your data or project! 
 
 
-```{r, Taxonomy, tidy=TRUE }
+```{r, taxonomy}
+#| eval: true
+#| echo: false
+#| tidy: true
+
 unite.ref <- file.path(out_dir, "Taxonomy", "sh_general_release_dynamic_29.11.2022.fasta")  # CHANGE ME to location on your machine
-taxa <- assignTaxonomy(seqtab.nochim, unite.ref, multithread = FALSE, tryRC = TRUE) #Multithread = FALSE in Windows. TRUE in Mac/Linux.
+taxa_seq1 <- assignTaxonomy(seqtab_seq1_nochim, unite.ref,
+                            multithread = TRUE, 
+                            tryRC = TRUE) #Multithread = FALSE in Windows. TRUE in Mac/Linux.
 
 
 #Loading from the files saved. In case it crashes, we start from here.
@@ -575,16 +674,284 @@ taxa <- assignTaxonomy(seqtab.nochim, unite.ref, multithread = FALSE, tryRC = TR
 
 Inspecting the taxonomic assignments:
 
-```{r}
-taxa.print <- taxa  # Removing sequence rownames for display only
-rownames(taxa.print) <- NULL
-head(taxa.print)
+```{r, taxa_inspection}
+#| eval: true
+#| echo: false
+#| tidy: true
+
+taxa.print_seq1 <- taxa_seq1  # Removing sequence rownames for display only
+rownames(taxa.print_seq1) <- NULL
+head(taxa.print_seq1)
 ```
 
 Done!
 
 You have successfully taken the sequences through the DADA2 pipeline. You can do the same for your samples. 
 This was a small number of samples and your local machine can handle it. When you obtain your sequence files from the sequencing core it is about 25 Gb of data. It is best to work on this through the Cypress HPC cluster. Let's move on to that.
+
+
+
+# Aponte_8756_23110702
+
+Remember to change the file paths to your files and directories. As well, as to where `cutadapt` is installed in your local machine or HPC cluster. Use the appropriate data base to assigning taxonomy to your data or project! 
+Notice that `multithread = TRUE` here to take advantage of HPC's capacity to run jobs in parallel. 
+
+```{r}
+#DADA2 pipeline
+#Modified by Bolívar Aponte Rolón for bioinformatic analyses of ITS amplicon sequences
+#14/june/2023
+
+# Loading packages
+# Activate commands as needed.
+# DADA2 package and associated
+#library("usethis") #Doesn't install on the HPC cluster for some reason.
+#library("devtools") #Doesn't install on the HPC cluster for some reason.
+library("Rcpp")
+library("dada2")
+library("ShortRead")
+library("Biostrings")  #This will install other packages and dependencies.
+
+
+### File Paths
+# path <- "/lustre/project/svanbael/bolivar/CH2_sequences/Aponte_8450_23052601"
+# out_dir <- "/lustre/project/svanbael/bolivar/CH2_sequences" #An "out" directory to avoid crowding main directory of new files. Also keeps intact raw files.
+
+list.files(path)
+fnFs_seq2 <- sort(list.files(path_2, pattern = "R1.fastq", full.names = TRUE))
+fnRs_seq2 <- sort(list.files(path_2, pattern = "R2.fastq", full.names = TRUE))
+
+# Identifying primers
+#CHANGE primers accordingly
+FWD<-"CACTCTTTCCCTACACGACGCTCTTCCGATCTCTTGGTCATTTAGAGGAAGTAA"# Forward ITS1f_adapt from IDT 
+nchar(FWD) #Number of primer nucleotides.
+REV<-"GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCTGCTGCGTTCTTCATCGATGC"# Reverse primer ITS2r_adapt from IDT
+nchar(REV)
+
+### Verifying the orientation of the primers
+allOrients <- function(primer) {# Create all orientations of the input sequence
+                   require(Biostrings)
+                   dna <- DNAString(primer)  # The Biostrings works w/ DNAString objects rather than character vectors
+                   orients <- c(Forward = dna, 
+                                Complement = Biostrings::complement(dna), 
+                                Reverse = Biostrings::reverse(dna),
+                                RevComp = Biostrings::reverseComplement(dna))
+                   return(sapply(orients, toString))  # Convert back to character vector
+}
+FWD.orients <- allOrients(FWD)
+REV.orients <- allOrients(REV)
+#FWD2 <- FWD.orients[["Complement"]] #Use if you suspect an orientation mix-up.
+#REV2 <- REV.orients[["Complement"]]
+
+### Filter Reads for ambiguous bases (N)
+fnFs_seq2_filtN <- file.path(path_2, "filtN", basename(fnFs_seq2)) # Put N-filtered forward read files in filtN/ subdirectory
+fnRs_seq2_filtN <- file.path(path_2, "filtN", basename(fnRs_seq2)) #Reverse reads
+
+filterAndTrim(fnFs_seq2, fnFs_seq2_filtN, fnRs_seq2, fnRs_seq2_filtN, maxN = 0, multithread = TRUE) #multithread = TRUE on Mac OS, FALSE in Windows
+
+### Checking for primer hits
+set.seed(123)
+primerHits <- function(primer, fn) {
+  # Counts number of reads in which the primer is found
+  nhits <- vcountPattern(primer, sread(readFastq(fn)), fixed = FALSE)
+  return(sum(nhits > 0))
+}
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq2_filtN[[1]]),
+      FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs_seq2_filtN[[1]]),
+      REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs_seq2_filtN[[1]]),
+      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs_seq2_filtN[[1]]))
+
+### Cutadapt: removal of primers
+#Once this has been completed there is no need to run again when working on the script
+cutadapt <-  "/urs/buin/cutadapt" # CHANGE ME to the cutadapt path on your machine
+system2(cutadapt, args = "--version") # Run shell commands from R
+
+path.cut_2 <- file.path(out_dir, "cutadapted/cut_8756") #Remember where this "out" directory path leads to.
+#all.cut <- file.path(out_dir, "FastQC") # Path to concatenated files 
+print(path.cut_2) #Checking if the path is correct.
+if(!dir.exists(path.cut_2)) dir.create(path.cut_2)
+fnFs_seq2_cut <- file.path(path.cut_2, basename(fnFs_seq2))
+fnRs_seq2_cut <- file.path(path.cut_2, basename(fnRs_seq2))
+
+FWD.RC <- dada2:::rc(FWD)
+REV.RC <- dada2:::rc(REV)
+
+# Trim FWD and the reverse-complement of REV off of R1 (forward reads)
+R1.flags <- paste("-g", FWD, "-a", REV.RC) 
+# Trim REV and the reverse-complement of FWD off of R2 (reverse reads)
+R2.flags <- paste("-G", REV, "-A", FWD.RC) 
+
+### Run Cutadapt
+for(i in seq_along(fnFs_seq2)) {
+  system2(cutadapt, args = c(R1.flags, R2.flags, "-n", 2, # -n 2 removes FWD and REV from reads
+                             "-o", fnFs_seq2_cut[i], "-p", fnRs_seq2_cut[i], # output files
+                             fnFs_seq2_filtN[i], fnRs_seq2_filtN[i])) #input files
+}
+
+#Re-inspecting if all primers were removed.  
+#Once this has been completed there is no need to run again when working on the script
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq2_cut[[1]]), 
+      FWD.ReverseReads = sapply(FWD.orients,
+      primerHits, fn = fnRs_seq2_cut[[1]]), 
+      REV.ForwardReads = sapply(REV.orients, primerHits,fn = fnFs_seq2_cut[[1]]), 
+      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs_seq2_cut[[1]]))
+                                                                                                        
+#Forward and reverse fastq filenames have the format:
+cutFs_seq2 <- sort(list.files(path.cut_2, pattern = "R1.fastq", full.names = TRUE))
+cutRs_seq2 <- sort(list.files(path.cut_2, pattern = "R2.fastq", full.names = TRUE))
+                                          
+#Extract sample names, assuming filenames have format:
+get.sample.name <- function(fname) strsplit(basename(fname), "_R")[[1]][1] #String in commas needs to be updated according to naming convention. If you have multiple underscores in the name then select the underscore next to the "R", like above, or any other unique identifier in the character string.
+              
+sample.namesF <- unname(sapply(cutFs_seq2, get.sample.name))
+sample.namesR <- unname(sapply(cutRs_seq2, get.sample.name))
+          
+### Inspect the read quality
+#plotQualityProfile(cutFs_seq2[20:21])
+#plotQualityProfile(cutFs_seq2[20:21])
+
+### Filter and trim
+filtFs_seq2 <- file.path(out_dir, "filtered/filt_8756", basename(cutFs_seq1))
+filtRs_seq2 <- file.path(out_dir, "filtered/filt_8756", basename(cutFs_seq1))
+names(filtFs_seq2) <- sample.namesF
+names(filtRs_se2) <- sample.namesR
+
+#Truncating Forward and Reverse reads to 230 and 180 respectively. The reverse maxEE is relaxed due to overall low quality of reads
+out_se2 <- filterAndTrim(fnFs_seq2, filtFs_seq2, fnRs_seq2, filtRs_seq2,
+                             truncLen=c(230,180),
+                             maxN=0,
+                             maxEE=c(2,3),
+                             truncQ=2,
+                             minLen=50,
+                             rm.phix=TRUE,
+                             compress=TRUE,
+                             multithread=TRUE) # minLen: Remove reads with length less than minLen. minLen is enforced after trimming and truncation. #enforce min length of 50 bp
+
+#Once it is completed there is no need to run again unless you are changing parameters.
+#Save file
+saveRDS(out_seq2, file.path(out_dir, "preprocess/pre_8756/out_8756.rds"))
+
+### Dereplication
+
+derepFs_seq2 <- derepFastq(filtFs_se2, n = 1000, verbose=TRUE) #n prevents it from reading more than 1000 reads at the same time. This controls the peak memory requirement so that large fastq files are supported. 
+derepRs_seq2 <- derepFastq(filtRs_seq2, n = 1000, verbose=TRUE)
+saveRDS(derepFs_seq2, file.path(out_dir, "preprocess/pre_8756/derepFs_8756.rds"))
+saveRDS(derepRs, file.path(out_dir, "preprocess/pre_8756/derepRs_8756.rds"))
+
+#derepFS <- readRDS(file.path(out_dir, "Preprocess", "/derepFs.rds"))
+#derepRS <- readRDS(file.path(out_dir, "Preprocess", "/derepRs.rds"))
+
+# name the dereplicated reads by the sample names
+names(derepFs_seq2) <- sample.namesF
+names(derepRs_seq2) <- sample.namesR
+
+### Learn error rates from dereplicated reads
+set.seed(123)
+errF_seq2 <- learnErrors(derepFs_seq2, randomize = TRUE, multithread=TRUE) #multithread is set to FALSE in Windows. Unix OS is =TRUE.
+errR_seq2 <- learnErrors(derepRs_seq2, randomize = TRUE, multithread=TRUE)
+
+# Save file
+saveRDS(errF_seq2, file.path(out_dir, "preprocess/pre_8756/errF_8756.rds"))
+saveRDS(errRseq2, file.path(out_dir, "preprocess/pre_8756/errR_8756.rds"))
+
+#errF <- readRDS(file.path(out_dir, "Preprocess", "/errF.rds"))
+#errR <- readRDS(file.path(out_dir, "Preprocess", "/errR.rds"))
+
+### Plot errors
+#plotErrors(errF, nominalQ=TRUE)
+
+### Sample Inference
+dadaFs_seq2 <- dada(derepFs_seq2, 
+                    err = errF_seq2, 
+                    multithread=TRUE)
+
+dadaRs_seq2 <- dada(derepRs_seq2, 
+                    err = errR, 
+                    multithread=TRUE)
+
+saveRDS(dadaFs_seq2, file.path(out_dir, "preprocess/pre_8756/dadaFs_8756.rds"))
+saveRDS(dadaRs_seq2, file.path(out_dir, "preprocess/pre_8756/dadaRs_8756.rds"))
+
+#dadaFS <- readRDS(file.path(out_dir, "Preprocess", "/dadaFs.rds"))
+#dadaRS <- readRDS(file.path(out_dir, "Preprocess", "/dadaRs.rds"))
+
+### Merge paired reads
+mergers_seq2 <- mergePairs(dadaFs_seq2, filtFs_seq2,
+                           dadaRs_seq2, filtRs_seq2, 
+                           minOverlap = 20, 
+                           maxMismatch = 0, 
+                           verbose=TRUE)
+
+saveRDS(mergers_seq2, file.path(out_dir, "Preprocess/pre_8756/mergers8756.rds"))
+
+#mergers <- readRDS(file.path(out_dir, "Preprocess", "/mergers.rds"))
+# Inspect the merger data.frame from the first sample
+head(mergers_seq2[[1]])
+
+### Construct ASV Sequence Table
+seqtab_seq2 <- makeSequenceTable(mergers_seq2)
+dim(seqtab)
+
+# Inspect distribution of sequence lengths
+table(nchar(getSequences(seqtab_seq2)))
+
+# Save file R object, and .csv
+saveRDS(seqtab_seq2, file.path(out_dir, "ASV_tables/ASV_seqtab_8756.rds")) #Functions to write a single R object to a file, and to restore it.
+write.csv(seqtab, file.path(out_dir, "ASV_tables/ASV_seqtab_8756.rds"))
+
+# Open from here in case R crashes
+#seqtab<- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds"))
+
+### Remove chimeras
+seqtab_seq2_nochim <- removeBimeraDenovo(seqtab_seq2,
+                                         method="consensus",
+                                         multithread = TRUE,
+                                         verbose=TRUE) #Multithread = FALSE in Windows
+
+# Frequency of chimeras
+sum(seqtab_seq2_nochim)/sum(seqtab_seq2)
+
+# Save file
+saveRDS(seqtab_seq2_nochim, file.path(out_dir, "ASV_tables/ASV_seqtab_nochim_8756.rds"))
+write.csv(seqtab_seq2_nochim, file.path(out_dir, "ASV_tables/ASV_nochim_denoise_filt.csv")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
+#seqtab.nochim <- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
+
+# Inspect distribution of sequence lengths
+table(nchar(getSequences(seqtab_seq2_nochim)))
+
+### Track reads through the pipeline
+getN_seq2 <- function(x) sum(getUniques(x))
+track_seq2 <- cbind(out_seq2, sapply(dadaFs_seq2, getN_seq2), sapply(dadaRs_seq2, getN_seq2), sapply(mergers_seq2, getN_seq2),
+rowSums(seqtab_seq2nochim))
+
+colnames(track_seq2) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
+rownames(track_seq2) <- sample.namesF
+head(track_seq2)
+
+# Save file
+saveRDS(track_seq2, file.path(out_dir, "preprocess/pre_8756/track_8756.rds"))
+
+### Taxonomy
+unite.ref <- file.path(out_dir, "Taxonomy", "sh_general_release_dynamic_29.11.2022.fasta")  # CHANGE ME to location on your machine
+taxa_seq2 <- assignTaxonomy(seqtab_seq2_nochim, unite.ref,
+                            multithread = TRUE, 
+                            tryRC = TRUE) #Multithread = FALSE in Windows. TRUE in Mac/Linux.
+
+#Loading from the files saved. In case it crashes, we start from here.
+#seqtab.nochim2 <- read.csv(file.path(out_dir, "ASV_tables", "/ASV_nochim_denoise_filt.csv")) 
+#seqtab.matrix <- as.matrix(seqtab.nochim2) #assignTaxonomy needs a vector matrix
+
+# Inspecting the taxonomic assignments:
+taxa.print_seq2 <- taxa_seq2  # Removing sequence rownames for display only
+rownames(taxa.print_seq2) <- NULL
+head(taxa.print_seq2)
+write.csv(taxa.print_seq2, file.path(out_dir, "Taxonomy/assign_tax_8756.csv"))
+
+
+#Done
+```
+
+
+
 
 # Cypress: How to submit this as a SLURM job. 
 See general guidelines from [Adrià Auladell Martín](https://github.com/adriaaula/dada2_guidelines)
@@ -619,13 +986,13 @@ Result
 
 Notice the change in the username of your session indicating that you are operating inside the "virtual" environment. Creating this environment allows you to install new packages and dependencies that are not available in Cypress. In this self-contained environment you can install a new version of R or any other program necessary for analyses. 
 
-# Software and packages on Cypress
+## Software and packages on Cypress
 Once you are in you desired environment you can proceed to install the packages and modules necessary. Check the available modules with:
 ```{bash}
 conda list
 ```
 
-You will see waht is available and your environment and decide what need to be installed. 
+You will see what is available and your environment and decide what need to be installed. 
 
 ## Cutadapt
 See [Shared installation (on a cluster)](https://cutadapt.readthedocs.io/en/stable/installation.html#shared-installation-on-a-cluster) for details. Yoi have already created the virtual environment. Install using `pip` command:
@@ -736,250 +1103,11 @@ module purge
 
 Because each project has different number of samples or target organisms each SLURM job is different and will have different memory and processing parameters. Adjust accordingly. See this resource: [dada2HPC_worload](https://github.com/erictleung/dada2HPCPipe#slurm-workload-manager)
 
-# Streamlined script.
-Remember to change the file paths to your files and directories. As well, as to where `cutadapt` is installed in your local machine or HPC cluster. Use the appropriate data base to assigning taxonomy to your data or project! 
-Notice that `multithread = TRUE` here to take advantage of HPC's capacity to run jobs in parallel. 
-```{r}
-#DADA2 pipeline
-#Modified by Bolívar Aponte Rolón for bioinformatic analyses of ITS amplicon sequences
-#14/june/2023
-
-# Loading packages
-# Activate commands as needed.
-# DADA2 package and associated
-#library("usethis") #Doesn't install on the HPC cluster for some reason.
-#library("devtools") #Doesn't install on the HPC cluster for some reason.
-library("Rcpp")
-library("dada2")
-library("ShortRead")
-library("Biostrings")  #This will install other packages and dependencies.
-
-
-### File Paths
-path <- "/lustre/project/svanbael/bolivar/CH2_sequences/Aponte_8450_23052601"
-out_dir <- "/lustre/project/svanbael/bolivar/CH2_sequences" #An "out" directory to avoid crowding main directory of new files. Also keeps intact raw files.
-
-list.files(path)
-fnFs <- sort(list.files(path, pattern = "R1.fastq", full.names = TRUE))
-fnRs <- sort(list.files(path, pattern = "R2.fastq", full.names = TRUE))
-
-# Identifying primers
-#CHANGE primers accordingly
-FWD<-"CACTCTTTCCCTACACGACGCTCTTCCGATCTCTTGGTCATTTAGAGGAAGTAA"# Forward ITS1f_adapt from IDT 
-nchar(FWD) #Number of primer nucleotides.
-REV<-"GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCTGCTGCGTTCTTCATCGATGC"# Reverse primer ITS2r_adapt from IDT
-nchar(REV)
-
-### Verifying the orientation of the primers
-allOrients <- function(primer) {# Create all orientations of the input sequence
-                   require(Biostrings)
-                   dna <- DNAString(primer)  # The Biostrings works w/ DNAString objects rather than character vectors
-                   orients <- c(Forward = dna, 
-                                Complement = Biostrings::complement(dna), 
-                                Reverse = Biostrings::reverse(dna),
-                                RevComp = Biostrings::reverseComplement(dna))
-                   return(sapply(orients, toString))  # Convert back to character vector
-}
-FWD.orients <- allOrients(FWD)
-REV.orients <- allOrients(REV)
-#FWD2 <- FWD.orients[["Complement"]] #Use if you suspect an orientation mix-up.
-#REV2 <- REV.orients[["Complement"]]
-
-### Filter Reads for ambiguous bases (N)
-fnFs.filtN <- file.path(path, "filtN", basename(fnFs)) # Put N-filtered forward read files in filtN/ subdirectory
-fnRs.filtN <- file.path(path, "filtN", basename(fnRs)) #Reverse reads
-filterAndTrim(fnFs, fnFs.filtN, fnRs, fnRs.filtN, maxN = 0, multithread = TRUE) #multithread = TRUE on Mac OS, FALSE in Windows
-
-### Checking for primer hits
-set.seed(123)
-primerHits <- function(primer, fn) {
-  # Counts number of reads in which the primer is found
-  nhits <- vcountPattern(primer, sread(readFastq(fn)), fixed = FALSE)
-  return(sum(nhits > 0))
-}
-rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.filtN[[1]]),
-      FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs.filtN[[1]]),
-      REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs.filtN[[1]]),
-      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.filtN[[1]]))
-
-### Cutadapt: removal of primers
-#Once this has been completed there is no need to run again when working on the script
-cutadapt <-  "/home/baponterolon/.conda/envs/virtual_env/bin/cutadapt" # CHANGE ME to the cutadapt path on your machine
-system2(cutadapt, args = "--version") # Run shell commands from R
-
-path.cut <- file.path(out_dir, "cutadapted") #Remember where this "out" directory path leads to.
-#all.cut <- file.path(out_dir, "FastQC") # Path to concatenated files 
-print(path.cut) #Checking if the path is correct.
-if(!dir.exists(path.cut)) dir.create(path.cut)
-fnFs.cut <- file.path(path.cut, basename(fnFs))
-fnRs.cut <- file.path(path.cut, basename(fnRs))
-
-FWD.RC <- dada2:::rc(FWD)
-REV.RC <- dada2:::rc(REV)
-
-# Trim FWD and the reverse-complement of REV off of R1 (forward reads)
-R1.flags <- paste("-g", FWD, "-a", REV.RC) 
-# Trim REV and the reverse-complement of FWD off of R2 (reverse reads)
-R2.flags <- paste("-G", REV, "-A", FWD.RC) 
-
-### Run Cutadapt
-for(i in seq_along(fnFs)) {
-  system2(cutadapt, args = c(R1.flags, R2.flags, "-n", 2, # -n 2 removes FWD and REV from reads
-                             "-o", fnFs.cut[i], "-p", fnRs.cut[i], # output files
-                             fnFs.filtN[i], fnRs.filtN[i])) #input files
-}
-
-#Re-inspecting if all primers were removed.  
-#Once this has been completed there is no need to run again when working on the script
-rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs.cut[[1]]), 
-      FWD.ReverseReads = sapply(FWD.orients,
-      primerHits, fn = fnRs.cut[[1]]), 
-      REV.ForwardReads = sapply(REV.orients, primerHits,fn = fnFs.cut[[1]]), 
-      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs.cut[[1]]))
-                                                                                                        
-#Forward and reverse fastq filenames have the format:
-cutFs <- sort(list.files(path.cut, pattern = "R1.fastq", full.names = TRUE))
-cutRs <- sort(list.files(path.cut, pattern = "R2.fastq", full.names = TRUE))
-                                          
-#Extract sample names, assuming filenames have format:
-get.sample.name <- function(fname) strsplit(basename(fname), "_R")[[1]][1] #String in commas needs to be updated according to naming convention. If you have multiple underscores in the name then select the underscore next to the "R", like above, or any other unique identifier in the character string.
-              
-sample.namesF <- unname(sapply(cutFs, get.sample.name))
-sample.namesR <- unname(sapply(cutRs, get.sample.name))
-          
-### Inspect the read quality
-#plotQualityProfile(cutFs[20:21])
-#plotQualityProfile(cutRs[20:21])
-
-### Filter and trim
-filtFs <- file.path(out_dir, "Filtered", basename(cutFs))
-filtRs <- file.path(out_dir, "Filtered", basename(cutRs))
-names(filtFs) <- sample.namesF
-names(filtRs) <- sample.namesR
-
-#Truncating Forward and Reverse reads to 230 and 180 respectively. The reverse maxEE is relaxed due to overall low quality of reads
-out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
-                             truncLen=c(230,180),
-                             maxN=0,
-                             maxEE=c(2,3),
-                             truncQ=2,
-                             minLen=50,
-                             rm.phix=TRUE,
-                             compress=TRUE,
-                             multithread=TRUE) # minLen: Remove reads with length less than minLen. minLen is enforced after trimming and truncation. #enforce min length of 50 bp
-
-#Once it is completed there is no need to run again unless you are changing parameters.
-#Save file
-saveRDS(out, file.path(out_dir, "Preprocess", "/out.rds"))
-
-### Dereplication
-# Dereplication combines all identical reads into one unique sequence with a corresponding abundance equal to the number of reads with that unique sequence. It is done because it reduces computation time by eliminating redundancy -- From DADA2 tutorial, v1.8
-derepFs <- derepFastq(filtFs, n = 1000, verbose=TRUE) #n prevents it from reading more than 1000 reads at the same time. This controls the peak memory requirement so that large fastq files are supported. 
-derepRs <- derepFastq(filtRs, n = 1000, verbose=TRUE)
-saveRDS(derepFs, file.path(out_dir, "Preprocess", "/derepFs.rds"))
-saveRDS(derepFs, file.path(out_dir, "Preprocess", "/derepFs.rds"))
-
-#derepFS <- readRDS(file.path(out_dir, "Preprocess", "/derepFs.rds"))
-#derepRS <- readRDS(file.path(out_dir, "Preprocess", "/derepRs.rds"))
-
-# name the dereplicated reads by the sample names
-names(derepFs) <- sample.namesF
-names(derepRs) <- sample.namesR
-
-### Learn error rates from dereplicated reads
-set.seed(123)
-errF <- learnErrors(derepFs, randomize = TRUE, multithread=TRUE) #multithread is set to FALSE in Windows. Unix OS is =TRUE.
-errR <- learnErrors(derepRs, randomize = TRUE, multithread=TRUE)
-
-# Save file
-saveRDS(errF, file.path(out_dir, "Preprocess", "/errF.rds"))
-saveRDS(errR, file.path(out_dir, "Preprocess", "/errR.rds"))
-
-#errF <- readRDS(file.path(out_dir, "Preprocess", "/errF.rds"))
-#errR <- readRDS(file.path(out_dir, "Preprocess", "/errR.rds"))
-
-### Plot errors
-#plotErrors(errF, nominalQ=TRUE)
-
-### Sample Inference
-dadaFs <- dada(derepFs, err=errF, multithread=TRUE)
-dadaRs <- dada(derepRs, err=errR, multithread=TRUE)
-saveRDS(dadaFs, file.path(out_dir, "Preprocess", "/dadaFs.rds"))
-saveRDS(dadaFs, file.path(out_dir, "Preprocess", "/dadaFs.rds"))
-
-#dadaFS <- readRDS(file.path(out_dir, "Preprocess", "/dadaFs.rds"))
-#dadaRS <- readRDS(file.path(out_dir, "Preprocess", "/dadaRs.rds"))
-
-### Merge paired reads
-mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, minOverlap = 20, maxMismatch = 0, verbose=TRUE)
-saveRDS(mergers, file.path(out_dir, "Preprocess", "/mergers.rds"))
-
-#mergers <- readRDS(file.path(out_dir, "Preprocess", "/mergers.rds"))
-# Inspect the merger data.frame from the first sample
-head(mergers[[1]])
-
-### Construct ASV Sequence Table
-seqtab <- makeSequenceTable(mergers)
-dim(seqtab)
-
-# Inspect distribution of sequence lengths
-table(nchar(getSequences(seqtab)))
-
-# Save file R object, and .csv
-saveRDS(seqtab, file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds")) #Functions to write a single R object to a file, and to restore it.
-write.csv(seqtab, file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds"))
-
-# Open from here in case R crashes
-#seqtab<- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds"))
-
-### Remove chimeras
-seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread = FALSE, verbose=TRUE) #Multithread = FALSE in Windows
-
-# Frequency of chimeras
-sum(seqtab.nochim)/sum(seqtab)
-
-# Save file
-saveRDS(seqtab.nochim, file.path(out_dir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
-write.csv(seqtab.nochim, file.path(out_dir, "ASV_tables", "/ASV_nochim_denoise_filt.csv")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
-#seqtab.nochim <- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
-
-# Inspect distribution of sequence lengths
-table(nchar(getSequences(seqtab.nochim)))
-
-### Track reads through the pipeline
-getN <- function(x) sum(getUniques(x))
-track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN),
-rowSums(seqtab.nochim))
-colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
-rownames(track) <- sample.namesF
-head(track)
-
-# Save file
-saveRDS(track, file.path(out_dir, "Preprocess", "/track.rds"))
-
-### Taxonomy
-unite.ref <- file.path(out_dir, "Taxonomy", "sh_general_release_dynamic_29.11.2022.fasta")  # CHANGE ME to location on your machine
-taxa <- assignTaxonomy(seqtab.nochim, unite.ref, multithread = TRUE, tryRC = TRUE) #Multithread = FALSE in Windows. TRUE in Mac/Linux.
-
-#Loading from the files saved. In case it crashes, we start from here.
-#seqtab.nochim2 <- read.csv(file.path(out_dir, "ASV_tables", "/ASV_nochim_denoise_filt.csv")) 
-#seqtab.matrix <- as.matrix(seqtab.nochim2) #assignTaxonomy needs a vector matrix
-
-# Inspecting the taxonomic assignments:
-taxa.print <- taxa  # Removing sequence rownames for display only
-rownames(taxa.print) <- NULL
-head(taxa.print)
-write.csv(taxa.print, file.path(out_dir, "Taxonomy", "/assign_tax_mim2.csv"))
-
-
-#Done
-```
-
-# Assigning Taxonomy
+## Assigning Taxonomy
 
 The last step in this pipeline can be consume a lot of processing memory, even for the HPC cluster. If your job fails at the last step, assigning taxonomy, consider submitting this part as separate job. 
 
-## Taxonomy batch job
+### Taxonomy batch job
 With these parameters it took about ~4.5 hrs. Maybe tasks per node can be increase to 10, hence 2 CPU's per task. 
 ```{bash}
 #!/bin/bash
@@ -1009,7 +1137,10 @@ R CMD BATCH dada2_tax_pipeline.R
 module purge
 ```
 
-The memory requirements are different than the batch job submitted for the whole pipeline. It has increased RAM memory core (256000k), 20 CPUs per task, and 1 task per node. This means that one task has a lost of processing memory to operate with. The previous batch job example carried out 20 tasks at a time in 20 CPUs, throughout 4 nodes. This make the computation of the pipeline quite fast (~2hrs), but it fails to locate enough processing memory for the `assingTaxonomy()` step. Another way of going about this issue is submitting a [job array](https://wiki.hpc.tulane.edu/trac/wiki/Workshops/cypress/ManyTaskComputing). 
+The memory requirements are different than the batch job submitted for the whole pipeline. It has increased RAM memory core (256000k), 20 CPUs per task, and 1 task per node. This means that one task has a lot of processing memory to operate with. The previous batch job example carried out 20 tasks at a time in 20 CPUs, throughout 4 nodes. This makes the computation of the pipeline quite fast (~2hrs), but it fails to locate enough processing memory for the `assingTaxonomy()` step. Another way of going about this issue is submitting a [job array](https://wiki.hpc.tulane.edu/trac/wiki/Workshops/cypress/ManyTaskComputing). 
+
+
+
 
 # Decontamination of samples
 
