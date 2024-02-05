@@ -101,8 +101,8 @@ controls and PCR controls are a little bit different than field samples
 and treated as such by using a slightly different script. For this I
 have prepared the following scripts.
 
-**Samples**
-No need to unzip files if `cutadapt` and `dada2` can handle zipped files.
+**Samples** No need to unzip files if `cutadapt` and `dada2` can handle
+zipped files.
 
 ```{bash}
 #!/bin/bash
@@ -138,8 +138,8 @@ done
 
     -   SPLB_L004_2_R2.fastq
 
-**Controls**
-No need to unzip files if `cutadapt` and `dada2` can handle zipped files.
+**Controls** No need to unzip files if `cutadapt` and `dada2` can handle
+zipped files.
 
 ```{bash}
 #!/bin/bash
@@ -193,9 +193,9 @@ Starting with `raw_sequences`, where *raw_sequences* is the directory
 name of where the main `fastq` or `fasta` files are. This is were the
 raw sequence files are. The file names have already been cleaned, see
 sections above. Create `filtN` as a sub-directory of `raw_sequences`.
-The final directories: `ASV_tables`, `preprocess`,
-`qc_reports`, and `Taxonomy`. As you work through this tutorial the
-files will be saved in their respective directories.
+The final directories: `ASV_tables`, `preprocess`, `qc_reports`, and
+`Taxonomy`. As you work through this tutorial the files will be saved in
+their respective directories.
 
 For this project, I will be working with two separate sequencing runs:
 *Aponte_8450_23052601* and *Aponte_8756_23110702*. Both contain samples.
@@ -386,24 +386,17 @@ primerHits <- function(primer, fn) {
     nhits <- vcountPattern(primer, sread(readFastq(fn)), fixed = FALSE)
     return(sum(nhits > 0))
 }
-rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq1_filtN[[1]]), FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs_seq1_filtN[[1]]), REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs_seq1_filtN[[1]]), REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs_seq1_filtN[[1]]))
+
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq1_filtN[[1]]), 
+      FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs_seq1_filtN[[1]]), 
+      REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs_seq1_filtN[[1]]), 
+      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs_seq1_filtN[[1]]))
 ```
 
 We see the reverse complement of primers present in the FWD.ReverseReads
 and the Rev.ForwardReads.
 
- ### Cutadapt: removal of primers
-
-Write section of how to install the latest version of [Python
-(3.11)](https://www.python.org/downloads/windows/), Visual Studio Build
-Tools 2022 and install
-[`cutadapt`](https://cutadapt.readthedocs.io/en/stable/installation.html#installation-on-windows)
-to have it work in this pipeline. The `cutadapt` package can be used
-directly in the command-line also. That is it's most basic use. If
-working from Windows OS you can use Git Bash with the added utility of
-[`wget`](https://gist.github.com/evanwill/0207876c3243bbb6863e65ec5dc3f058)
-to install [Python
-3.11](https://programmingwithjim.wordpress.com/2020/09/08/installing-python-3-in-git-bash-on-windows-10/)
+### Cutadapt: removal of primers
 
 ```{r, cutadapt}
 #| eval: true
@@ -419,7 +412,6 @@ system2(cutadapt, args = "--version") # Run shell commands from R
 #| echo: false
 #| tidy: true
 path.cut_1 <- file.path(path_1, "cutadapt") #Remember where this "out" directory path leads to.
-#all.cut <- file.path(out_dir, "FastQC") # Path to concatenated files 
 print(path.cut_1) #Checking if the path is correct.
 
 if(!dir.exists(path.cut_1)) dir.create(path.cut_1)
@@ -443,14 +435,14 @@ R2.flags <- paste("-G", REV, "-A", FWD.RC)
 # Run Cutadapt
 #Once this has been completed there is no need to run again when working on the script.
 
-for(i in seq_along(fnFs_seq1)) {
-  system2(cutadapt, args = c(R1.flags, R2.flags, 
-                             "-n", 2, # -n 2 removes FWD and REV from reads
-                             "-o", fnFs_seq1_cut[i], 
-                             "-p", fnRs_seq1_cut[i], # output files
-                             fnFs_seq1_filtN[i], 
-                             fnRs_seq1_filtN[i])) #input files
-}
+# for(i in seq_along(fnFs_seq1)) {
+#   system2(cutadapt, args = c(R1.flags, R2.flags, 
+#                              "-n", 2, # -n 2 removes FWD and REV from reads
+#                              "-o", fnFs_seq1_cut[i], 
+#                              "-p", fnRs_seq1_cut[i], # output files
+#                              fnFs_seq1_filtN[i], 
+#                              fnRs_seq1_filtN[i])) #input files
+# }
 
 # String for changing file extension (i.e. .fastq > .fa)
 # new_extension <- ".fa"
@@ -468,15 +460,14 @@ for(i in seq_along(fnFs_seq1)) {
 #Once this has been completed there is no need to run again when working on the script
 #
 rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq1_cut[[1]]), 
-      FWD.ReverseReads = sapply(FWD.orients,
-      primerHits, fn = fnRs_seq1_cut[[1]]), 
-      REV.ForwardReads = sapply(REV.orients, primerHits,fn = fnFs_seq1_cut[[1]]), 
+      FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs_seq1_cut[[1]]), 
+      REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs_seq1_cut[[1]]), 
       REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs_seq1_cut[[1]]))
 
 
 # Forward and reverse fastq filenames have the format:
 cutFs_seq1 <- sort(list.files(path.cut_1, pattern = "R1.fastq.gz", full.names = TRUE))
-cutFs_seq1 <- sort(list.files(path.cut_1, pattern = "R2.fastq.gz", full.names = TRUE))
+cutRs_seq1 <- sort(list.files(path.cut_1, pattern = "R2.fastq.gz", full.names = TRUE))
 #allcutF <- sort(list.files(all.cut, pattern = "R1.fastq.gz", full.names = TRUE))
 
 # Extract sample names, assuming filenames have format:
@@ -487,6 +478,8 @@ sample.namesR <- unname(sapply(cutFs_seq1, get.sample.name))
 head(sample.namesF)
 head(sample.namesR)
 ```
+
+**All primers were successfully removed.**
 
 ### Inspect the read quality
 
@@ -506,9 +499,11 @@ Linux environment](https://www.youtube.com/watch?v=5nth7o_-f0Q)
 ```{r}
 #| eval: true
 #| echo: false
-plotQualityProfile(cutFs_seq1[1:2])
-plotQualityProfile(cutFs_seq1[1:2])
+plotQualityProfile(cutFs_seq1[2:2])
+plotQualityProfile(cutRs_seq1[1:2])
 ```
+
+The quality of the reads improves after removal of N calls and adapter sequences. The `plotQualityProfile` function allows only a subset of the reads to be plotted. This is not as useful when you have a large number of samples and you want to inspect the quality of the reads. We will create new FastQC reports and MultiQC reports to inspect the quality of the reads and establish which parameters to use for filtering, trimming and truncation.
 
 ### FastQC reports: mismatches (Ns) filtered and cut
 
@@ -521,66 +516,71 @@ Se previous MultiQC section. The out put should include all cut and
 trimmed FastQC report. It will inform the following steps: trimming and
 truncating.
 
-### FIGARO: tool for deciding what parameters to use for filtering, trimming and truncation
+<!-- ### FIGARO: tool for deciding what parameters to use for filtering, trimming and truncation -->
 
-This step can be performed on the raw reads as well. Here we focus on
-the cut, filtered and trimmed reads.
+<!-- This step can be performed on the raw reads as well. Here we focus on -->
+<!-- the cut, filtered and trimmed reads. -->
 
-```{python}
+<!-- ```{python} -->
 
-# from figaro import figaro
-# resultTable, forwardCurve, reverseCurve = figaro.runAnalysis(
-#   sequenceFolder = path.cut, 
-#   ampliconLength = 500, #Maximum expected size of the amplicon
-#   forwardPrimerLength= 54,
-#   reversePrimerLength = 54, 
-#   minimumOverlap = 20, 
-#   fileNamingStandard, 
-#   trimParameterDownsample, 
-#   trimParameterPercentile)
-```
+<!-- # from figaro import figaro -->
+<!-- # resultTable, forwardCurve, reverseCurve = figaro.runAnalysis( -->
+<!-- #   sequenceFolder = path.cut,  -->
+<!-- #   ampliconLength = 500, #Maximum expected size of the amplicon -->
+<!-- #   forwardPrimerLength= 54, -->
+<!-- #   reversePrimerLength = 54,  -->
+<!-- #   minimumOverlap = 20,  -->
+<!-- #   fileNamingStandard,  -->
+<!-- #   trimParameterDownsample,  -->
+<!-- #   trimParameterPercentile) -->
+<!-- ``` -->
 
 ## Filter and trim
+
+Results from MultiQC and FIGARO inform parameter selection.
+
+For Aponte_8450_23052601 we see that the forwards reads have a decent
+quality up to 200-230 bp. 
+<!-- The reverse reads are of lower quality. We will use a `truncLen` of 210 and 200 for forward and reverse reads, respectively. -->
+We will use a cut off quality of 2 (Phred score 20) in arguments `trunQ` and `minQ`, which tranlates to a read length of about 215 bp, which is decent. We are being a little stringent here since the quality of these libraries has been poor since the PCR stages. The average ITS amplicon size for this library pool was 385 bp (see Duke report and MultiQC report in repository). Around 230 bp is where the average read drops below a Phred score of ~25.
 
 ```{r, assign_file_names}
 #| eval: true
 #| echo: false
 #| tidy: true
 filtFs_seq1 <- file.path(out_dir, "filtered/filt_8450", basename(cutFs_seq1))
-filtRs_seq1 <- file.path(out_dir, "filtered/filt_8450", basename(cutFs_seq1))
+filtRs_seq1 <- file.path(out_dir, "filtered/filt_8450", basename(cutRs_seq1))
 names(filtFs_seq1) <- sample.namesF
 names(filtRs_seq1) <- sample.namesR
 head(filtFs_seq1, 10)
 head(filtRs_seq1, 10)
 ```
 
-Results from MultiQC and FIGARO inform parameter selection.
-
 ```{r, truncating}
 #| eval: true
 #| echo: false
 #| tidy: true
-#Truncating Forward and Reverse reads to 230 and 180 respectively. The reverse maxEE is relaxed due to overall low quality of reads
-out_seq1 <- filterAndTrim(fnFs_seq1, filtFs_seq1, fnRs_seq1, filtRs_seq1,
-                     truncLen=c(230,180),
-                     maxN=0,
-                     maxEE=c(2,3),
-                     truncQ=2,
-                     minLen=50,
-                     rm.phix=TRUE,
-                     compress=TRUE,
-                     multithread=FALSE) # minLen: Remove reads with length less than minLen. minLen is enforced after trimming and truncation. #enforce min length of 50 bp
+# Truncating Forward and Reverse reads to ~ 230 bp based on trunQ = 2. 
+# The reverse maxEE is relaxed due to overall low quality of reads
+out_seq1 <- filterAndTrim(cutFs_seq1, filtFs_seq1, 
+                          cutRs_seq1, filtRs_seq1,
+                          #truncLen=c(210,200), #Truncate reads after truncLen bases. Reads shorter than this are discarded.
+                          truncQ = 2,
+                          minQ = 2,
+                          maxN = 0,
+                          maxEE = c(2,2),
+                          minLen = 50, #Not necessary when using truncLen
+                          rm.phix = TRUE,
+                          compress = TRUE,
+                          multithread = TRUE) # minLen: Remove reads with length less than minLen. minLen is enforced after trimming and truncation. #enforce min length of 50 bp
 
 #Once it is completed there is no need to run again unless you are changing parameters.
 
 #Saving file
-saveRDS(out_seq1, file.path(out_dir, "preprocess/pre_8450/out_8450.rds"))
+#saveRDS(out_seq1, file.path(out_dir, "preprocess/pre_8450/out_8450.rds"))
 #out <- readRDS(file.path(out_dir, "preprocess/pre_8450", "/out.rds"))
 ```
 
-```{r}
-head(out)
-```
 
 ### Dereplication
 
@@ -593,15 +593,15 @@ redundancy -- From DADA2 tutorial, v1.8
 #| eval: true
 #| echo: false
 #| tidy: true
-derepFs_seq1 <- derepFastq(filtFs_seq1, n = 1000, verbose=TRUE) #n prevents it from reading more than 1000 reads at the same time. This controls the peak memory requirement so that large fastq files are supported. 
-derepRs_seq1 <- derepFastq(filtRs_seq1, n = 1000, verbose=TRUE)
+derepFs_seq1 <- derepFastq(filtFs_seq1, n = 1000, verbose = TRUE) #n prevents it from reading more than 1000 reads at the same time. This controls the peak memory requirement so that large fastq files are supported. 
+derepRs_seq1 <- derepFastq(filtRs_seq1, n = 1000, verbose = TRUE)
 
 saveRDS(derepFs_seq1, file.path(out_dir, "preprocess/pre_8450/derepFs_8450.rds"))
-saveRDS(derepFs_seq1, file.path(out_dir, "preprocess/pre_8450/derepFs_8450.rds"))
-#derepFs_seq1 <- readRDS(file.path(out_dir, "Ppreprocess/pre_8450", "/derepFs_8450.rds"))
-#derepRs_seq1 <- readRDS(file.path(out_dir, "preprocess/pre_8450", "/derepRs_8450.rds"))
+saveRDS(derepRs_seq1, file.path(out_dir, "preprocess/pre_8450/derepRs_8450.rds"))
+#derepFs_seq1 <- readRDS(file.path(out_dir, "preprocess/pre_8450/derepFs_8450.rds"))
+#derepRs_seq1 <- readRDS(file.path(out_dir, "preprocess/pre_8450/derepRs_8450.rds"))
 
-# #name the dereplicated reads by the sample names
+#name the dereplicated reads by the sample names
 names(derepFs_seq1) <- sample.namesF
 names(derepRs_seq1) <- sample.namesR
 ```
@@ -711,7 +711,7 @@ saveRDS(seqtab_seq1_nochim, file.path(out_dir, "ASV_tables/ASV_seqtab_nochim_845
 Inspect distribution of sequence lengths
 
 ```{r, eval=TRUE}
-table(nchar(getSequences(seqtab.nochim)))
+table(nchar(getSequences(seqtab_seq1_nochim)))
 ```
 
 ### Track reads through the pipeline
@@ -725,8 +725,11 @@ the pipeline to verify everything worked as expected.
 #| tidy: true
 
 getN_seq1 <- function(x) sum(getUniques(x))
-track_seq1 <- cbind(out, sapply(dadaFs_seq1, getN_seq1), sapply(dadaRs_seq1, getN_seq1), sapply(mergers_seq1, getN_seq1),
-    rowSums(seqtab_seq1_nochim))
+track_seq1 <- cbind(out, sapply(dadaFs_seq1, getN_seq1), 
+                    sapply(dadaRs_seq1, getN_seq1), 
+                    sapply(mergers_seq1, getN_seq1),
+                    rowSums(seqtab_seq1_nochim))
+
 # If processing a single sample, remove the sapply calls: e.g. replace
 # sapply(dadaFs, getN) with getN(dadaFs)
 colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
@@ -738,7 +741,8 @@ saveRDS(track, file.path(out_dir, "preprocess/pre_8450/track_8450.rds"))
 ```
 
 ::: callout-warning
-<font size="4"> [**Note from DADA2 ITS tutorial**](https://benjjneb.github.io/dada2/ITS_workflow.html).
+<font size="4"> [**Note from DADA2 ITS
+tutorial**](https://benjjneb.github.io/dada2/ITS_workflow.html).
 
 **Considerations for your own data:** This is a great place to do a last
 sanity check. Outside of filtering (depending on how stringent you want
