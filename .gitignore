@@ -18,3 +18,7 @@
 
 # RStudio files
 .Rproj.user/
+
+# Directories with big files
+preprocess/
+filtered/

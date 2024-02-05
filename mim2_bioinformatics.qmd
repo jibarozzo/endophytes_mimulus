@@ -50,7 +50,11 @@ on github "LAmarshGradient2 ITS code.
 
 ### Packages required
 
-```{r, Pre-requisites, tidy=TRUE, eval=TRUE}
+```{r, Pre-requisites}
+#| eval: true
+#| echo: false
+#| tidy: true
+#| warning: false
 # Activate commands as needed.
 # change the ref argument to get other versions
 # DADA2 package and associated
@@ -98,6 +102,7 @@ and treated as such by using a slightly different script. For this I
 have prepared the following scripts.
 
 **Samples**
+No need to unzip files if `cutadapt` and `dada2` can handle zipped files.
 
 ```{bash}
 #!/bin/bash
@@ -134,6 +139,7 @@ done
     -   SPLB_L004_2_R2.fastq
 
 **Controls**
+No need to unzip files if `cutadapt` and `dada2` can handle zipped files.
 
 ```{bash}
 #!/bin/bash
@@ -187,7 +193,7 @@ Starting with `raw_sequences`, where *raw_sequences* is the directory
 name of where the main `fastq` or `fasta` files are. This is were the
 raw sequence files are. The file names have already been cleaned, see
 sections above. Create `filtN` as a sub-directory of `raw_sequences`.
-The final directories: `ASV_tables`. `cutadapted`, `Preprocess`,
+The final directories: `ASV_tables`, `preprocess`,
 `qc_reports`, and `Taxonomy`. As you work through this tutorial the
 files will be saved in their respective directories.
 
@@ -208,16 +214,16 @@ out_dir <- "/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics"
 
 
 list.files(path_1)
-fnFs_seq1 <- sort(list.files(path_1, pattern = "R1.fastq", full.names = TRUE))
-fnRs_seq1 <- sort(list.files(path_1, pattern = "R2.fastq", full.names = TRUE))
+fnFs_seq1 <- sort(list.files(path_1, pattern = "R1.fastq.gz", full.names = TRUE))
+fnRs_seq1 <- sort(list.files(path_1, pattern = "R2.fastq.gz", full.names = TRUE))
 
 #Aponte_8756_23110702
 path_2 <- "/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics/Aponte_8756_23110702"
 
 
 list.files(path_2)
-fnFs_seq2 <- sort(list.files(path_2, pattern = "R1.fastq", full.names = TRUE))
-fnRs_seq2 <- sort(list.files(path_2, pattern = "R2.fastq", full.names = TRUE))
+fnFs_seq2 <- sort(list.files(path_2, pattern = "R1.fastq.gz", full.names = TRUE))
+fnRs_seq2 <- sort(list.files(path_2, pattern = "R2.fastq.gz", full.names = TRUE))
 ```
 
 # Aponte_8450_23052601
@@ -347,7 +353,7 @@ REV.orients <- allOrients(REV)
 ### Filter Reads for ambiguous bases (N)
 
 We are filtering sequences for presence of ambiguous bases (N) before
-cutting primerd off. This pre-filtering step iomproves mmaping of short
+cutting primerd off. This pre-filtering step improves maping of short
 primer sequences. No other filtering is performed.
 
 ```{r, filtering_ambiguous_bases_N}
@@ -358,9 +364,9 @@ primer sequences. No other filtering is performed.
 fnFs_seq1_filtN <- file.path(path_1, "filtN", basename(fnFs_seq1)) # Put N-filtered forward read files in filtN/ subdirectory
 fnRs_seq1_filtN <- file.path(path_1, "filtN", basename(fnRs_seq1)) #Reverse reads
 
-#filterAndTrim(fnFs_seq1, fnFs_seq1_filtN, 
-#              fnRs_seq1, fnRs_seq1_filtN, 
-#              maxN = 0, multithread = TRUE)
+# filterAndTrim(fnFs_seq1, fnFs_seq1_filtN, 
+#               fnRs_seq1, fnRs_seq1_filtN, 
+#               maxN = 0, multithread = TRUE)
 ```
 
 ### Checking for primer hits
@@ -380,10 +386,7 @@ primerHits <- function(primer, fn) {
     nhits <- vcountPattern(primer, sread(readFastq(fn)), fixed = FALSE)
     return(sum(nhits > 0))
 }
-rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq1_filtN[[1]]),
-      FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs_seq1_filtN[[1]]),
-      REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs_seq1_filtN[[1]]),
-      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs_seq1_filtN[[1]]))
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq1_filtN[[1]]), FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs_seq1_filtN[[1]]), REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs_seq1_filtN[[1]]), REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs_seq1_filtN[[1]]))
 ```
 
 We see the reverse complement of primers present in the FWD.ReverseReads
@@ -415,7 +418,7 @@ system2(cutadapt, args = "--version") # Run shell commands from R
 #| eval: true
 #| echo: false
 #| tidy: true
-path.cut_1 <- file.path(out_dir, "cutadapted/cut_8450") #Remember where this "out" directory path leads to.
+path.cut_1 <- file.path(path_1, "cutadapt") #Remember where this "out" directory path leads to.
 #all.cut <- file.path(out_dir, "FastQC") # Path to concatenated files 
 print(path.cut_1) #Checking if the path is correct.
 
@@ -472,9 +475,9 @@ rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq1_cut[[1]]
 
 
 # Forward and reverse fastq filenames have the format:
-cutFs_seq1 <- sort(list.files(path.cut_1, pattern = "R1.fastq", full.names = TRUE))
-cutFs_seq1 <- sort(list.files(path.cut_1, pattern = "R2.fastq", full.names = TRUE))
-#allcutF <- sort(list.files(all.cut, pattern = "R1.fastq", full.names = TRUE))
+cutFs_seq1 <- sort(list.files(path.cut_1, pattern = "R1.fastq.gz", full.names = TRUE))
+cutFs_seq1 <- sort(list.files(path.cut_1, pattern = "R2.fastq.gz", full.names = TRUE))
+#allcutF <- sort(list.files(all.cut, pattern = "R1.fastq.gz", full.names = TRUE))
 
 # Extract sample names, assuming filenames have format:
 get.sample.name <- function(fname) strsplit(basename(fname), "_R")[[1]][1] #String in commas needs to be updated according to naming convention. If you have multiple underscores in the name then select the underscore next to the "R", like above, or any other unique identifier in the character string.
@@ -735,7 +738,7 @@ saveRDS(track, file.path(out_dir, "preprocess/pre_8450/track_8450.rds"))
 ```
 
 ::: callout-warning
-<font size="4"> **Note from DADA2 tutorial**.
+<font size="4"> [**Note from DADA2 ITS tutorial**](https://benjjneb.github.io/dada2/ITS_workflow.html).
 
 **Considerations for your own data:** This is a great place to do a last
 sanity check. Outside of filtering (depending on how stringent you want
@@ -828,9 +831,9 @@ library("Biostrings")  #This will install other packages and dependencies.
 # path <- "/lustre/project/svanbael/bolivar/CH2_sequences/Aponte_8450_23052601"
 # out_dir <- "/lustre/project/svanbael/bolivar/CH2_sequences" #An "out" directory to avoid crowding main directory of new files. Also keeps intact raw files.
 
-list.files(path)
-fnFs_seq2 <- sort(list.files(path_2, pattern = "R1.fastq", full.names = TRUE))
-fnRs_seq2 <- sort(list.files(path_2, pattern = "R2.fastq", full.names = TRUE))
+list.files(path_2)
+fnFs_seq2 <- sort(list.files(path_2, pattern = "R1.fastq.gz", full.names = TRUE))
+fnRs_seq2 <- sort(list.files(path_2, pattern = "R2.fastq.gz", full.names = TRUE))
 
 # Identifying primers
 #CHANGE primers accordingly
@@ -874,10 +877,10 @@ rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq2_filtN[[1
 
 ### Cutadapt: removal of primers
 #Once this has been completed there is no need to run again when working on the script
-cutadapt <-  "/urs/buin/cutadapt" # CHANGE ME to the cutadapt path on your machine
+cutadapt <-  "/urs/bin/cutadapt" # CHANGE ME to the cutadapt path on your machine
 system2(cutadapt, args = "--version") # Run shell commands from R
 
-path.cut_2 <- file.path(out_dir, "cutadapted/cut_8756") #Remember where this "out" directory path leads to.
+path.cut_2 <- file.path(path_2, "cutadapt") #Remember where this "out" directory path leads to.
 #all.cut <- file.path(out_dir, "FastQC") # Path to concatenated files 
 print(path.cut_2) #Checking if the path is correct.
 if(!dir.exists(path.cut_2)) dir.create(path.cut_2)
@@ -908,8 +911,8 @@ rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq2_cut[[1]]
       REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs_seq2_cut[[1]]))
                                                                                                         
 #Forward and reverse fastq filenames have the format:
-cutFs_seq2 <- sort(list.files(path.cut_2, pattern = "R1.fastq", full.names = TRUE))
-cutRs_seq2 <- sort(list.files(path.cut_2, pattern = "R2.fastq", full.names = TRUE))
+cutFs_seq2 <- sort(list.files(path.cut_2, pattern = "R1.fastq.gz", full.names = TRUE))
+cutRs_seq2 <- sort(list.files(path.cut_2, pattern = "R2.fastq.gz", full.names = TRUE))
                                           
 #Extract sample names, assuming filenames have format:
 get.sample.name <- function(fname) strsplit(basename(fname), "_R")[[1]][1] #String in commas needs to be updated according to naming convention. If you have multiple underscores in the name then select the underscore next to the "R", like above, or any other unique identifier in the character string.

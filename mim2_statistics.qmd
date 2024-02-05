@@ -260,8 +260,9 @@ pairwise.wilcox.test(imagej1$logLBI, g = imagej1$Genotype)
 
 ```
 
-
-# Linear model Evo 2023
+# Figures
+### Linear model 
+Regressions presented at Evo 2023.
 ```{r}
 # Regressions
 # Elevation and Thicknes
@@ -407,8 +408,8 @@ ant_arranged_with_caption
 ```
 
 
-## Leaf traits
-### LMA
+### Leaf traits
+#### LMA
 ```{r}
 #Cleaner data set
 #
@@ -457,7 +458,7 @@ lma
 ggsave(filename = file.path(newdir, "Plots", "/lma_evo2023.jpg"), plot = lma, dpi=300, units=c("mm"), width=300, height=150)
 ```
 
-### ACI
+#### ACI
 ```{r}
 errbar_lims <- group_by(ntraits2, Species) %>% 
               summarize(mean=mean(ACI), se=sd(ACI)/sqrt(n()), 
@@ -492,8 +493,8 @@ aci
 
 ggsave(filename = file.path(newdir, "Plots", "/aci_evo23.jpg"), plot = aci, dpi=300, units=c("mm"), width=300, height=150)
 ```
-### LBI
 
+#### LBI
 ```{r}
 #By Elevation
 errbar_lims <- group_by(ntraits2, Species) %>% 
@@ -529,7 +530,7 @@ ggsave(filename = file.path(newdir, "Plots", "/lbi_evo23.jpg"), plot = lbi, dpi=
 
 ```
 
-### Toughness
+#### Toughness
 ```{r}
 #Remove outlier and NAs for Toughness
 filtered_data <- ntraits2 %>%
@@ -568,7 +569,7 @@ thg
 ggsave(filename = file.path(newdir, "Plots", "/thg_evo23.jpg"), plot = thg, dpi=300, units=c("mm"), width=300, height=150)
 ```
 
-### Thickness
+#### Thickness
 
 ```{r}
 errbar_lims <- group_by(ntraits2, Species) %>% 
@@ -603,7 +604,7 @@ thk
 ggsave(filename = file.path(newdir, "Plots", "/thk_evo23.jpg"), plot = thk, dpi=300, units=c("mm"), width=300, height=150)
 ```
 
-### Multiple
+#### Multiple
 ```{r}
 # Multiples plots together
 #LMA and ACI
@@ -630,7 +631,7 @@ ant_arranged_with_caption
 ```
 
 
-## Elevation
+#### Elevation
 
 ```{r}
 legend_title <- "Species"
@@ -700,7 +701,7 @@ summary(model2)
 ggsave(filename = file.path(newdir, "Plots", "/rich_evo2023.jpg"), plot = rdv, dpi=300, units=c("mm"), width=250, height=150)
 ```
 
-## PCA
+#### PCA
 
 ```{r, PCA, tidy = FALSE}
 # PCA using covariates to explain species richness/abundance ####
