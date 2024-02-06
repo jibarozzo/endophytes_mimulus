@@ -1,15 +1,15 @@
 #!/bin/bash
-for file in *.fastq.gz
-do
- echo "Unziping"
- gzip -d  "$file"
-done
+#for file in *.fastq.gz
+#do
+# echo "Unziping"
+# gzip -d  "$file"
+#done
 
 #Rename the files
-for file in *.fastq
+for file in *.fastq.gz
 do
  echo "Renaming"
- newname=$(echo $file | cut -d_ -f1,2,5).fastq
+ newname=$(echo $file | cut -d_ -f1,2,5).fastq.gz
 # echo "Renaming $file as $newname"
  mv $file $newname 
 done
