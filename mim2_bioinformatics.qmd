@@ -194,7 +194,7 @@ name of where the main `fastq` or `fasta` files are. This is were the
 raw sequence files are. The file names have already been cleaned, see
 sections above. Create `filtN` as a sub-directory of `raw_sequences`.
 The final directories: `ASV_tables`, `preprocess`, `qc_reports`, and
-`Taxonomy`. As you work through this tutorial the files will be saved in
+`taxonomy`. As you work through this tutorial the files will be saved in
 their respective directories.
 
 For this project, I will be working with two separate sequencing runs:
@@ -466,15 +466,17 @@ rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs_seq1_cut[[1]]
 
 
 # Forward and reverse fastq filenames have the format:
+
 cutFs_seq1 <- sort(list.files(path.cut_1, pattern = "R1.fastq.gz", full.names = TRUE))
 cutRs_seq1 <- sort(list.files(path.cut_1, pattern = "R2.fastq.gz", full.names = TRUE))
+
 #allcutF <- sort(list.files(all.cut, pattern = "R1.fastq.gz", full.names = TRUE))
 
 # Extract sample names, assuming filenames have format:
 get.sample.name <- function(fname) strsplit(basename(fname), "_R")[[1]][1] #String in commas needs to be updated according to naming convention. If you have multiple underscores in the name then select the underscore next to the "R", like above, or any other unique identifier in the character string.
 
 sample.namesF <- unname(sapply(cutFs_seq1, get.sample.name))
-sample.namesR <- unname(sapply(cutFs_seq1, get.sample.name))
+sample.namesR <- unname(sapply(cutRs_seq1, get.sample.name))
 head(sample.namesF)
 head(sample.namesR)
 ```
@@ -578,7 +580,9 @@ out_seq1 <- filterAndTrim(cutFs_seq1, filtFs_seq1,
 
 #Saving file
 #saveRDS(out_seq1, file.path(out_dir, "preprocess/pre_8450/out_8450.rds"))
-#out <- readRDS(file.path(out_dir, "preprocess/pre_8450", "/out.rds"))
+
+#Loading file
+out_seq1 <- readRDS(file.path(out_dir, "preprocess/pre_8450/out_8450.rds"))
 ```
 
 
@@ -596,10 +600,13 @@ redundancy -- From DADA2 tutorial, v1.8
 derepFs_seq1 <- derepFastq(filtFs_seq1, n = 1000, verbose = TRUE) #n prevents it from reading more than 1000 reads at the same time. This controls the peak memory requirement so that large fastq files are supported. 
 derepRs_seq1 <- derepFastq(filtRs_seq1, n = 1000, verbose = TRUE)
 
-saveRDS(derepFs_seq1, file.path(out_dir, "preprocess/pre_8450/derepFs_8450.rds"))
-saveRDS(derepRs_seq1, file.path(out_dir, "preprocess/pre_8450/derepRs_8450.rds"))
-#derepFs_seq1 <- readRDS(file.path(out_dir, "preprocess/pre_8450/derepFs_8450.rds"))
-#derepRs_seq1 <- readRDS(file.path(out_dir, "preprocess/pre_8450/derepRs_8450.rds"))
+#Save file
+#saveRDS(derepFs_seq1, file.path(out_dir, "preprocess/pre_8450/derepFs_8450.rds"))
+#saveRDS(derepRs_seq1, file.path(out_dir, "preprocess/pre_8450/derepRs_8450.rds"))
+
+#Load file
+derepFs_seq1 <- readRDS(file.path(out_dir, "preprocess/pre_8450/derepFs_8450.rds"))
+derepRs_seq1 <- readRDS(file.path(out_dir, "preprocess/pre_8450/derepRs_8450.rds"))
 
 #name the dereplicated reads by the sample names
 names(derepFs_seq1) <- sample.namesF
@@ -614,17 +621,23 @@ names(derepRs_seq1) <- sample.namesR
 #| tidy: true
 
 set.seed(123)
-errF_seq1 <- learnErrors(derepFs_seq1, randomize = TRUE, multithread=TRUE) #multithread is set to FALSE in Windows. Unix OS is =TRUE.
-# 
-errR_seq1 <- learnErrors(derepRs_seq1, randomize = TRUE, multithread=TRUE)
 
-#Save file
+errF_seq1 <- learnErrors(derepFs_seq1, randomize = TRUE, multithread = TRUE) #multithread is set to FALSE in Windows. Unix OS is =TRUE.
+# 
+errR_seq1 <- learnErrors(derepRs_seq1, randomize = TRUE, multithread = TRUE)
+
+# Save file
 saveRDS(errF_seq1, file.path(out_dir, "preprocess/pre_8450/errF_8450.rds"))
 saveRDS(errR_seq1, file.path(out_dir, "preprocess/pre_8450/errR_8450.rds"))
-#errF <- readRDS(file.path(out_dir, "Preprocess", "/errF.rds"))
-#errR <- readRDS(file.path(out_dir, "Preprocess", "/errR.rds"))
-#Plot errors
-plotErrors(errF, nominalQ=TRUE)
+
+# Load file
+#errF <- readRDS(file.path(out_dir, "preprocess/pre_8450/errF_8450.rds"))
+#errR <- readRDS(file.path(out_dir, "preprocess/pre_8450/errR_8450.rds"))
+
+# Plot errors
+plotErrors(errF_seq1, nominalQ = TRUE)
+plotErrors(errR_seq1, nominalQ = TRUE)
+
 ```
 
 ### Sample Inference
@@ -634,12 +647,16 @@ plotErrors(errF, nominalQ=TRUE)
 #| echo: false
 #| tidy: true
 
-dadaFs_seq1 <- dada(derepFs_seq1, err=errF_seq, multithread=TRUE)
-dadaRs_seq1 <- dada(derepRs_seq1, err=errR_seq1, multithread=TRUE)
-saveRDS(dadaFs, file.path(out_dir, "Preprocess", "/dadaFs.rds"))
-saveRDS(dadaFs, file.path(out_dir, "Preprocess", "/dadaFs.rds"))
-#dadaFS <- readRDS(file.path(out_dir, "Preprocess", "/dadaFs.rds"))
-#dadaRS <- readRDS(file.path(out_dir, "Preprocess", "/dadaRs.rds"))
+dadaFs_seq1 <- dada(derepFs_seq1, err = errF_seq1, multithread = TRUE)
+dadaRs_seq1 <- dada(derepRs_seq1, err = errR_seq1, multithread = TRUE)
+
+# Save file
+#saveRDS(dadaFs_seq1, file.path(out_dir, "preprocess/pre_8450/dadaFs_8450.rds"))
+#saveRDS(dadaRs_seq1, file.path(out_dir, "preprocess/pre_8450/dadaRs_8450.rds"))
+
+# Load file
+dadaFs_seq1 <- readRDS(file.path(out_dir, "preprocess/pre_8450/dadaFs_8450.rds"))
+dadaRs_seq1 <- readRDS(file.path(out_dir, "preprocess/pre_8450/dadaRs_8450.rds"))
 ```
 
 ### Merge paired reads
@@ -654,9 +671,12 @@ mergers_seq1 <- mergePairs(dadaFs_seq1, filtFs_seq1,
                            maxMismatch = 0,
                            verbose=TRUE)
 
-saveRDS(mergers_seq1, file.path(out_dir, "preprocess/pre_8450/mergers_8450.rds"))
+# Save file
+#saveRDS(mergers_seq1, file.path(out_dir, "preprocess/pre_8450/mergers_8450.rds"))
 
-#mergers <- readRDS(file.path(out_dir, "Preprocess", "/mergers.rds"))
+# Load file
+#mergers_seq1 <- readRDS(file.path(out_dir, "preprocess/pre_8450/mergers_8450.rds"))
+
 # Inspect the merger data.frame from the first sample
 head(mergers_seq1[[1]])
 ```
@@ -696,16 +716,19 @@ chimeras remain.
 #| echo: false
 #| tidy: true
 
-seqtab_seq1_nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread = FALSE, verbose=TRUE) #Multithread = FALSE in Windows
+seqtab_seq1_nochim <- removeBimeraDenovo(seqtab_seq1, 
+                                         method = "consensus", 
+                                         multithread = FALSE, 
+                                         verbose = TRUE) #Multithread = FALSE in Windows
 
 #Frequency of chimeras
 sum(seqtab_seq1_nochim)/sum(seqtab_seq1)
 
 #Save file
-saveRDS(seqtab_seq1_nochim, file.path(out_dir, "ASV_tables/ASV_seqtab_nochim_8450.rds"))
+#saveRDS(seqtab_seq1_nochim, file.path(out_dir, "ASV_tables/ASV_seqtab_nochim_8450.rds"))
 #write.csv(seqtab_seq1_nochim, file.path(out_dir, "ASV_tables/ASV_seqtab_nochim_denoise_filt.rds")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
 
-#seqtab_seq1_nochim <- readRDS(file.path(out_dir, "ASV_tables/ASV_seqtab_8450_nochim.rds"))
+seqtab_seq1_nochim <- readRDS(file.path(out_dir, "ASV_tables/ASV_seqtab_8450_nochim.rds"))
 ```
 
 Inspect distribution of sequence lengths
@@ -725,20 +748,28 @@ the pipeline to verify everything worked as expected.
 #| tidy: true
 
 getN_seq1 <- function(x) sum(getUniques(x))
-track_seq1 <- cbind(out, sapply(dadaFs_seq1, getN_seq1), 
+
+track_seq1 <- cbind(out_seq1, 
+                    sapply(dadaFs_seq1, getN_seq1), 
                     sapply(dadaRs_seq1, getN_seq1), 
                     sapply(mergers_seq1, getN_seq1),
                     rowSums(seqtab_seq1_nochim))
 
 # If processing a single sample, remove the sapply calls: e.g. replace
 # sapply(dadaFs, getN) with getN(dadaFs)
-colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
-rownames(track) <- sample.namesF
+colnames(track_seq1) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
+rownames(track_seq1) <- sample.namesF
 head(track)
 
 # Save file
-saveRDS(track, file.path(out_dir, "preprocess/pre_8450/track_8450.rds"))
+#saveRDS(track_seq1, file.path(out_dir, "preprocess/pre_8450/track_8450.rds"))
+
+# Load file
+#track <- readRDS(file.path(out_dir, "preprocess/pre_8450/track_8450.rds"))
 ```
+
+#### Tracking summary
+Doesn't look good. We lose a majority of the reads in the filter and trim step. This is a large drop-off in reads. Current parameters using `trunQ = 2` and `minQ = 2` are more stringent than `truncLen = c(230, 180)` used on June 2023 preliminary analyses. 
 
 ::: callout-warning
 <font size="4"> [**Note from DADA2 ITS
@@ -772,8 +803,10 @@ assing taxonomy to your data or project!
 #| echo: false
 #| tidy: true
 
-unite.ref <- file.path(out_dir, "Taxonomy", "sh_general_release_dynamic_29.11.2022.fasta")  # CHANGE ME to location on your machine
-taxa_seq1 <- assignTaxonomy(seqtab_seq1_nochim, unite.ref,
+unite.ref <- file.path(out_dir, "taxonomy/sh_general_release_dynamic_s_25.07.2023.fasta")  # CHANGE ME to location on your machine
+
+taxa_seq1 <- assignTaxonomy(seqtab_seq1_nochim, 
+                            unite.ref,
                             multithread = TRUE, 
                             tryRC = TRUE) #Multithread = FALSE in Windows. TRUE in Mac/Linux.
 
@@ -797,6 +830,9 @@ Inspecting the taxonomic assignments:
 taxa.print_seq1 <- taxa_seq1  # Removing sequence rownames for display only
 rownames(taxa.print_seq1) <- NULL
 head(taxa.print_seq1)
+
+# Save file
+write.csv(taxa.print_seq1, file.path(out_dir, "taxonomy/assign_tax_8450.csv"))
 ```
 
 Done!
@@ -843,6 +879,7 @@ fnRs_seq2 <- sort(list.files(path_2, pattern = "R2.fastq.gz", full.names = TRUE)
 #CHANGE primers accordingly
 FWD<-"CACTCTTTCCCTACACGACGCTCTTCCGATCTCTTGGTCATTTAGAGGAAGTAA"# Forward ITS1f_adapt from IDT 
 nchar(FWD) #Number of primer nucleotides.
+
 REV<-"GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCTGCTGCGTTCTTCATCGATGC"# Reverse primer ITS2r_adapt from IDT
 nchar(REV)
 
@@ -856,17 +893,30 @@ allOrients <- function(primer) {# Create all orientations of the input sequence
                                 RevComp = Biostrings::reverseComplement(dna))
                    return(sapply(orients, toString))  # Convert back to character vector
 }
+
 FWD.orients <- allOrients(FWD)
 REV.orients <- allOrients(REV)
 #FWD2 <- FWD.orients[["Complement"]] #Use if you suspect an orientation mix-up.
 #REV2 <- REV.orients[["Complement"]]
+```
 
+
+```{r}
 ### Filter Reads for ambiguous bases (N)
 fnFs_seq2_filtN <- file.path(path_2, "filtN", basename(fnFs_seq2)) # Put N-filtered forward read files in filtN/ subdirectory
 fnRs_seq2_filtN <- file.path(path_2, "filtN", basename(fnRs_seq2)) #Reverse reads
 
-filterAndTrim(fnFs_seq2, fnFs_seq2_filtN, fnRs_seq2, fnRs_seq2_filtN, maxN = 0, multithread = TRUE) #multithread = TRUE on Mac OS, FALSE in Windows
+#filterAndTrim(fnFs_seq1, fnFs_seq1_filtN, 
+#               fnRs_seq1, fnRs_seq1_filtN, 
+#               maxN = 0, multithread = TRUE)
 
+filterAndTrim(fnFs_seq2, fnFs_seq2_filtN,
+              fnRs_seq2, fnRs_seq2_filtN, 
+              maxN = 0, multithread = TRUE) #multithread = TRUE on Mac OS, FALSE in Windows
+```
+
+
+```{r}
 ### Checking for primer hits
 set.seed(123)
 primerHits <- function(primer, fn) {
@@ -901,8 +951,10 @@ R2.flags <- paste("-G", REV, "-A", FWD.RC)
 
 ### Run Cutadapt
 for(i in seq_along(fnFs_seq2)) {
-  system2(cutadapt, args = c(R1.flags, R2.flags, "-n", 2, # -n 2 removes FWD and REV from reads
-                             "-o", fnFs_seq2_cut[i], "-p", fnRs_seq2_cut[i], # output files
+  system2(cutadapt, args = c(R1.flags, R2.flags, 
+                             "-n", 2, # -n 2 removes FWD and REV from reads
+                             "-o", fnFs_seq2_cut[i], 
+                             "-p", fnRs_seq2_cut[i], # output files
                              fnFs_seq2_filtN[i], fnRs_seq2_filtN[i])) #input files
 }
 
@@ -1049,8 +1101,8 @@ head(track_seq2)
 # Save file
 saveRDS(track_seq2, file.path(out_dir, "preprocess/pre_8756/track_8756.rds"))
 
-### Taxonomy
-unite.ref <- file.path(out_dir, "Taxonomy", "sh_general_release_dynamic_29.11.2022.fasta")  # CHANGE ME to location on your machine
+### taxonomy
+unite.ref <- file.path(out_dir, "taxonomy", "sh_general_release_dynamic_29.11.2022.fasta")  # CHANGE ME to location on your machine
 taxa_seq2 <- assignTaxonomy(seqtab_seq2_nochim, unite.ref,
                             multithread = TRUE, 
                             tryRC = TRUE) #Multithread = FALSE in Windows. TRUE in Mac/Linux.
@@ -1063,7 +1115,7 @@ taxa_seq2 <- assignTaxonomy(seqtab_seq2_nochim, unite.ref,
 taxa.print_seq2 <- taxa_seq2  # Removing sequence rownames for display only
 rownames(taxa.print_seq2) <- NULL
 head(taxa.print_seq2)
-write.csv(taxa.print_seq2, file.path(out_dir, "Taxonomy/assign_tax_8756.csv"))
+write.csv(taxa.print_seq2, file.path(out_dir, "taxonomy/assign_tax_8756.csv"))
 
 
 #Done
@@ -1255,13 +1307,13 @@ each SLURM job is different and will have different memory and
 processing parameters. Adjust accordingly. See this resource:
 [dada2HPC_worload](https://github.com/erictleung/dada2HPCPipe#slurm-workload-manager)
 
-## Assigning Taxonomy
+## Assigning taxonomy
 
 The last step in this pipeline can be consume a lot of processing
 memory, even for the HPC cluster. If your job fails at the last step,
 assigning taxonomy, consider submitting this part as separate job.
 
-### Taxonomy batch job
+### taxonomy batch job
 
 With these parameters it took about \~4.5 hrs. Maybe tasks per node can
 be increase to 10, hence 2 CPU's per task.
@@ -1300,7 +1352,7 @@ per task, and 1 task per node. This means that one task has a lot of
 processing memory to operate with. The previous batch job example
 carried out 20 tasks at a time in 20 CPUs, throughout 4 nodes. This
 makes the computation of the pipeline quite fast (\~2hrs), but it fails
-to locate enough processing memory for the `assingTaxonomy()` step.
+to locate enough processing memory for the `assingtaxonomy()` step.
 Another way of going about this issue is submitting a [job
 array](https://wiki.hpc.tulane.edu/trac/wiki/Workshops/cypress/ManyTaskComputing).
 
@@ -1323,8 +1375,8 @@ library("decontam")
 library("data.table")
 library("tidyverse")
 newdir <- file.path("H:/.shortcut-targets-by-id/0B9v0CdUUCqU5VVR4a3BvNHM1Z28/VBL_users/Grad_Students/Bolivar/Dissertation/Mimulus/Data/CH2_sequences")
-taxa <- read.csv(file.path(newdir, "Taxonomy", "/assign_tax_mim2.csv"))
-#saveRDS(taxa, file.path(newdir, "Taxonomy", "/assign_tax_mim2.rds"))
+taxa <- read.csv(file.path(newdir, "taxonomy", "/assign_tax_mim2.csv"))
+#saveRDS(taxa, file.path(newdir, "taxonomy", "/assign_tax_mim2.rds"))
 
 # Adding ASV_ to the taxonomical assignment
 rownames(taxa)<-paste0("ASV_",1:nrow(taxa))
@@ -1332,7 +1384,7 @@ taxa <- taxa %>%
   select(!X) %>%
   setDT(keep.rownames = "ASV_ID")
 
-#saveRDS(taxa, file.path(newdir, "Taxonomy", "/assign_tax_mim2.rds"))
+#saveRDS(taxa, file.path(newdir, "taxonomy", "/assign_tax_mim2.rds"))
 
 #Sequences (ASV) per sample table 
 seqtab.nochim <- readRDS(file.path(newdir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
@@ -1595,7 +1647,7 @@ sample.names(SAMP)
 #Phyloseq main
 pq <- phyloseq(ASV, TAX, SAMP)
 
-#saveRDS(pq, file.path(newdir, "Taxonomy", "/phyloseq_8450.rds"))
+#saveRDS(pq, file.path(newdir, "taxonomy", "/phyloseq_8450.rds"))
 ```
 
 **Check which sample are actually lost in the cleaning and
@@ -1616,13 +1668,13 @@ ntaxa(pq2) #There are 2 taxa with 0 reads.
  # Removal of  singletons
 pq3 <- filter_taxa(pq2, function (x) {sum(x > 0) > 1}, prune=TRUE)
 ntaxa(pq3) # The result is 337 taxa in 169 samples.
-#saveRDS(pq3, file.path(newdir, "Taxonomy", "/ASV_mim2_8450_assigned_nonsingletons.rds"))
+#saveRDS(pq3, file.path(newdir, "taxonomy", "/ASV_mim2_8450_assigned_nonsingletons.rds"))
 
 
 # Relative abundance calculation ####
 relpq <- transform_sample_counts(pq3, function(x)x/sum(x))
 relpq <- prune_samples(sample_sums(relpq) > 0, relpq) #Eliminatin samples that have 0 reads  of any taxa
-#saveRDS(relpq, file.path(newdir, "Taxonomy", "/relative_abund_phyloseq.rds"))
+#saveRDS(relpq, file.path(newdir, "taxonomy", "/relative_abund_phyloseq.rds"))
 
 
 # Phyloseq object to data frames 
@@ -1631,9 +1683,9 @@ library("metagMisc")
 
 relpqDF <- phyloseq_to_df(relpq, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
 #relpqDF <- replace(relpqDF, relpqDF == "NaN", 0) #Replacing forced NaNs when mturned into df
-#write.csv(relpqDF, file.path(newdir, "Taxonomy", "ASV_mim2_8450_relabun_nonsingletons.csv"))
+#write.csv(relpqDF, file.path(newdir, "taxonomy", "ASV_mim2_8450_relabun_nonsingletons.csv"))
 pq3DF <- phyloseq_to_df(pq3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
-# write.csv(pq3DF,file.path(newdir, "Taxonomy", "ASV_mim2_8450_assigned_nonsingletons.csv"))
+# write.csv(pq3DF,file.path(newdir, "taxonomy", "ASV_mim2_8450_assigned_nonsingletons.csv"))
 
 ```
 
