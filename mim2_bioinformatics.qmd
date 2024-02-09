@@ -742,7 +742,7 @@ table(nchar(getSequences(seqtab_seq1)))
 #write.csv(seqtab_seq1, file.path(out_dir, "ASV_tables/ASV_seqtab_8450.rds"))
 
 #Open from here in case R crashes
-seqtab_seq1 <- readRDS(file.path(out_dir, "ASV_tables/ASV_seqtab_8450.rds"))
+seqtab <- readRDS(file.path(out_dir, "ASV_tables/ASV_seqtab_8450.rds"))
 ```
 
 ### Remove chimeras
@@ -1536,7 +1536,7 @@ tasv_tab <- tasv_tab |>
   data.frame() |>
   setDT(keep.rownames = "Sample_ID")
 
-plate1 <- semi_join(tasv_tab, filter_table1, by= "Sample_ID") #Somehow plate1 ends up with 95 row instead of 96.
+plate1 <- semi_join(tasv_tab, filter_table1, by = "Sample_ID") #Somehow plate1 ends up with 95 row instead of 96.
 
 plate1 <- plate1 |>
   mutate(across(!Sample_ID, as.numeric))
@@ -1555,7 +1555,7 @@ plate2 <- semi_join(tasv_tab, filter_table2, by= c("Sample_ID" = "Sample_ID"))
 plate2 <- plate2 |>
   mutate(across(!Sample_ID, as.numeric))
 
-filter_filter2 <- anti_join( filter_table2, plate2, by = c("Sample_ID"="Sample_ID")) #Corroborating if indeed all match.
+filter_filter2 <- anti_join( filter_table2, plate2, by = c("Sample_ID" = "Sample_ID")) #Corroborating if indeed all match.
 ```
 
 ## Contaminant removal from DNA and PCR controls
@@ -1586,27 +1586,39 @@ TAX <- tax_table(taxa) #726 ASVs (raw)
 
 #Sample data
 #From Mim2_stat_analyses.Rmd
-ptraits <- readRDS(file.path(out_dir, "statistics/ptraits.rds"))
+dna_data <- read.csv(file.path(out_dir, "mim2_dna_pcr.csv"))
 
+dna_data <- dna_data |>
+  select(c(7, 15, 22)) |>
+  filter(!Unique_ID == "S1",
+         !Unique_ID == "S2", 
+         !Unique_ID == "#NAME?") |>
+  distinct() |>
+  slice(-197) |> #Removes one sneaky sample.
+  mutate(concentration = as.numeric(DNA_conc._ng.µl)) |>
+  as.data.frame()
+dna_data[is.na(dna_data)] <- 0 #Replace NA with 0
+  
 
 
 # #Sample data. Only keeping samples that have sequence data for ASV analyses.
 #getting rownmes to filter
-names <- column_to_rownames(all_decontaminated, var = "X")
+plates <- bind_rows(plate1, plate2)
+names <- column_to_rownames(plates, var = "Sample_ID")
 samples <- rownames(names) #Using the colname to filter out
 
-ftraits <- ptraits |>
-  #filter(Unique_ID %in% samples) |>
+dna_data <- dna_data |>
+  filter(Unique_ID %in% samples) |>
   column_to_rownames(var = "Unique_ID")
   slice(-c(29,105:106)) #Some control that are still there.
 #saveRDS(ftraits, file.path(out_dir, "Statistics", "/ftraits.rds"))
 
-SAMP <- sample_data(ftraits)
+SAMP <- sample_data(dna_data)
 class(SAMP)
 sample.names(SAMP)
 
 #Phyloseq main
-pq <- phyloseq(ASV, TAX, SAMP)
+ps <- phyloseq(ASV, TAX, SAMP)
 
 #saveRDS(pq, file.path(out_dir, "taxonomy", "/phyloseq_8450.rds"))
 ```
@@ -1619,7 +1631,18 @@ worth knowing which samples are those.**
 pq
 head(sample_data(pq))
 
+
+df <- as.data.frame(sample_data(ps)) # Put sample_data into a ggplot-friendly data.frame
+df$LibrarySize <- sample_sums(ps)
+df <- df[order(df$LibrarySize),]
+df$Index <- seq(nrow(df))
+ggplot(data=df, aes(x=Index, y=LibrarySize, color=sample_control)) + geom_point()
+
+
+contamdf.freq <- isContaminant(ps, method="frequency", conc="concentration")
+head(contamdf.freq)
 ```
+
 
 ### In-house decontamination protocol
 
