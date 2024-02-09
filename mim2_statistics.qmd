@@ -31,27 +31,23 @@ library("ggtext")
 # File Path
 
 ```{r}
-# path <- file.path("H:/.shortcut-targets-by-id/0B9v0CdUUCqU5VVR4a3BvNHM1Z28/VBL_users/Grad_Students/Bolivar/Dissertation/Mimulus/Data")
-# newdir <- file.path("H:/.shortcut-targets-by-id/0B9v0CdUUCqU5VVR4a3BvNHM1Z28/VBL_users/Grad_Students/Bolivar/Dissertation/Mimulus/Data/CH2_sequences")
-# 
-path<-"C:/Users/boloq/Box/Dissertation/Mimulus/Data/CH2/bioinformatics/CH2_sequences"
+
+path<-"/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics"
   
-newdir <- "C:/Users/boloq/Box/Dissertation/Mimulus/Data/CH2/bioinformatics/CH2_sequences"
-  
+newdir <- "/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics"
 ```
 
 #Leaf Traits
 ##Cleaning and Shaping
-```{r, Mim2 Leaft traits, tidy=TRUE}
+```{r, Mim2 Leaf traits, tidy=TRUE}
 
-traits <- read.csv(file.path(path, "Mim2_leaf_trais_evo2023.csv"))
-
+traits <- read.csv(file.path(path, "mim2_leaf_traits_field_survey.csv"))
 
 #Elevation categories (meters)
 breaks <- c(-Inf, 1219.2, 1828.495, Inf)
 labels <- c("LOW", "MEDIUM", "HIGH")
 #Leaf level
-ntraits <-  traits %>%
+leaf_traits <-  traits %>%
   slice(-c(959:973))%>%
   rename(LMA = LMA.mg., 
          LBI = Leaf_lobe_index,
@@ -68,7 +64,7 @@ ntraits <-  traits %>%
   as_tibble()
 
 #Plant level for ASV analyses
-ptraits <- ntraits %>%
+plant_traits <- leaf_traits %>%
   relocate(Unique_ID, .before = Site) %>%
   group_by(Unique_ID, Site, Species, Elevation, Elevation_cat)%>%
   summarise(ACI = mean(ACI, na.rm = TRUE),
@@ -81,9 +77,9 @@ ptraits <- ntraits %>%
             log10LBI = mean(log10LBI, na.rm = TRUE)) 
 
 
-str(ptraits)
-#saveRDS(ptraits, file.path(newdir, "Statistics", "/ptraits.rds"))
-ptraits <- readRDS(file.path(newdir, "Statistics", "/ptraits.rds"))
+str(plant_traits)
+#saveRDS(plant_traits, file.path(newdir, "statistics/plant_traits.rds"))
+plant_traits <- readRDS(file.path(newdir, "statistics/plant_traits.rds"))
 
 #getting rownmes to filter
 names <- column_to_rownames(all_decontaminated, var = "X")
