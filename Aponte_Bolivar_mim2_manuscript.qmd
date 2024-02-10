@@ -1,0 +1,160 @@
+---
+title: "[Working title]: Foliar fungal symbionts in sympatric yellow moenkeyflowers in the Sierra Nevada, CA, USA"
+author:  
+date: last-modified
+date-format: "MMMM D, YYYY"
+bibliography: references.bib
+csl: functional-ecology.csl
+author:
+  - name: Bolívar Aponte Rolón
+    orcid: 0000-0002-2544-4551
+    email: baponterolo@tulane.edu
+    corresponding: true
+    affiliation: 
+      - id: tu
+        name: Tulane University
+        department: Ecology and Evolutionary Biology
+        city: New Orleans
+        state: LA
+        country: US
+        url: www.tulane.edu
+  - name: Kathleen G. Ferris
+    email: kferris@tulane.edu
+    corresponding: false
+    affiliation: 
+      - ref: tu
+  - name: Sunshine A. Van Bael
+    orcid: 0000-0001-7317-3533
+    email: svanbael@tulane.edu
+    corresponding: false
+    affiliation: 
+      - ref: tu
+format:
+  # pdf:
+  #   documentclass: scrartcl
+  #   include-in-header:
+  #       text: '\usepackage{lineno}\linenumbers'
+  #   linestretch: 2.0
+  #   margin-left: 1in
+  #   margin-right: 1in
+  #   margin-top: 1in
+  #   margin-bottom: 1in
+  #   mainfont: TeX Gyre Termes #Alternative to Times New Roman
+  #   sansfont: TeX Gyre Termes #Another option is Liberation Serif
+  #   number-sections: true
+  #   citation-package: biblatex
+  #   #keep_tex: true
+  #   keep_md: true
+  docx:
+    reference-doc: custom-reference-doc.docx
+    number-sections: true
+    tbl-colwidths: true
+    #linestretch: 2.0
+    citation-package: biblatex
+crossref:
+  custom:
+    - kind: float
+      key: suppfig
+      latex-env: suppfig
+      reference-prefix: Fig. S
+      space-before-numbering: false
+      latex-list-of-description: Supplementary Figure
+    
+editor: source
+  markdown: 
+    wrap: 72
+execute:
+  echo: false
+warning: false
+keep-md: true
+---
+## Keywords
+# Abstract
+# Introduction
+My dissertation work has led me to ask the following: 1) **What leaf
+traits and corresponding host genetics (species) and phenotypic
+plasticity are associated with endophytes communities?**; 2) **How does
+elevation influence endophyte communities in monkeyflowers?**. These
+questions arise due to current scientific knowledge on how plants have
+evolved alongside fungi and what key evolutionary drivers might
+influence this interaction: *phenotypic plasticity*, an organism's
+ability to produce different physical traits when exposed to different
+conditions [@fuscoPhenotypicPlasticityDevelopment2010]; and *genetic
+variation*. Both processes are vital to the ability to adapt to a
+warming climate [@jumpRunningStandStill2005a]. Microbes might play an
+essential role in a plant's capacity to adapt to a changing climate.
+Previous studies have suggested that endophytes (i.e., fungi in plant
+leaves) can alter plant traits (phenotypic plasticity) under stressful
+conditions [@songAdvancesResearchEpichloe2016a].
+
+No previous studies have considered how phenotypic plasticity traits and
+local genetic adaptation influence endophyte communities within leaves
+and, in turn, how these might play a role in the development of such
+traits. An ideal model system to explore the interactions between
+endophytes and host genetics and phenotypes is the closely related
+yellow monkeyflowers in the *Mimulus guttatus* species complex is
+well-documented [@ferrisLeafShapeEvolution2015a]: *Mimulus guttatus*,
+*Mimulus laciniatus* and *Mimulus nudatus*.
+
+In answering my main questions for this research project I aimed to
+create a detailed account of the endophyte communities present in *M.
+guttatus* and *M. laciniatus* along an environmental gradient (e.g.,
+elevation) to capture variation in population habitat, genetics and
+phenotypes and their associated endophyte communities. Ultimately,
+shedding light on how local adaptations, phenotypic traits, and
+endophyte communities in the *M. guttatus* complex interact.
+
+# Materials and Methods
+## Field Sites
+## Sample Collection
+## Leaf traits measurement
+## Molecular Work
+### Tissue preservation
+Upon completion of the leaf traits measurements, we prepared and preserved samples at the UC Merced Yosemite Field Station. We started by removing the main vein and margins from photosynthetic tissue. The leaf lamina was haphazardly cut with a sterile blade into 2 mm wide strip in parallel to the main vein [@arnold; @tellez; @higgins2014]. Leaf strips were then sterilized with sequential washes in 95% EtOH (10 s) , 0.5% sodium hypochlorite (NaOCl) (60 s), and 70% EtOH (60 s) and air dried under sterile conditions. Due to the small size of monkeyflower plants, the maximum amount of leaf lamina was preserved in sterile 15 mL tubes with ~ 10 mL CTAB solution (1 M Tris–HCl pH 8, 5 M NaCl, 0.5 M EDTA, and 20 g CTAB). Leaf tissue in CTAB solution was used for amplicon sequencing (described in detail below). All leaf tissue handling was performed in a sterile environment with an alcohol burner lamp inside a portable biosafety cabinet. All surfaces were previously sterilized sequentially with 0.5% NaOCl, 95% EtOH, and 70% EtOH. We surface sterilized surfaces and instruments in between sample handling to prevent cross contamination. 
+
+## Amplicon sequencing
+We stored leaf tissue in CTAB solution for 2 months at room temperature before extracting DNA at Tulane University. To prepare for sample DNA extraction procedure, we decontaminated all instruments, materials, and surfaces with 0.5 % NaOCl, 70 % EtOH, and 95% EtOH, and subsequently treated with UV light for 30 minutes in biosafety cabinet.  We subsampled 0.2 - 0.3 g of leaf tissue from each sample and placed into a sterile 2 mL tubes containing an assortment of beads: 3.2 mm stainless steel beads (Next Advance Cat # SSB32), 100 uL stainless steel bead blend, 0.9-2.0mm (NextAdvance Cat # SSB14B) and  2-3 of the autoclaved 2 mm zirconium oxide beads (Next Advance Cat # ZRoB20). The 2 mL tubes with beads were previously prepared. We then proceeded to lyophilize samples for 72 hours to fully remove CTAB content from tissue. After, we submerged the sample tubes in liquid nitrogen for 30 s and proceeded to homogenize samples at 30 Hz for 3 minutes in a TissueLyser LT (QIAGEN, Valencia, CA, USA). We stored samples in 20 C until DNA extraction procedure. 
+
+We used DNA extraction protocol for high-molecular weight DNA extraction and adapted from Russo et al., [-@russo2022]. Protocol modifications allowed us to optimize extractions for fungal DNA from preserved leaf tissue [see details in @aponterolon2023]. 
+
+
+
+After all genomic DNA was extracted, we pooled the subsamples for each individual sample before amplification. We used sterile equipment and pipettes with aerosol-resistant tips with filters in all steps before amplification. We followed a two-step amplification approach previously described by Sarmiento et al. (2017) and U´Ren & Arnold (2017). We used primers for the fungal ITSrDNA region, ITS1f (5’-CTTGGTCATTTAGAGGAAGTAA-3’) and ITS4 (5’-TCCTCCGCTTATTGATATGC-3’) with modified universal consensus sequences CS1 and CS2 and 0–5 bp for phase-shifting. Every sample was amplified in two parallel reactions containing 1-2 µL of DNA template (U’Ren & Arnold, 2017; see also Tellez et al., 2022). We visualized PCR (PCR1) reactions with SYBR Green 1 (Invitrogen, Carlsbad, CA, USA) on 2% agarose gel (Oita et al., 2021). Based on the electrophoresis band intensity, we combined parallel PCR1 reactions and diluted 5 µL of amplicon product with molecular grade water to standardize to a concentration of 1:15 (Sarmiento et al., 2017 for details; Tellez et al., 2022). We included DNA extraction blanks and PCR1 negatives in this step. We used a separate set of sterile pipettes, tips, and equipment to reduce contamination. We used a designated PCR area to restrict contact with pre-PCR materials (Oita et al., 2021). We used 1 µL of PCR1 product from samples and negative control for a second PCR (PCR2) with barcode adapters (IBEST Genomics Resource Core, Moscow, ID, USA). Each PCR2 reaction (total 15 µL) contained 1X Phusion Flash High Fidelity PCR Master Mix, 0.075 µM of barcoded primers (forward and reverse pooled at a concentration of 2 µM) and 0.24mg/mL of BSA following Sarmiento (2017) and U’Ren & Arnold (2017). Before final pooling for sequencing, we purified the amplicons using Agencourt AMPure XP Beads (Beckman Coulter Inc, Brea, CA USA) to a ratio of 1:1 following the manufacturer’s instructions. The products were evaluated with Bio Analyzer 2100 (Agilent Technologies, Santa Clara, CA, USA) (Tellez et al., 2022). We quantified the samples through University of Arizona Genetics Core, and subsequently diluted them to the same concentration to prevent over representation of samples with higher concentration (Sarmiento et al., 2017). Amplicons were normalized to 1 ng/µL, then pooled 2 µL of each for sequencing. No contamination was detected visually or by fluorometric analysis. To provide robust controls we combined 5 µL of each PCR1 negative and the DNA extraction blanks and sequenced them as samples. Ultimately, we combined samples into a single tube with 20 ng/µL of amplified DNA with barcoded adapters for sequencing on the Illumina MiSeq platform with Reagent Kit v3 (2 × 300 bp) following protocols from the IBEST Genomics Resource Core at the University of Idaho, USA. Again, we included the DNA extraction blanks and two PCR1 negatives and sequenced with samples. Sequencing yielded 3,778,081 total ITS1 reads.
+
+
+This protocol is adapted from [Russo et al. 2023](https://www.frontiersin.org/articles/10.3389/fpls.2022.883897/full) methods for high-molecular weight DNA extraction. I modified the protocol to use reagents and incubation conditions used by the Ferris Lab at Tulane University to extract DNA from Mimulus spp. (monkeyflower) tissue (leaf and buds), see protocol. The original CTAB:Chloroform protocol used by the Ferris lab traces back to the Willis Lab at Duke University. The objective of these DNA extractions are to collect fungal DNA present in leaf tissue. I have [incorporated sample preparation procedures used by the Arnold Lab](https://www.protocols.io/view/96-well-dna-extraction-protocol-for-plant-and-lich-fscbnaw) at The University of Arizona to eliminate contamination of samples and optimize DNA extractions from preserved leaf tissue for future fungal ITS Illumina MiSeq sequencing. Solid phase reversible immobilization beads (SPRI) utilized are adapted from [Rohland and Reich 2012](https://pubmed.ncbi.nlm.nih.gov/22267522/) and [Liu et al 2023](https://doi.org/10.1186/s12864-023-09211-w). All extractions were performed un a sterile biosafety cabinet to prevent sample contamination.
+
+
+### DNA extractions and PCR reactions
+## Bioinformatic analyses
+I used a subset of samples and sequences data to tailor a bioinformatic
+pipeline for this research project. It consisted in adapting the DADA2
+[@callahanDADA22016] pipeline to the data set, as well as incorporating
+detailed explanations of the pipeline's inner workings. The outcome of
+this process was an exhaustive "tutorial" documenting each step of the
+pipeline for future researchers to follow along with examples. Tailoring
+and synthesing the bioinformatic stage of this project in this way
+facilitates the training and transfer of knowledge to graduate students
+and post-doctoral fellows interested in fungal genomics. This document
+is publicly available in the [Van Bael Lab GitHub
+repository](https://github.com/VanBaelLab/VBL_DADA2).
+## Statistical Analyses
+Once the bioinformatics for the subset data were completed, I performed
+a statistical technique called Principal Component Analysis (PCA). This
+help me understand patterns and relationships among leaf traits of host
+species (**Figure 1**). Additionally, I used a distance-based Redundancy
+Analysis (dbRDA) to statistically compare the endophyte community
+similarities within each yellow monkeyflower species per site. This
+method allowed me to further understand how host species leaf trait's
+influence the diversity, relative abundance, and richness of endophyte
+communities (**Figure 2**).
+
+# Results
+# Discussion
+# Conclusion
+# References
+
+::: {#refs}
+:::
+
+

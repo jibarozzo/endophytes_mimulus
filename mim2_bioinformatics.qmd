@@ -1069,7 +1069,7 @@ out_seq2 <- filterAndTrim(fnFs_seq2, filtFs_seq2,
 #Once it is completed there is no need to run again unless you are changing parameters.
 
 #Save file
-saveRDS(out_seq2, file.path(out_dir, "preprocess/pre_8756/out_8756.rds"))
+#saveRDS(out_seq2, file.path(out_dir, "preprocess/pre_8756/out_8756.rds"))
 
 # Load file
 #out_seq2 <- readRDS(out_seq2, file.path(out_dir, "preprocess/pre_8756/out_8756.rds"))
@@ -1082,8 +1082,8 @@ derepFs_seq2 <- derepFastq(filtFs_seq2, n = 1000, verbose = TRUE) #n prevents it
 derepRs_seq2 <- derepFastq(filtRs_seq2, n = 1000, verbose = TRUE)
 
 # Save file
-saveRDS(derepFs_seq2, file.path(out_dir, "preprocess/pre_8756/derepFs_8756.rds"))
-saveRDS(derepRs_seq2, file.path(out_dir, "preprocess/pre_8756/derepRs_8756.rds"))
+#saveRDS(derepFs_seq2, file.path(out_dir, "preprocess/pre_8756/derepFs_8756.rds"))
+#saveRDS(derepRs_seq2, file.path(out_dir, "preprocess/pre_8756/derepRs_8756.rds"))
 
 # Load file
 #derepFS_seq2 <- readRDS(file.path(out_dir, "preprocess/pre_8756/derepFs_8756.rds"))
@@ -1099,8 +1099,8 @@ errF_seq2 <- learnErrors(derepFs_seq2, randomize = TRUE, multithread=TRUE) #mult
 errR_seq2 <- learnErrors(derepRs_seq2, randomize = TRUE, multithread=TRUE)
 
 # Save file
-saveRDS(errF_seq2, file.path(out_dir, "preprocess/pre_8756/errF_8756.rds"))
-saveRDS(errR_seq2, file.path(out_dir, "preprocess/pre_8756/errR_8756.rds"))
+#saveRDS(errF_seq2, file.path(out_dir, "preprocess/pre_8756/errF_8756.rds"))
+#saveRDS(errR_seq2, file.path(out_dir, "preprocess/pre_8756/errR_8756.rds"))
 
 # Load file
 #errF_seq2 <- readRDS(file.path(out_dir, "preprocess/pre_8756/errF_8756.rds"))
@@ -1120,8 +1120,8 @@ dadaRs_seq2 <- dada(derepRs_seq2,
                     multithread=TRUE)
 
 # Save file
-saveRDS(dadaFs_seq2, file.path(out_dir, "preprocess/pre_8756/dadaFs_8756.rds"))
-saveRDS(dadaRs_seq2, file.path(out_dir, "preprocess/pre_8756/dadaRs_8756.rds"))
+#saveRDS(dadaFs_seq2, file.path(out_dir, "preprocess/pre_8756/dadaFs_8756.rds"))
+#saveRDS(dadaRs_seq2, file.path(out_dir, "preprocess/pre_8756/dadaRs_8756.rds"))
 
 # Load file
 #dadaFS <- readRDS(file.path(out_dir, "Preprocess", "/dadaFs.rds"))
@@ -1135,7 +1135,7 @@ mergers_seq2 <- mergePairs(dadaFs_seq2, filtFs_seq2,
                            maxMismatch = 0, 
                            verbose=TRUE)
 
-saveRDS(mergers_seq2, file.path(out_dir, "Preprocess/pre_8756/mergers8756.rds"))
+#saveRDS(mergers_seq2, file.path(out_dir, "Preprocess/pre_8756/mergers8756.rds"))
 
 #mergers <- readRDS(file.path(out_dir, "Preprocess", "/mergers.rds"))
 # Inspect the merger data.frame from the first sample
@@ -1150,8 +1150,8 @@ dim(seqtab)
 table(nchar(getSequences(seqtab_seq2)))
 
 # Save file R object, and .csv
-saveRDS(seqtab_seq2, file.path(out_dir, "ASV_tables/ASV_seqtab_8756.rds")) #Functions to write a single R object to a file, and to restore it.
-write.csv(seqtab, file.path(out_dir, "ASV_tables/ASV_seqtab_8756.rds"))
+#saveRDS(seqtab_seq2, file.path(out_dir, "ASV_tables/ASV_seqtab_8756.rds")) #Functions to write a single R object to a file, and to restore it.
+#write.csv(seqtab, file.path(out_dir, "ASV_tables/ASV_seqtab_8756.rds"))
 
 # Open from here in case R crashes
 #seqtab<- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab.rds"))
@@ -1166,8 +1166,8 @@ seqtab_seq2_nochim <- removeBimeraDenovo(seqtab_seq2,
 sum(seqtab_seq2_nochim)/sum(seqtab_seq2)
 
 # Save file
-saveRDS(seqtab_seq2_nochim, file.path(out_dir, "ASV_tables/ASV_seqtab_nochim_8756.rds"))
-write.csv(seqtab_seq2_nochim, file.path(out_dir, "ASV_tables/ASV_nochim_denoise_filt.csv")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
+#saveRDS(seqtab_seq2_nochim, file.path(out_dir, "ASV_tables/ASV_seqtab_nochim_8756.rds"))
+#write.csv(seqtab_seq2_nochim, file.path(out_dir, "ASV_tables/ASV_nochim_denoise_filt.csv")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
 #seqtab.nochim <- readRDS(file.path(out_dir, "ASV_tables", "/ASV_seqtab_nochim.rds"))
 
 # Inspect distribution of sequence lengths
@@ -1183,7 +1183,7 @@ rownames(track_seq2) <- sample.namesF
 head(track_seq2)
 
 # Save file
-saveRDS(track_seq2, file.path(out_dir, "preprocess/pre_8756/track_8756.rds"))
+#saveRDS(track_seq2, file.path(out_dir, "preprocess/pre_8756/track_8756.rds"))
 
 ### taxonomy
 unite.ref <- file.path(out_dir, "taxonomy", "sh_general_release_dynamic_29.11.2022.fasta")  # CHANGE ME to location on your machine
@@ -1199,8 +1199,9 @@ taxa_seq2 <- assignTaxonomy(seqtab_seq2_nochim, unite.ref,
 taxa.print_seq2 <- taxa_seq2  # Removing sequence rownames for display only
 rownames(taxa.print_seq2) <- NULL
 head(taxa.print_seq2)
-write.csv(taxa.print_seq2, file.path(out_dir, "taxonomy/assign_tax_8756.csv"))
 
+# Save file
+#write.csv(taxa.print_seq2, file.path(out_dir, "taxonomy/assign_tax_8756.csv"))
 
 #Done
 ```
@@ -1905,17 +1906,19 @@ ntaxa(ps_clean_2) # No taxa removed. 688 taxa in 174 samples.
  # Removal of  singletons
 ps_clean_3 <- filter_taxa(ps_clean_2, function (x) {sum(x > 0) > 1}, prune=TRUE)
 ntaxa(ps_clean_3) # The result is 231 taxa in 174 samples.
-#saveRDS(ps_clean_3, file.path(out_dir, "taxonomy/ASV_8450_assigned_nonsingletons.rds"))
+
 
 # Relative abundance calculation ####
 rel_abund_ps_clean <- transform_sample_counts(ps_clean_3, function(x)x/sum(x))
 
 #Eliminating samples that have 0 reads of any taxa
+ps_clean_3 <- prune_samples(sample_sums(ps_clean_3) > 0, ps_clean_3)
 rel_abund_ps_clean <- prune_samples(sample_sums(rel_abund_ps_clean ) > 0, rel_abund_ps_clean) 
 # Result: 231 taxa in 160 samples.
 
 # Save file
-saveRDS(rel_abund_ps_clean, file.path(out_dir, "taxonomy/ASV_8450_relabun_nonsingletons.rds"))
+#saveRDS(ps_clean_3, file.path(out_dir, "taxonomy/ASV_8450_assigned_nonsingletons.rds"))
+#saveRDS(rel_abund_ps_clean, file.path(out_dir, "taxonomy/ASV_8450_relabun_nonsingletons.rds"))
 ```
 
 The removal of singletons and samples with no reads of any taxa resulted in 231 ASVs in 160 samples. We have lost 14 samples in the process.
@@ -1946,7 +1949,7 @@ CSVs. We can treat the data set like any other and visualize with
 ggplot. Phyloseq does provide the means of doings this also, but that is
 beyond the scope of this notebook.
 
-###J oining cleaned ASV table with taxonomy
+### Joining cleaned ASV table with taxonomy
 
 ```{r, ASV and taxonomy, tidy=TRUE}
 # #Joint ASV and taxonomy table:

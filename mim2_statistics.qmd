@@ -16,13 +16,15 @@ library("data.table")
 library("ggplot2")
 library("ggpubr")
 library("ggfortify")
-library("devtools")
 library("ggthemes")
 library("ggiraphExtra")
-library("car")
-library("nlme")
 library("wesanderson")
 library("MetBrewer")
+
+library("rstatix")
+library("car")
+library("nlme")
+
 library("vegan")
 library("phyloseq")
 library("ggtext")
@@ -31,220 +33,288 @@ library("ggtext")
 # File Path
 
 ```{r}
-
-path<-"/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics"
-  
-newdir <- "/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics"
+#| echo: false
+#| eval: true
+#| tidy: true
+path <-"/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics"
 ```
 
-#Leaf Traits
-##Cleaning and Shaping
-```{r, Mim2 Leaf traits, tidy=TRUE}
+# Leaf Traits
+
+## Cleaning and Shaping
+```{r, leaf_traits}
+#| echo: false
+#| eval: true
+#| tidy: true
 
 traits <- read.csv(file.path(path, "mim2_leaf_traits_field_survey.csv"))
 
 #Elevation categories (meters)
 breaks <- c(-Inf, 1219.2, 1828.495, Inf)
 labels <- c("LOW", "MEDIUM", "HIGH")
-#Leaf level
-leaf_traits <-  traits %>%
-  slice(-c(959:973))%>%
+
+#Leaf level data set
+leaf_traits <-  traits |>
+  slice(-c(959:973))|> #Removing control samples
   rename(LMA = LMA.mg., 
          LBI = Leaf_lobe_index,
          Toughness = Leaf_toughness,
-         Thickness = Leaf_thickness) %>% 
-  select(!c(6,9:12, 20:22)) %>%
-  group_by(Site, Species, Unique_ID) %>%
-  fill(ImageJ_1, ImageJ_2, LBI, .direction = 'down') %>%
-  mutate(log10LBI = log10(LBI)) %>%
-  mutate(Elevation = Elevation*0.3048, Species = as.factor(Species), Site = as.factor(Site))%>%
-  mutate(Elevation_cat = cut(Elevation, breaks = breaks, labels = labels)) %>%
-  
-  relocate(Elevation_cat, .before = Elevation)%>%
+         Thickness = Leaf_thickness) |> 
+  select(!c(6,9:12, 20:22)) |>
+  group_by(Site, Species, Unique_ID) |>
+  fill(ImageJ_1, ImageJ_2, LBI, .direction = 'down') |>
+  mutate(Elevation = Elevation*0.3048, 
+         Species = as.factor(Species), 
+         Site = as.factor(Site),
+         Elevation_cat = cut(Elevation, 
+                             breaks = breaks,
+                             labels = labels)) |>
+  relocate(Elevation_cat, .before = Elevation)|>
   as_tibble()
 
 #Plant level for ASV analyses
-plant_traits <- leaf_traits %>%
-  relocate(Unique_ID, .before = Site) %>%
-  group_by(Unique_ID, Site, Species, Elevation, Elevation_cat)%>%
+plant_traits <- leaf_traits |>
+  relocate(Unique_ID, .before = Site) |>
+  group_by(Unique_ID, Site, Species, Elevation, Elevation_cat)|>
   summarise(ACI = mean(ACI, na.rm = TRUE),
             Thickness = mean(Thickness, na.rm = TRUE),
             Toughness = mean(Toughness, na.rm =TRUE),
             LMA = mean(LMA, na.rm = TRUE),
             ImageJ_1 = mean(ImageJ_1, na.rm = TRUE),
             ImageJ_2 = mean(ImageJ_2, na.rm = TRUE),
-            LBI = mean(LBI, na.rm = TRUE),
-            log10LBI = mean(log10LBI, na.rm = TRUE)) 
+            LBI = mean(LBI, na.rm = TRUE))
 
 
 str(plant_traits)
-#saveRDS(plant_traits, file.path(newdir, "statistics/plant_traits.rds"))
-plant_traits <- readRDS(file.path(newdir, "statistics/plant_traits.rds"))
+#saveRDS(plant_traits, file.path(path, "statistics/plant_traits.rds"))
+plant_traits <- readRDS(file.path(path, "statistics/plant_traits.rds"))
 
 #getting rownmes to filter
 names <- column_to_rownames(all_decontaminated, var = "X")
 samples <- rownames(names) #Using the colname to filter out 
-
-ftraits <- ptraits %>%
-  filter(Unique_ID %in% samples) %>%
-  column_to_rownames(var = "Unique_ID")%>%
-  slice(-c(29,105:106))#Some control that are still there.
-#saveRDS(ftraits, file.path(newdir, "Statistics", "/ftraits.rds"))
-ftraits <- readRDS(file.path(newdir, "Statistics", "/ftraits.rds"))
+# 
+# ftraits <- ptraits |>
+#   filter(Unique_ID %in% samples) |>
+#   column_to_rownames(var = "Unique_ID")|>
+#   slice(-c(29,105:106))#Some control that are still there.
+# #saveRDS(ftraits, file.path(path, "Statistics", "/ftraits.rds"))
+# ftraits <- readRDS(file.path(path, "Statistics", "/ftraits.rds"))
 ```
 
 ```{r, Mim3 ImageJ, tidy=TRUE}
 # head(imagej)
 # imagej <- as_tibble(imagej)
 # 
-# imagej1 <- imagej %>% 
-#   mutate(Leaf_Lobe_Index = (ImageJ_2 - ImageJ_1)/ ImageJ_2) %>%
-#   rename(Site = ï..Site, LBI = Leaf_Lobe_Index) %>%
-#   select(-Analyzed_by, -Node, -Leaf_date, -Date_analyzed, -Notes) %>%
+# imagej1 <- imagej |> 
+#   mutate(Leaf_Lobe_Index = (ImageJ_2 - ImageJ_1)/ ImageJ_2) |>
+#   rename(Site = ï..Site, LBI = Leaf_Lobe_Index) |>
+#   select(-Analyzed_by, -Node, -Leaf_date, -Date_analyzed, -Notes) |>
 #   slice(-c(679,680,699:702,711,712,717,718,740,
-#            741,768,769,777:780,782,783,860,861))%>%
-#   na.omit() %>%
+#            741,768,769,777:780,782,783,860,861))|>
+#   na.omit() |>
 #   na.fail()
 ```
 
 
 ##Descriptive stats
-```{r, Leaf traits basics, tidy=TRUE}
+```{r, Leaf_traits_basics}
+#| echo: false
+#| eval: true
+#| tidy: true
+
 #LBI
-hist(ntraits$LBI) #Skewed to the left, non-normal distribution of LBI data
-mean(ntraits$LBI, na.rm = TRUE)
-max(ntraits$LBI, na.rm = TRUE)
-min(ntraits$LBI, na.rm = TRUE)
-sd(ntraits$LBI, na.rm = TRUE)
+hist(leaf_traits$LBI) #Skewed to the left, non-normal distribution of LBI data
+mean(leaf_traits$LBI, na.rm = TRUE)
+max(leaf_traits$LBI, na.rm = TRUE)
+min(leaf_traits$LBI, na.rm = TRUE)
+sd(leaf_traits$LBI, na.rm = TRUE)
+
+qqPlot(leaf_traits$LBI) #Does not seem normal at all.
+hist(rnorm(n = length(leaf_traits$LBI))) #For comparison: normal distribution based on random permutation of my data.
+shapiro.test(leaf_traits$LBI) #Since p-value is less than 0.05 this means the residuals from the LBI data are not normally distributed. Data needs transfromation.
+
 
 #LMA
-hist(ntraits$LMA)
-mean(ntraits$LMA, na.rm = TRUE)
-max(ntraits$LMA, na.rm = TRUE)
-min(ntraits$LMA, na.rm = TRUE)
-sd(ntraits$LMA, na.rm = TRUE)
+hist(leaf_traits$LMA)
+mean(leaf_traits$LMA, na.rm = TRUE)
+max(leaf_traits$LMA, na.rm = TRUE)
+min(leaf_traits$LMA, na.rm = TRUE)
+sd(leaf_traits$LMA, na.rm = TRUE)
+
+qqPlot(leaf_traits$LMA) #Remove outiler 4.4mg
+#hist(rnorm(n = length(leaf_traits$LMA))) #For comparison: normal distribution based on random permutation of my data.
+shapiro.test(leaf_traits$LMA) #Since p-value is less than 0.05 this means the residuals from the LMA data are not normally distributed.
+
 
 #Toughness
-hist(ntraits$Toughness)
-mean(ntraits$Toughness, na.rm = TRUE)
-max(ntraits$Toughness, na.rm = TRUE)
-min(ntraits$Toughness, na.rm = TRUE)
-sd(ntraits$Toughness, na.rm = TRUE)
+hist(leaf_traits$Toughness[leaf_traits$Toughness < 4]) # Remove two outliers by using cut-off at 4.
+mean(leaf_traits$Toughness[leaf_traits$Toughness < 4], na.rm = TRUE)
+max(leaf_traits$Toughness[leaf_traits$Toughness < 4], na.rm = TRUE)
+min(leaf_traits$Toughness[leaf_traits$Toughness < 4], na.rm = TRUE)
+sd(leaf_traits$Toughness[leaf_traits$Toughness < 4], na.rm = TRUE)
+
+qqPlot(leaf_traits$Toughness[leaf_traits$Toughness < 4]) 
+hist(rnorm(n = length(leaf_traits$Toughness[leaf_traits$Toughness < 4]))) #For comparison: normal distribution based on random permutation of my data.
+shapiro.test(leaf_traits$Toughness[leaf_traits$Toughness < 4]) #Since p-value is less than 0.05 this means the residuals from the Toughness data are not normally distributed. Data needs transformation.
+
 
 #Thickness
-hist(ntraits$Thickness)
-mean(ntraits$Thickness, na.rm = TRUE)
-max(ntraits$Thickness, na.rm = TRUE)
-min(ntraits$Thickness, na.rm = TRUE)
-sd(ntraits$Thickness, na.rm = TRUE)
+hist(leaf_traits$Thickness)
+mean(leaf_traits$Thickness, na.rm = TRUE)
+max(leaf_traits$Thickness, na.rm = TRUE)
+min(leaf_traits$Thickness, na.rm = TRUE)
+sd(leaf_traits$Thickness, na.rm = TRUE)
+
+qqPlot(leaf_traits$Thickness) # Skewed to the right. 
+hist(rnorm(n = length(leaf_traits$Thickness))) #For comparison: normal distribution based on random permutation of my data.
+shapiro.test(leaf_traits$Thickness) #Since p-value is less than 0.05 this means the residuals from the Thickness data are not normally distributed. Data needs transformation.
+
 
 #ACI
-hist(ntraits$ACI)
-mean(ntraits$ACI, na.rm = TRUE)
-max(ntraits$ACI, na.rm = TRUE)
-min(ntraits$ACI, na.rm = TRUE)
-sd(ntraits$ACI, na.rm = TRUE)
+hist(leaf_traits$ACI[leaf_traits$ACI < 20]) #Setting cut-off at 20 to remove outliers. 
+mean(leaf_traits$ACI[leaf_traits$ACI <20], na.rm = TRUE)
+max(leaf_traits$ACI, na.rm = TRUE)
+min(leaf_traits$ACI, na.rm = TRUE)
+sd(leaf_traits$ACI[leaf_traits$ACI <20], na.rm = TRUE)
+
+qqPlot(leaf_traits$ACI[leaf_traits$ACI <20]) # Remove outliers, it's is skewed to the right. 
+hist(rnorm(n = length(leaf_traits$ACI))) #For comparison: normal distribution based on random permutation of my data.
+shapiro.test(leaf_traits$ACI[leaf_traits$ACI <20]) #Since p-value is less than 0.05 this means the residuals from the Thickness data are not normally distributed. Data needs transformation.
+
 
 #Elevation
-hist(ntraits$Elevation)
-mean(ntraits$Elevation, na.rm = TRUE)
-max(ntraits$Elevation, na.rm = TRUE)
-min(ntraits$Elevation, na.rm = TRUE)
-sd(ntraits$Elevation, na.rm = TRUE)
+hist(leaf_traits$Elevation)
+mean(leaf_traits$Elevation, na.rm = TRUE)
+max(leaf_traits$Elevation, na.rm = TRUE)
+min(leaf_traits$Elevation, na.rm = TRUE)
+sd(leaf_traits$Elevation, na.rm = TRUE)
 
-
+qqPlot(leaf_traits$Elevation) 
+hist(rnorm(n = length(leaf_traits$Elevation))) #For comparison: normal distribution based on random permutation of my data.
+shapiro.test(leaf_traits$Elevation) #Since p-value is less than 0.05 this means the residuals from the Thickness data are not normally distributed. Data needs transformation.
 ```
 
-##Checking assumptions of normality
-```{r}
+All leaf traits and elevation are not normally distributed. This requires transformation for further analysis. We will proceed weith a log transformation of the data.
+
+```{r, Leaf_traits_transformation}
+
+# Leaft traits transformed
+leaf_traits <- leaf_traits |>
+  mutate(logLBI = log10(LBI),
+         logACI = log10(ACI),
+         logLT = log10(Thickness),
+         logLPS = log10(Toughness),
+         logLMA = log10(LMA))
+
+
+# Plant traits transformed
+plant_traits <- plant_traits |>
+  mutate(logLBI = log10(LBI),
+         logACI = log10(ACI),
+         logLT = log10(Thickness),
+         logLPS = log10(Toughness),
+         logLMA = log10(LMA))
+```
+
+We are not omiting samples with NAs because some have the complete data for some leaf traits and not for others. We will omit samples with NAs for the Fungal analyses.
+
+
+## Post data transformations
+```{r, post_transformation}
+#| echo: false
+#| eval: true
+#| tidy: true
+
 #LBI
-qqPlot(ntraits$LBI) #Does not seem normal at all.
-hist(rnorm(n = length(ntraits$LBI))) #For comparison: normal distribution based on random permutation of my data.
-shapiro.test(ntraits$LBI) #Since p-value is less than 0.05 this means the residuals from the LBI data are not normally distributed.
+hist(leaf_traits$LBI, col = "steelblue", main = "Non-normal distribution")
+hist(na.omit(leaf_traits$logLBI), col='coral2', main='Log Transformed')
+qqPlot(leaf_traits$logLBI) #a BETTER, but not normal distribution
+shapiro.test(leaf_traits$logLBI)
 
 #LMA
-qqPlot(ntraits$LMA) #Remove outiler 4.4mg
-#hist(rnorm(n = length(ntraits$LMA))) #For comparison: normal distribution based on random permutation of my data.
-shapiro.test(ntraits$LMA) #Since p-value is less than 0.05 this means the residuals from the LMA data are not normally distributed.
+hist(leaf_traits$LMA, col = "steelblue", main = "Non-normal distribution")
+hist(na.omit(leaf_traits$logLMA), col='coral2', main='Log Transformed')
+qqPlot(na.omit(leaf_traits$logLMA)) 
+shapiro.test(na.omit(leaf_traits$logLMA))
 
 #Toughness
-qqPlot(ntraits$Toughness) # Remove two outliers, everything else looks normal
-#hist(rnorm(n = length(ntraits$Toughness))) #For comparison: normal distribution based on random permutation of my data.
-shapiro.test(ntraits$Toughness) #Since p-value is less than 0.05 this means the residuals from the Toughness data are not normally distributed.
+hist(leaf_traits$Toughness[leaf_traits$Toughness < 4], col = "steelblue", main = "Non-normal distribution")
+hist(na.omit(leaf_traits$logLPS[leaf_traits$logLPS < 0.5]), col='coral2', main='Log Transformed')
+qqPlot(leaf_traits$logLPS[leaf_traits$logLPS < 0.5]) # Excludinfg the outliers, this transformation looks good
+shapiro.test(leaf_traits$logLPS) # It still does not meet normality assumptions.
 
 #Thickness
-qqPlot(ntraits$Thickness) # Skewed to the right. 
-#hist(rnorm(n = length(ntraits$Thickness))) #For comparison: normal distribution based on random permutation of my data.
-shapiro.test(ntraits$Thickness) #Since p-value is less than 0.05 this means the residuals from the Thickness data are not normally distributed.
+hist(leaf_traits$Thickness, col = "steelblue", main = "Non-normal distribution")
+hist(na.omit(leaf_traits$logLT), col='coral2', main='Log Transformed')
+qqPlot(leaf_traits$logLT)
+shapiro.test(leaf_traits$logLT) #Close to normality, but not quite there.
 
 #ACI
-qqPlot(ntraits$ACI) # Remove outliers, it's is skewed to the right. 
-#hist(rnorm(n = length(ntraits$ACI))) #For comparison: normal distribution based on random permutation of my data.
-shapiro.test(ntraits$ACI) #Since p-value is less than 0.05 this means the residuals from the Thickness data are not normally distributed.
-
-#Elevation
-qqPlot(ntraits$Elevation) 
-#hist(rnorm(n = length(ntraits$Elevation))) #For comparison: normal distribution based on random permutation of my data.
-shapiro.test(ntraits$Elevation) #Since p-value is less than 0.05 this means the residuals from the Thickness data are not normally distributed.
-
-
-
+hist(leaf_traits$ACI, col = "steelblue", main = "Non-normal distribution")
+hist(na.omit(leaf_traits$logACI), col='coral2', main='Log Transformed')
+qqPlot(leaf_traits$logACI) 
+shapiro.test(leaf_traits$logACI) #Another transformation that does not meet normality assumptions.
 ```
 
-Toughness looks quite normal with the exception of some outliers that are skewing the distribution. Thickness and ACI are skewed to the right. LMA is normal, with the exception of a data point of 4.4mg. 
+The log transformations improve the normality of the data, but it does not meet the assumptions for normality. We will proceed with the analyses using the log transformed data. We will use non-parametric tests for the analyses.
 
-##Data transformations
-```{r}
-##Log transforming data to meet normality assumption (dplyr)
-imagej1 <- imagej1 %>%
-  mutate(logLBI = log10(LBI)) %>%
-  na.omit() %>%
-  na.fail()
-hist(ntraits$LBI, col = "steelblue", main = "Non-normal distribution")
-hist(ntraits$log10LBI, col='coral2', main='Log Transformed')
-shapiro.test(ntraits$log10LBI)
-#Square root transformation (base R)
-# imagej1$sqr_LBI <- (sqrt(ntraits$LBI))
-# hist(imagej1$sqr_LBI)
-# 
-# #Cube Root Transformation
-# imagej1$cube_LBI <- imagej1$LBI^(1/3)
-# hist(imagej1$cube_LBI)
-# 
-# shapiro.test(imagej1$cube_LBI)
-
-#The most normal distribution is that achieved by log transformation of the data. Enven though is does not pas the Shapiro-Wilk test, it is the best we can transform.
-```
-
-
-##Generalized linear Mixed Models using nlme package
-```{r}
+## Non-parametric tests
+```{r, non_parametric}
 #M1 <- lme(logLBI ~ , method = "REML", data = imagej1) # this is not the best given that I don't have continuous data.
-
-
-##Two-way ANOVA
-two.way <- aov(LMA ~ Species, data = ntraits2 )
-summary(two.way)
-qqPlot(two.way)
-
-
-one.way <- aov(logLBI ~ Site + Elevation, data = imagej1) #One-way ANOVA IS THE BEST MODEL
-summary(one.way)
-plot(one.way)
-aov_residuals <- residuals(object = one.way)
-# Run Shapiro-Wilk test
-shapiro.test(x = aov_residuals)
-
-drop1(two.way,.~., test = "F")
-#Anova(two.way, one.way, type = "II")
-AIC(one.way)
 
 #Kruskal-Wallis
 #Because the data does not meet normality assumptions after transformation, I decisded to stick to a non-parametric test like Kruskal-Wallis.
-kruskal <- kruskal.test(logLBI ~ Site, data = imagej1)
-kruskal2 <- kruskal.test(logLBI ~ Elevation, data = imagej1)
-summary(kruskal)
-print(kruskal2)
+# LBI by Site
+print(kruskal.test(logLBI ~ Site, 
+                   data = leaf_traits,
+                   na.action = na.omit))
+
+# LBI by Elevation
+print(kruskal.test(logLBI ~ Elevation, 
+             data = leaf_traits,
+             na.action = na.omit))
+
+# LMA by Site
+print(kruskal.test(logLMA ~ Site, 
+                   data = leaf_traits,
+                   na.action = na.omit))
+
+# LMA by Elevation
+print(kruskal.test(logLMA ~ Elevation, 
+                   data = leaf_traits,
+                   na.action = na.omit))
+
+# Toughness by Site
+print(kruskal.test(logLPS ~ Site, 
+                   data = leaf_traits,
+                   na.action = na.omit))
+
+# Toughness by Elevation
+print(kruskal.test(logLPS ~ Elevation, 
+                   data = leaf_traits,
+                   na.action = na.omit))
+
+# Thickness by Site
+print(kruskal.test(logLT ~ Site, 
+                   data = leaf_traits,
+                   na.action = na.omit))
+
+# Thickness by Elevation
+print(kruskal.test(logLT ~ Elevation, 
+                   data = leaf_traits,
+                   na.action = na.omit))
+
+# ACI by Site
+print(kruskal.test(logACI ~ Site, 
+                   data = leaf_traits,
+                   na.action = na.omit))
+
+# ACI by Elevation
+print(kruskal.test(logACI ~ Elevation, 
+                   data = leaf_traits,
+                   na.action = na.omit))
+
+
 
 #Post-Hoc tests
 TukeyHSD(two.way, which = "Species")
@@ -257,13 +327,329 @@ pairwise.wilcox.test(imagej1$logLBI, g = imagej1$Genotype)
 ```
 
 # Figures
+
+
+### Leaf traits
+#### LMA
+```{r}
+#Removing species B
+leaf_traits2 <- leaf_traits |>
+  filter(!Species == "B")
+
+#ggpubr package used for t.tests and plotting t-test comparisons
+
+lma_compare_means <- compare_means(logLMA ~ Species,
+         data = leaf_traits2,
+         group.by = "Site",
+         method = "wilcox.test",
+         p.adjust.method = "BH",
+  paired = FALSE,
+  alternative = "two.sided", 
+  mu = 0, 
+  var.equal = FALSE,
+  conf.level = 0.95)
+
+lma_compare_means
+#Roughly the same outcome as pairwise_t_test.
+
+#Report with `compare_means` because it is easier to plot with `ggpubr` package.
+
+
+
+#Filter outlier
+
+#Error bars for plots 
+errbar_lims <- group_by(leaf_traits2, Site) |> 
+              summarize(mean=mean(logLMA), se=sd(logLMA)/sqrt(n()), 
+                        upper=mean+(2*se), lower=mean-(2*se))
+#Comparisons
+my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
+
+#By Site
+lma <- ggplot(leaf_traits2, aes(y= logLMA, x = Species)) +
+  geom_violin(aes(fill = Species)) +
+  geom_crossbar(stat="summary",
+                fun = mean,
+                fun.max = mean,
+                fun.min = mean,
+                fatten = 1.5, width = 0.8) +
+  geom_point(color="black", alpha = 0.2,
+             size=1.7, 
+             position = position_jitter(w = 0.05))  +
+  scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  scale_color_manual(aes(color = "black")) +
+  #scale_color_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  theme_classic(base_size = 12) +
+  theme(legend.title = element_text(face = "bold"),
+        panel.border = element_rect(linetype = "blank", fill = NA),
+        legend.text = element_markdown(size = 12), #Make legend text italic
+        axis.text.x = element_text(face="italic", 
+                                    size = 14,  
+                                    hjust = 1,
+                                    angle = 30)) +
+  labs(y = "log10[Leaf Mass per Area (LMA) (mg/mm)]", x = "") +
+  scale_x_discrete(labels = c('M. guttatus', 'M. laciniatus', 'M. nasutus')) +
+  stat_compare_means(comparisons = my_comparisons,
+                     method = "wilcox.test",
+                     label.y.npc = 0.25,
+                     label = "p.signif") +
+  facet_wrap(~Elevation_cat)
+
+lma
+
+ggsave(filename = file.path(path, "figures/lma_violin.png"), plot = lma, dpi=300, units=c("mm"), width=300, height=150)
+```
+
+#### ACI
+```{r}
+errbar_lims <- group_by(leaf_traits2, Species) |> 
+              summarize(mean=mean(ACI), se=sd(ACI)/sqrt(n()), 
+                        upper=mean+(2*se), lower=mean-(2*se))
+spp <- c("M. bicolor", "M. guttatus", "M. laciniatus", "M. nasutus")
+
+aci <- ggplot(leaf_traits2, aes(y= ACI, x = Species)) +
+  geom_violin(aes(fill=Species, color = Species)) +
+  geom_crossbar(stat="summary", fun = mean, fun.max = mean, fun.min = mean,  fatten = 2, width = 0.5) +
+  geom_point(color="black", alpha = 0.2,size =1.7, position = position_jitter(w=0.05))  +
+  scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  scale_color_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  theme_bw() +
+  theme(panel.grid.major = element_line(colour = "grey90")) +
+  theme(panel.grid.minor = element_line(colour = "grey90")) +
+  theme(strip.background = element_rect(fill = "white")) +
+  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
+  theme(legend.title = element_text(face = "bold")) +
+  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
+  theme(legend.text = element_markdown()) +
+  theme(axis.text.x = element_text(face="italic", size = 14)) +
+  scale_x_discrete(labels = c('M. guttatus', 'M. laciniatus', 'M. nasutus')) +
+  stat_compare_means(comparisons = my_comparisons,method = "t.test", label = "p.format") +
+  labs(y = "Anthocyanins (ACI)", x = "", caption = "n = 851, AIC = % transmittance at 931 nm / % transmittance at 525 nm") +
+  guides(color = "none")  +      #To turn off color legend
+  guides(fill = "none") + #To turn off fill legend
+  guides(shape = "none") + #To turn off shape legend
+   
+  facet_wrap(~Elevation_cat)
+
+aci
+
+ggsave(filename = file.path(path, "Plots", "/aci_evo23.jpg"), plot = aci, dpi=300, units=c("mm"), width=300, height=150)
+```
+
+#### LBI
+```{r}
+#By Elevation
+errbar_lims <- group_by(leaf_traits2, Species) |> 
+              summarize(mean=mean(LBI), se=sd(LBI)/sqrt(n()), 
+                        upper=mean+(2*se), lower=mean-(2*se))
+
+
+lbi <- ggplot(leaf_traits2, aes(y= LBI, x = Species)) +
+  geom_violin(aes(fill=Species, color = Species)) +
+  geom_crossbar(stat="summary", fun = mean, fun.max = mean, fun.min = mean,  fatten = 2, width = 0.5) +
+  geom_point(color="black", alpha = 0.2,size =2, position = position_jitter(w=0.05)) +
+    scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  scale_color_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  theme_bw() +
+  theme(panel.grid.major = element_line(colour = "grey90")) +
+  theme(panel.grid.minor = element_line(colour = "grey90")) +
+  theme(strip.background = element_rect(fill = "white")) +
+  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
+  theme(legend.title = element_text(face = "bold")) +
+  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
+  theme(legend.text = element_markdown()) +
+  theme(axis.text.x = element_text(face="italic", size = 14)) +
+  scale_x_discrete(labels = c('M. guttatus', 'M. laciniatus', 'M. nasutus')) +
+  stat_compare_means(comparisons = my_comparisons,method = "t.test", label = "p.format") +
+  labs(y = "Leaf lobe index (LBI)", x = "", caption = "n = 769, LBI = [convex_hull - true_area]/convex_hull") +
+  guides(color = "none")  +      #To turn off color legend
+  guides(fill = "none") + #To turn off fill legend
+  guides(shape = "none") +#To turn off shape legend
+  facet_wrap(~Elevation_cat)
+lbi
+
+ggsave(filename = file.path(path, "Plots", "/lbi_evo23.jpg"), plot = lbi, dpi=300, units=c("mm"), width=300, height=150)
+
+```
+
+#### Toughness
+```{r}
+#Remove outlier and NAs for Toughness
+filtered_data <- leaf_traits2 |>
+  filter(Toughness <= 4)
+
+
+errbar_lims <- group_by(filtered_data, Species) |> 
+              summarize(mean=mean(Toughness), se=sd(Toughness)/sqrt(n()), 
+                        upper=mean+(2*se), lower=mean-(2*se))
+
+
+thg <- ggplot(filtered_data, aes(y= Toughness, x = Species)) +
+  geom_violin(aes(fill=Species, color = Species)) +
+  geom_crossbar(stat="summary", fun = mean, fun.max = mean, fun.min = mean,  fatten = 2, width = 0.5) +
+  geom_point(color="black", alpha = 0.2,size =2, position = position_jitter(w=0.05)) +
+    scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  scale_color_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  theme_bw() +
+  theme(panel.grid.major = element_line(colour = "grey90")) +
+  theme(panel.grid.minor = element_line(colour = "grey90")) +
+  theme(strip.background = element_rect(fill = "white")) +
+  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
+  theme(legend.title = element_text(face = "bold")) +
+  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
+  theme(legend.text = element_markdown()) +
+  theme(axis.text.x = element_text(face="italic", size = 14)) +
+  scale_x_discrete(labels = c('M. guttatus', 'M. laciniatus', 'M. nasutus')) +
+  stat_compare_means(comparisons = my_comparisons,method = "t.test", label = "p.format") +
+  labs(y = "Leaf punch strength (N mm-1)", x = "", caption = "n = 873 ") +
+   guides(color = "none")  +      #To turn off color legend
+  guides(fill = "none") + #To turn off fill legend
+  guides(shape = "none") +#To turn off shape legend
+  facet_wrap(~Elevation_cat)
+thg
+
+ggsave(filename = file.path(path, "Plots", "/thg_evo23.jpg"), plot = thg, dpi=300, units=c("mm"), width=300, height=150)
+```
+
+#### Thickness
+
+```{r}
+errbar_lims <- group_by(leaf_traits2, Species) |> 
+              summarize(mean=mean(Thickness), se=sd(Thickness)/sqrt(n()), 
+                        upper=mean+(2*se), lower=mean-(2*se))
+
+thk <- ggplot(leaf_traits2, aes(y= Thickness, x = Species)) +
+  geom_violin(aes(fill=Species, color = Species)) +
+  geom_crossbar(stat="summary", fun = mean, fun.max = mean, fun.min = mean,  fatten = 2, width = 0.5) +
+  geom_point(color="black", alpha = 0.2,size =2, position = position_jitter(w=0.05)) +
+    scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  scale_color_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  theme_bw() +
+  theme(panel.grid.major = element_line(colour = "grey90")) +
+  theme(panel.grid.minor = element_line(colour = "grey90")) +
+  theme(strip.background = element_rect(fill = "white")) +
+  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
+  theme(legend.title = element_text(face = "bold")) +
+  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
+  theme(legend.text = element_markdown()) +
+  theme(axis.text.x = element_text(face="italic", size = 14)) +
+  scale_x_discrete(labels = c('M. guttatus', 'M. laciniatus', 'M. nasutus')) +
+  stat_compare_means(comparisons = my_comparisons,method = "t.test", label = "p.format") +
+  labs(y = "Leaf thickness (/u03BCm)", x = "", caption = "n = 872") + 
+   guides(color = "none")  +      #To turn off color legend
+  guides(fill = "none") + #To turn off fill legend
+  guides(shape = "none") +
+  facet_wrap(~Elevation_cat)#To turn off shape legend
+
+thk
+
+ggsave(filename = file.path(path, "Plots", "/thk_evo23.jpg"), plot = thk, dpi=300, units=c("mm"), width=300, height=150)
+```
+
+#### Multiple
+```{r}
+# Multiples plots together
+#LMA and ACI
+arrange <- ggarrange( lma, aci, nrow = 1, ncol=2, common.legend = TRUE, legend="right")
+arrange
+
+ggsave(filename = file.path(path, "Plots", "/lma_aci_evo23.jpg"), plot = arrange, dpi=300, units=c("mm"), width=300, height=150)
+
+#LBI
+ggsave(filename = file.path(path, "Plots", "/lbi_evo23.jpg"), plot = lbi, dpi=300, units=c("mm"), width=150, height=150)
+
+#Toughness and Thickness
+arrange2 <- ggarrange( thg, thk, nrow = 1, ncol=2, common.legend = TRUE, legend="right")
+arrange2
+
+ggsave(filename = file.path(path, "Plots", "/thg_thk_evo23.jpg"), plot = arrange2, dpi=300, units=c("mm"), width=300, height=150)
+
+
+# Adding caption
+ant_caption <- "*All individuals per tree species included (n = 210)"
+ant_arranged_with_caption <- annotate_figure(ant_arranged, bottom = text_grob(ant_caption), fig.lab.pos = "bottom.right", fig.lab.size = 6)
+
+ant_arranged_with_caption
+```
+
+
+#### Elevation
+
+```{r}
+legend_title <- "Species"
+ edv <- ggplot(data = ftraits2, aes(x= Elevation, y= Shannon, color = Species))+
+  geom_jitter(aes(color = Species), size = 3, alpha = 0.7) +
+  geom_smooth(method=lm, se=F) +
+ # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
+  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
+ scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*','*M. guttatus*' ),values= met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) +
+  scale_color_manual(legend_title, labels=c( '*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'), values= met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) +
+  stat_regline_equation(label.y = 3, label.x = 2100, aes(label = ..eq.label..), size = rel(4), color= "black") +
+  stat_regline_equation(label.y = 2.7, label.x = 2100, aes(label = ..adj.rr.label..),size = rel(4), color = "black") +
+  labs(y="Shannon diversity index", x="Elevation (m.a.s.l.)", col = "") +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.major = element_line(colour = "grey90")) +
+  theme(panel.grid.minor = element_line(colour = "grey90")) +
+  theme(strip.background = element_rect(fill = "white")) +
+  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
+  theme(legend.title = element_text(face = "bold")) +
+  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
+  theme(legend.text = element_markdown()) +
+  theme(axis.text.x = element_text(size = 12)) +
+  theme(axis.title.x = element_text(size = 14)) +
+ annotate(geom="text", x=2100, y=2.5, label="p = 0.03", color = "black")
+
+edv
+
+model1 <- lm(Shannon ~ Elevation, data = ftraits2)
+summary(model1)
+
+ggsave(filename = file.path(path, "Plots", "/elevation_evo2023.jpg"), plot = edv, dpi=300, units=c("mm"), width=250, height=150)
+```
+
+
+```{r}
+rdv <- ggplot(data = ftraits2, aes(x= Elevation, y= Observed, color = Species))+
+  geom_jitter(aes(color = Species), size = 3, alpha = 0.7) +
+  geom_smooth(method=lm, se=F) +
+ # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
+  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
+  scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*','*M. guttatus*' ),values= met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) +
+  scale_color_manual(legend_title, labels=c( '*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'), values= met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) +
+  stat_regline_equation(label.y = 60, label.x = 2100, aes(label = ..eq.label..), size = rel(4), color= "black") +
+  stat_regline_equation(label.y = 55, label.x = 2100, aes(label = ..adj.rr.label..),size = rel(4), color = "black") +
+  labs(y="Richness", x="Elevation (m.a.s.l.)", col = "") +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.major = element_line(colour = "grey90")) +
+  theme(panel.grid.minor = element_line(colour = "grey90")) +
+  theme(strip.background = element_rect(fill = "white")) +
+  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
+  theme(legend.title = element_text(face = "bold")) +
+  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
+  theme(legend.text = element_markdown()) +
+  theme(axis.text.x = element_text(size = 12)) +
+  theme(axis.title.x = element_text(size = 14)) +
+ annotate(geom="text", x=2100, y=50, label="p = 0.06", color = "black")
+
+
+rdv
+
+
+
+model2 <- lm(Observed ~ Elevation, data = ftraits2)
+summary(model2)
+
+
+ggsave(filename = file.path(path, "Plots", "/rich_evo2023.jpg"), plot = rdv, dpi=300, units=c("mm"), width=250, height=150)
+```
+
 ### Linear model 
 Regressions presented at Evo 2023.
 ```{r}
 # Regressions
 # Elevation and Thicknes
   
-t <-ggplot(data = ntraits, aes(y= Thickness, x = Elevation, color = Species)) +
+t <-ggplot(data = leaf_traits, aes(y= Thickness, x = Elevation, color = Species)) +
    geom_jitter(aes(color = Species,), size = 2, alpha = 0.5, na.rm = TRUE)+
 #scale_shape_manual(values=c(1:24)) +
   scale_color_manual(values= met.brewer("Signac", n = 4, type = "discrete"))+
@@ -297,7 +683,7 @@ t
 
 # Elevation and Anthocyanins
 
-a <- ggplot(data = ntraits, aes(y= ACI, x= Elevation, color = Species))+
+a <- ggplot(data = leaf_traits, aes(y= ACI, x= Elevation, color = Species))+
    geom_jitter(aes(color = Species), size = 2, alpha = 0.5) +
   #scale_shape_manual(values=c(15:22)) +
   scale_color_manual(values= met.brewer("Signac", n = 4, type = "discrete")) +
@@ -404,310 +790,18 @@ ant_arranged_with_caption
 ```
 
 
-### Leaf traits
-#### LMA
-```{r}
-#Cleaner data set
-#
-breaks <- c(-Inf, 4000, 5999, Inf)
-labels <- c("LOW", "MEDIUM", "HIGH")
-ntraits2 <- ntraits %>%
-  filter(!Unique_ID == "HUOB_G012") %>%
-  filter(!Species == "B") %>%
-  mutate(Elevation_cat = cut(Elevation, breaks = breaks, labels = labels))
-  
-#Filter outlier
-
-#Error bars for plots 
-errbar_lims <- group_by(ntraits2, Site) %>% 
-              summarize(mean=mean(LMA), se=sd(LMA)/sqrt(n()), 
-                        upper=mean+(2*se), lower=mean-(2*se))
-#Comparisons
-my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
-
-#By Site
-lma <- ggplot(ntraits2, aes(y= LMA, x = Species)) +
-  geom_violin(aes(fill=Species, color = Species)) +
-  geom_crossbar(stat="summary", fun = mean, fun.max = mean, fun.min = mean,  fatten = 2, width = 0.5) +
-  geom_point(color="black", alpha = 0.2,size=1.7, position = position_jitter(w=0.05))  +
-  scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
-  scale_color_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
-  theme_bw() +
-  theme(panel.grid.major = element_line(colour = "grey90")) +
-  theme(panel.grid.minor = element_line(colour = "grey90")) +
-  theme(strip.background = element_rect(fill = "white")) +
-  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
-  theme(legend.title = element_text(face = "bold")) +
-  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
-  theme(legend.text = element_markdown()) +
-  theme(axis.text.x = element_text(face="italic", size = 14)) +
-  scale_x_discrete(labels = c('M. guttatus', 'M. laciniatus', 'M. nasutus')) +
-  stat_compare_means(comparisons = my_comparisons,method = "t.test", label = "p.format") +
-  labs(y = "Leaf mass per area (LMA)", x = "", caption = "n = 591") +
-  guides(color = "none")  +      #To turn off color legend
-  guides(fill = "none") + #To turn off fill legend
-  guides(shape = "none") +
-  facet_wrap(~Elevation_cat)
-
-lma
-
-ggsave(filename = file.path(newdir, "Plots", "/lma_evo2023.jpg"), plot = lma, dpi=300, units=c("mm"), width=300, height=150)
-```
-
-#### ACI
-```{r}
-errbar_lims <- group_by(ntraits2, Species) %>% 
-              summarize(mean=mean(ACI), se=sd(ACI)/sqrt(n()), 
-                        upper=mean+(2*se), lower=mean-(2*se))
-spp <- c("M. bicolor", "M. guttatus", "M. laciniatus", "M. nasutus")
-
-aci <- ggplot(ntraits2, aes(y= ACI, x = Species)) +
-  geom_violin(aes(fill=Species, color = Species)) +
-  geom_crossbar(stat="summary", fun = mean, fun.max = mean, fun.min = mean,  fatten = 2, width = 0.5) +
-  geom_point(color="black", alpha = 0.2,size =1.7, position = position_jitter(w=0.05))  +
-  scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
-  scale_color_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
-  theme_bw() +
-  theme(panel.grid.major = element_line(colour = "grey90")) +
-  theme(panel.grid.minor = element_line(colour = "grey90")) +
-  theme(strip.background = element_rect(fill = "white")) +
-  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
-  theme(legend.title = element_text(face = "bold")) +
-  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
-  theme(legend.text = element_markdown()) +
-  theme(axis.text.x = element_text(face="italic", size = 14)) +
-  scale_x_discrete(labels = c('M. guttatus', 'M. laciniatus', 'M. nasutus')) +
-  stat_compare_means(comparisons = my_comparisons,method = "t.test", label = "p.format") +
-  labs(y = "Anthocyanins (ACI)", x = "", caption = "n = 851, AIC = % transmittance at 931 nm / % transmittance at 525 nm") +
-  guides(color = "none")  +      #To turn off color legend
-  guides(fill = "none") + #To turn off fill legend
-  guides(shape = "none") + #To turn off shape legend
-   
-  facet_wrap(~Elevation_cat)
-
-aci
-
-ggsave(filename = file.path(newdir, "Plots", "/aci_evo23.jpg"), plot = aci, dpi=300, units=c("mm"), width=300, height=150)
-```
-
-#### LBI
-```{r}
-#By Elevation
-errbar_lims <- group_by(ntraits2, Species) %>% 
-              summarize(mean=mean(LBI), se=sd(LBI)/sqrt(n()), 
-                        upper=mean+(2*se), lower=mean-(2*se))
-
-
-lbi <- ggplot(ntraits2, aes(y= LBI, x = Species)) +
-  geom_violin(aes(fill=Species, color = Species)) +
-  geom_crossbar(stat="summary", fun = mean, fun.max = mean, fun.min = mean,  fatten = 2, width = 0.5) +
-  geom_point(color="black", alpha = 0.2,size =2, position = position_jitter(w=0.05)) +
-    scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
-  scale_color_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
-  theme_bw() +
-  theme(panel.grid.major = element_line(colour = "grey90")) +
-  theme(panel.grid.minor = element_line(colour = "grey90")) +
-  theme(strip.background = element_rect(fill = "white")) +
-  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
-  theme(legend.title = element_text(face = "bold")) +
-  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
-  theme(legend.text = element_markdown()) +
-  theme(axis.text.x = element_text(face="italic", size = 14)) +
-  scale_x_discrete(labels = c('M. guttatus', 'M. laciniatus', 'M. nasutus')) +
-  stat_compare_means(comparisons = my_comparisons,method = "t.test", label = "p.format") +
-  labs(y = "Leaf lobe index (LBI)", x = "", caption = "n = 769, LBI = [convex_hull - true_area]/convex_hull") +
-  guides(color = "none")  +      #To turn off color legend
-  guides(fill = "none") + #To turn off fill legend
-  guides(shape = "none") +#To turn off shape legend
-  facet_wrap(~Elevation_cat)
-lbi
-
-ggsave(filename = file.path(newdir, "Plots", "/lbi_evo23.jpg"), plot = lbi, dpi=300, units=c("mm"), width=300, height=150)
-
-```
-
-#### Toughness
-```{r}
-#Remove outlier and NAs for Toughness
-filtered_data <- ntraits2 %>%
-  filter(Toughness <= 4)
-
-
-errbar_lims <- group_by(filtered_data, Species) %>% 
-              summarize(mean=mean(Toughness), se=sd(Toughness)/sqrt(n()), 
-                        upper=mean+(2*se), lower=mean-(2*se))
-
-
-thg <- ggplot(filtered_data, aes(y= Toughness, x = Species)) +
-  geom_violin(aes(fill=Species, color = Species)) +
-  geom_crossbar(stat="summary", fun = mean, fun.max = mean, fun.min = mean,  fatten = 2, width = 0.5) +
-  geom_point(color="black", alpha = 0.2,size =2, position = position_jitter(w=0.05)) +
-    scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
-  scale_color_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
-  theme_bw() +
-  theme(panel.grid.major = element_line(colour = "grey90")) +
-  theme(panel.grid.minor = element_line(colour = "grey90")) +
-  theme(strip.background = element_rect(fill = "white")) +
-  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
-  theme(legend.title = element_text(face = "bold")) +
-  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
-  theme(legend.text = element_markdown()) +
-  theme(axis.text.x = element_text(face="italic", size = 14)) +
-  scale_x_discrete(labels = c('M. guttatus', 'M. laciniatus', 'M. nasutus')) +
-  stat_compare_means(comparisons = my_comparisons,method = "t.test", label = "p.format") +
-  labs(y = "Leaf punch strength (N mm-1)", x = "", caption = "n = 873 ") +
-   guides(color = "none")  +      #To turn off color legend
-  guides(fill = "none") + #To turn off fill legend
-  guides(shape = "none") +#To turn off shape legend
-  facet_wrap(~Elevation_cat)
-thg
-
-ggsave(filename = file.path(newdir, "Plots", "/thg_evo23.jpg"), plot = thg, dpi=300, units=c("mm"), width=300, height=150)
-```
-
-#### Thickness
-
-```{r}
-errbar_lims <- group_by(ntraits2, Species) %>% 
-              summarize(mean=mean(Thickness), se=sd(Thickness)/sqrt(n()), 
-                        upper=mean+(2*se), lower=mean-(2*se))
-
-thk <- ggplot(ntraits2, aes(y= Thickness, x = Species)) +
-  geom_violin(aes(fill=Species, color = Species)) +
-  geom_crossbar(stat="summary", fun = mean, fun.max = mean, fun.min = mean,  fatten = 2, width = 0.5) +
-  geom_point(color="black", alpha = 0.2,size =2, position = position_jitter(w=0.05)) +
-    scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
-  scale_color_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
-  theme_bw() +
-  theme(panel.grid.major = element_line(colour = "grey90")) +
-  theme(panel.grid.minor = element_line(colour = "grey90")) +
-  theme(strip.background = element_rect(fill = "white")) +
-  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
-  theme(legend.title = element_text(face = "bold")) +
-  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
-  theme(legend.text = element_markdown()) +
-  theme(axis.text.x = element_text(face="italic", size = 14)) +
-  scale_x_discrete(labels = c('M. guttatus', 'M. laciniatus', 'M. nasutus')) +
-  stat_compare_means(comparisons = my_comparisons,method = "t.test", label = "p.format") +
-  labs(y = "Leaf thickness (/u03BCm)", x = "", caption = "n = 872") + 
-   guides(color = "none")  +      #To turn off color legend
-  guides(fill = "none") + #To turn off fill legend
-  guides(shape = "none") +
-  facet_wrap(~Elevation_cat)#To turn off shape legend
-
-thk
-
-ggsave(filename = file.path(newdir, "Plots", "/thk_evo23.jpg"), plot = thk, dpi=300, units=c("mm"), width=300, height=150)
-```
-
-#### Multiple
-```{r}
-# Multiples plots together
-#LMA and ACI
-arrange <- ggarrange( lma, aci, nrow = 1, ncol=2, common.legend = TRUE, legend="right")
-arrange
-
-ggsave(filename = file.path(newdir, "Plots", "/lma_aci_evo23.jpg"), plot = arrange, dpi=300, units=c("mm"), width=300, height=150)
-
-#LBI
-ggsave(filename = file.path(newdir, "Plots", "/lbi_evo23.jpg"), plot = lbi, dpi=300, units=c("mm"), width=150, height=150)
-
-#Toughness and Thickness
-arrange2 <- ggarrange( thg, thk, nrow = 1, ncol=2, common.legend = TRUE, legend="right")
-arrange2
-
-ggsave(filename = file.path(newdir, "Plots", "/thg_thk_evo23.jpg"), plot = arrange2, dpi=300, units=c("mm"), width=300, height=150)
-
-
-# Adding caption
-ant_caption <- "*All individuals per tree species included (n = 210)"
-ant_arranged_with_caption <- annotate_figure(ant_arranged, bottom = text_grob(ant_caption), fig.lab.pos = "bottom.right", fig.lab.size = 6)
-
-ant_arranged_with_caption
-```
-
-
-#### Elevation
-
-```{r}
-legend_title <- "Species"
- edv <- ggplot(data = ftraits2, aes(x= Elevation, y= Shannon, color = Species))+
-  geom_jitter(aes(color = Species), size = 3, alpha = 0.7) +
-  geom_smooth(method=lm, se=F) +
- # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
-  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
- scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*','*M. guttatus*' ),values= met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) +
-  scale_color_manual(legend_title, labels=c( '*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'), values= met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) +
-  stat_regline_equation(label.y = 3, label.x = 2100, aes(label = ..eq.label..), size = rel(4), color= "black") +
-  stat_regline_equation(label.y = 2.7, label.x = 2100, aes(label = ..adj.rr.label..),size = rel(4), color = "black") +
-  labs(y="Shannon diversity index", x="Elevation (m.a.s.l.)", col = "") +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.major = element_line(colour = "grey90")) +
-  theme(panel.grid.minor = element_line(colour = "grey90")) +
-  theme(strip.background = element_rect(fill = "white")) +
-  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
-  theme(legend.title = element_text(face = "bold")) +
-  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
-  theme(legend.text = element_markdown()) +
-  theme(axis.text.x = element_text(size = 12)) +
-  theme(axis.title.x = element_text(size = 14)) +
- annotate(geom="text", x=2100, y=2.5, label="p = 0.03", color = "black")
-
-edv
-
-model1 <- lm(Shannon ~ Elevation, data = ftraits2)
-summary(model1)
-
-ggsave(filename = file.path(newdir, "Plots", "/elevation_evo2023.jpg"), plot = edv, dpi=300, units=c("mm"), width=250, height=150)
-```
-
-
-```{r}
-rdv <- ggplot(data = ftraits2, aes(x= Elevation, y= Observed, color = Species))+
-  geom_jitter(aes(color = Species), size = 3, alpha = 0.7) +
-  geom_smooth(method=lm, se=F) +
- # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
-  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
-  scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*','*M. guttatus*' ),values= met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) +
-  scale_color_manual(legend_title, labels=c( '*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'), values= met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) +
-  stat_regline_equation(label.y = 60, label.x = 2100, aes(label = ..eq.label..), size = rel(4), color= "black") +
-  stat_regline_equation(label.y = 55, label.x = 2100, aes(label = ..adj.rr.label..),size = rel(4), color = "black") +
-  labs(y="Richness", x="Elevation (m.a.s.l.)", col = "") +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.major = element_line(colour = "grey90")) +
-  theme(panel.grid.minor = element_line(colour = "grey90")) +
-  theme(strip.background = element_rect(fill = "white")) +
-  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
-  theme(legend.title = element_text(face = "bold")) +
-  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
-  theme(legend.text = element_markdown()) +
-  theme(axis.text.x = element_text(size = 12)) +
-  theme(axis.title.x = element_text(size = 14)) +
- annotate(geom="text", x=2100, y=50, label="p = 0.06", color = "black")
-
-
-rdv
-
-
-
-model2 <- lm(Observed ~ Elevation, data = ftraits2)
-summary(model2)
-
-
-ggsave(filename = file.path(newdir, "Plots", "/rich_evo2023.jpg"), plot = rdv, dpi=300, units=c("mm"), width=250, height=150)
-```
 
 #### PCA
 
 ```{r, PCA, tidy = FALSE}
 # PCA using covariates to explain species richness/abundance ####
-data.pca <- ntraits2[c(8:11, 14)]
-data.pca <- ntraits2 %>%
-  na.omit() %>%
-  select(c(8:11,14)) %>%
+data.pca <- leaf_traits2[c(8:11, 14)]
+data.pca <- leaf_traits2 |>
+  na.omit() |>
+  select(c(8:11,14)) |>
   rename(LT = Thickness, LPS = Toughness)
 
-ntraits.pca <- ntraits2 %>%
+leaf_traits.pca <- leaf_traits2 |>
   na.omit()
 
 ###Run this to create pca with prcomp function
@@ -720,7 +814,7 @@ plot(pca,type = "lines")
 biplot(pca) # Base type PCA
 
 # PCA using autoplot() and prcomp()and modifying with ggplot syntax ####
-auto <- autoplot((pca), data = data.frame(ntraits.pca), # For some reason this functions require data to be data= data.frame()
+auto <- autoplot((pca), data = data.frame(leaf_traits.pca), # For some reason this functions require data to be data= data.frame()
          alpha=0, #Setting alpha to zero render the automatic circle point null.Manipulate shapes with geom_point(). 
          loadings = TRUE,loadings.colour = "black",
          loadings.label=TRUE, loadings.label.colour="black",
@@ -744,129 +838,38 @@ auto$layers <- c(auto$layers, auto$layers[[2]], auto$layers[[3]]) # This adds/co
 #   theme(plot.caption = element_text(size = 6, hjust = 0, vjust = 1))
 auto
 
-#ggsave(filename = file.path(newdir, "Plots", "/pca_evo23.jpg"), plot = auto, dpi=300, units=c("mm"), width=150, height=150)
+#ggsave(filename = file.path(path, "Plots", "/pca_evo23.jpg"), plot = auto, dpi=300, units=c("mm"), width=150, height=150)
 ```
 
 
+# Phyloseq objects
 
-#Phyloseq
-
-```{r, Leaf trait data set, tidy=TRUE}
-#From Mim2_stat_analyses.Rmd
-ptraits <- readRDS(file.path(newdir, "Statistics", "/ptraits.rds"))
-all_decontaminated <-read.csv(file.path(newdir , "ASV_tables", "ASVs_mim2_8450_decont_blankandnegs.csv"))
-```
-
-### Phyloseq objects
 Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data.
+```{r, Loading_phyloseq_objects}
+#| echo: false
+#| eval: true
+#| tidy: true
 
-```{r, PQ objects , tidy=TRUE}
-#ASV table
-asv_10 <- readRDS(file.path(newdir, "ASV_tables", "ASVs_mim2_8450_cleaned_10_percent.rds"))
-asv_10 <- asv_10 %>%
-  as.matrix()
-ASV <- otu_table(asv_10, taxa_are_rows = TRUE)
-
-class(asv_10) #Should be matrix
-taxa_names(ASV) #Should be ASV_#
-
-#Taxonomixc table
-taxa <- readRDS(file.path(newdir, "Taxonomy", "/assign_tax_mim2.rds"))
-taxa <- taxa %>%
-  column_to_rownames(var = "ASV_ID") %>%
-  as.matrix()
-TAX <- tax_table(taxa) #1141 ASVs (raw)
-
-class(taxa) #Should be matrix
-taxa_names(TAX) #Should be ASV_#
-
-#Sample data. Only keeping samples that have sequence data for ASV analyses.
-#getting rownmes to filter
-names <- column_to_rownames(all_decontaminated, var = "X")
-samples <- rownames(names) #Using the colname to filter out 
-
-ftraits <- ptraits %>%
-  filter(Unique_ID %in% samples) %>%
-  column_to_rownames(var = "Unique_ID")%>%
-  filter(!Species == "B")
- 
-#Some control that are still there.
-saveRDS(ftraits, file.path(newdir, "Statistics", "/ftraits.rds"))
-
-SAMP <- sample_data(ftraits)
-class(SAMP)
-sample.names(SAMP)
-
-#Phyloseq main
-pq <- phyloseq(ASV, TAX, SAMP) #Without M. bicolor
-
-#saveRDS(pq, file.path(newdir, "Taxonomy", "/phyloseq_8450.rds"))
-pq <- readRDS(file.path(newdir, "Taxonomy", "/phyloseq_8450.rds"))
-```
-
-**Check which sample are actually lost in the cleaning and decontaminating process. Some samples don't have enough reads. It's worth knowing which samples are those.** 
-
-
-### Removal of singletons
-
-Code modified from Mareli Sánchez Juliá.
-```{r, Mareli code, tidy = TRUE}
-# Are there any taxa with no (0) reads?
-#
-pq2 <- prune_taxa(taxa_sums(pq) > 0, pq)
-ntaxa(pq2) #There are 2 taxa with 0 reads.
-
-# Filtering Taxa: Removal of singletons ####
- # Removal of  singletons
-pq3 <- filter_taxa(pq2, function (x) {sum(x > 0) > 1}, prune=TRUE)
-ntaxa(pq3) # The result is 330 taxa in 167 samples.
-#saveRDS(pq3, file.path(newdir, "Taxonomy", "/ASV_mim2_8450_assigned_nonsingletons.rds"))
-
-
-# Relative abundance calculation ####
-relpq <- transform_sample_counts(pq3, function(x)x/sum(x))
-relpq <- prune_samples(sample_sums(relpq) > 0, relpq) #Eliminating samples that have 0 reads  of any taxa
-#saveRDS(relpq, file.path(newdir, "Taxonomy", "/relative_abund_phyloseq.rds"))
-
-
-# Phyloseq object to data frames 
-# Cleaned: no singletons
-library("metagMisc")
-
-relpqDF <- phyloseq_to_df(relpq, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
-#relpqDF <- replace(relpqDF, relpqDF == "NaN", 0) #Replacing forced NaNs when mturned into df
-#write.csv(relpqDF, file.path(newdir, "Taxonomy", "ASV_mim2_8450_relabun_nonsingletons.csv"))
-pq3DF <- phyloseq_to_df(pq3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
-# write.csv(pq3DF,file.path(newdir, "Taxonomy", "ASV_mim2_8450_assigned_nonsingletons.csv"))
-# 
-# 
-# Richness data frame ####
-rich <- estimate_richness(pq3, split = TRUE, measures = c("Observed","Shannon"))
-
-rich <- rich %>%
-  rownames_to_column() %>%
-  rename(Unique_ID = rowname)
-
-```
-
-Now we have the objects from Phyloseq saved as R objects as well as CSVs. You can treat the data set like any other and visualize with ggplot. Phyloseq does provide the means of doings this also, but that is beyond the scope of this tutorial. 
-
-
-```{r, Loading phyloseq products, tidy = TRUE}
 # install.packages("microbiome")
 # install.packages("scales")
-#These are the data frames resulting from the phyloseq data wrangling.
-#Phyloseq object cleaned of singletons (337 ASvs)
+#These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook
 
-pq3 <- readRDS(file.path(newdir, "Taxonomy", "/ASV_mim2_8450_assigned_nonsingletons.rds"))
-
-pq3DF <- read.csv(file.path(newdir, "Taxonomy", "/ASV_mim2_8450_assigned_nonsingletons.csv"))
+#Phyloseq object cleaned of singletons (231 ASVs)
+ps_clean_3 <- readRDS(file.path(path, "taxonomy/ASV_8450_assigned_nonsingletons.rds"))
+ps_clean_3_df  <- read.csv(file.path(path, "taxonomy/ASV_8450_assigned_nonsingletons.csv"))
 
 #Relative abundance phyloseq
-relpq <- readRDS(file.path(newdir, "Taxonomy", "/relative_abund_phyloseq.rds"))
+rel_abund_ps_clean <- readRDS(file.path(path, "taxonomy/ASV_8450_relabun_nonsingletons.rds"))
+rel_ps_clean_df <- read.csv(file.path(path, "taxonomy/ASV_8450_relabun_nonsingletons.csv"))
 
-relpqDF <- read.csv(file.path(newdir, "Taxonomy", "/ASV_mim2_8450_relabun_nonsingletons.csv"))
+# Richness data frame ####
+rich <- estimate_richness(ps_clean_3, split = TRUE, measures = c("Observed","Shannon"))
+
+rich <- rich |>
+  rownames_to_column() |>
+  rename(Unique_ID = rowname)
 ```
+
 
 ## Phyloseq plot
 
@@ -895,7 +898,7 @@ pp1 <- p1 + scale_fill_manual(labels=c('Ascomycota', 'Basidiomycota', 'Chytridio
 
   
 pp1 
-ggsave(file.path(newdir, "Plots", "/barplot_evo2023.jpg") , plot = pp1, dpi=300, units=c("mm"), width=200, height=150)
+ggsave(file.path(path, "Plots", "/barplot_evo2023.jpg") , plot = pp1, dpi=300, units=c("mm"), width=200, height=150)
 ```
 
 ### Relative abundance barplot
@@ -925,19 +928,19 @@ rel_abundplot
  # Melt to long format
 
 # #Useful code for Relative abundance in a data frame
-# #relpq2 <- relpq %>%
-# tax_glom(taxrank = "Phylum") %>%                        # Set to smallest taxonomic level you are interested in
-#   transform_sample_counts(function(x) {x/sum(x)} ) %>%   # Transform to rel. abundance
+# #relpq2 <- relpq |>
+# tax_glom(taxrank = "Phylum") |>                        # Set to smallest taxonomic level you are interested in
+#   transform_sample_counts(function(x) {x/sum(x)} ) |>   # Transform to rel. abundance
 #   psmelt()    
-# phylum <- relpq2 %>%
-#   select(sample_Species, Elevation_cat, Sample, Phylum, Abundance) %>%  #choose variables to work with
-#   group_by(sample_Species, Elevation_cat, Sample) %>%                   #group by variables used to plot NOT taxonomic level
-#   mutate(totalSum = sum(Abundance)) %>%                     ungroup() %>%                                                         #remove grouping variables
-#   group_by(sample_Species, Elevation_cat, Sample, Phylum) %>%           #group by same variables PLUS taxonomic level
+# phylum <- relpq2 |>
+#   select(sample_Species, Elevation_cat, Sample, Phylum, Abundance) |>  #choose variables to work with
+#   group_by(sample_Species, Elevation_cat, Sample) |>                   #group by variables used to plot NOT taxonomic level
+#   mutate(totalSum = sum(Abundance)) |>                     ungroup() |>                                                         #remove grouping variables
+#   group_by(sample_Species, Elevation_cat, Sample, Phylum) |>           #group by same variables PLUS taxonomic level
 #   summarise(                                                            
 #     Abundance = sum(Abundance),                                         #sum abundance in each phylum for each  group
 #     totalSum,
-#     RelAb = Abundance/totalSum) %>%                                     #calculate relative abundance
+#     RelAb = Abundance/totalSum) |>                                     #calculate relative abundance
 #   unique()            #calculate total abundance of each Phylum
   
 # 
@@ -983,8 +986,8 @@ rel_abundplot
 # Richness data frame ####
 rich <- estimate_richness(relpq, split = TRUE, measures = c("Observed","Shannon"))
 
-rich <- rich %>%
-  rownames_to_column() %>%
+rich <- rich |>
+  rownames_to_column() |>
   rename(Sample_name = rowname)
 
 #Comparisons
@@ -1014,7 +1017,7 @@ pp <-  p +  geom_violin(aes(fill=Species, color = Species)) +
   labs(y = "Alpha Diversity", x = "", caption = "n = 167") +theme(axis.title.x = element_text(size = 14))
 pp
 p
-ggsave(file.path(newdir, "Plots", "/shannon_evo2023.jpg") , plot = pp, dpi=300, units=c("mm"), width=200, height=150)
+ggsave(file.path(path, "Plots", "/shannon_evo2023.jpg") , plot = pp, dpi=300, units=c("mm"), width=200, height=150)
 
 
 ```
@@ -1046,7 +1049,7 @@ bbe <-  be +  geom_violin(aes(fill=Elevation_cat, color = Elevation_cat)) +
   labs(y = "Beta Diversity", x = "", caption = "n = 167") +theme(axis.title.x = element_text(size = 14))
 bbe
 p
-ggsave(file.path(newdir, "Plots", "/BETA_evo2023.svg") , plot = bbe, dpi=300, units=c("mm"), width=200, height=150)
+ggsave(file.path(path, "Plots", "/BETA_evo2023.svg") , plot = bbe, dpi=300, units=c("mm"), width=200, height=150)
 
 ```
 
@@ -1055,29 +1058,29 @@ After various attempts, it seems this data set is filled with NA's as a product 
 ```{r}
 #Making a new df that does not have Bicolor and Nasutus
 # outgroup <-c("SDSB_B001","SDSB_B005")
-# relpqDF <- relpqDF %>%
+# relpqDF <- relpqDF |>
 #   select(!outgroup)
 #   
 #remove NaN
-relmax <- relpqDF %>%
-  select(!c(2:8)) %>%
-  column_to_rownames(var = "OTU") %>%
+relmax <- relpqDF |>
+  select(!c(2:8)) |>
+  column_to_rownames(var = "OTU") |>
   as.matrix()
 #replace(relpqDF, relpqDF == "NaN", 0)
 #
-pqmax <- pq3DF %>%
-  select(!c(2:8)) %>%
-  column_to_rownames(var = "OTU") %>%
+pqmax <- pq3DF |>
+  select(!c(2:8)) |>
+  column_to_rownames(var = "OTU") |>
   as.matrix()
 #Data frame for NDMS sample
 nmds.names <- colnames(relmax)
 #Using the colname to filter out 
 
-nmds.traits <- ptraits %>%
+nmds.traits <- ptraits |>
   filter(Unique_ID %in% nmds.names)
 
-#nmds.traits2 <- nmds.traits %>%
-  #filter(!Species == "B") %>%
+#nmds.traits2 <- nmds.traits |>
+  #filter(!Species == "B") |>
   #na.omit()
   
   
@@ -1199,7 +1202,6 @@ m3.forsel <- ordistep(m0, scope = formula(m3), Pin = 0.5, Pout = 0.1, trace = T,
 ### dbRDA Results
 
 #### Plotting m3 model dbRDA
-
 ```{r, m3 dbRDA, tidy = TRUE}
 #m3.forsel 
 # Terms: otu_e.dist ~ Thickness + Toughness + Anthocyanins + LMA
@@ -1220,9 +1222,9 @@ A.1 <- vegan::scores(m3dbRDA)
 A.2 <- as.data.frame(A.1$sites)
 nmds2.names <- rownames(A.2)
 A.2 <- rownames_to_column(A.2, var = "Unique_ID")
-nmds2 <- ptraits %>%
+nmds2 <- ptraits |>
   filter(Unique_ID %in% nmds2.names) 
-A.3 <- right_join(A.2, nmds2, by = "Unique_ID") %>%
+A.3 <- right_join(A.2, nmds2, by = "Unique_ID") |>
   filter(!Species == "B")
 
 
@@ -1282,7 +1284,7 @@ p_m3dbrda
 
 MetBrewer::colorblind_palettes
 MetBrewer::colorblind.friendly("Cross")
-ggsave(filename=file.path(newdir, "Plots", "/dbRDA_evo23.svg"), plot=p_m3dbrda, dpi=600, units=c("mm"), width=150, height=150)
+ggsave(filename=file.path(path, "Plots", "/dbRDA_evo23.svg"), plot=p_m3dbrda, dpi=600, units=c("mm"), width=150, height=150)
 ```
 
 ### PERMANOVA
@@ -1299,7 +1301,7 @@ strata = NULL)
 print(perma)
 dfperma <- as.data.frame(perma)
 
-fwrite(dfperma, file.path(newdir, "Plots", "/permanova.csv"))
+fwrite(dfperma, file.path(path, "Plots", "/permanova.csv"))
 ```
 
 ### Analysis of multivariate homogeneity of group dispersions. 
@@ -1334,15 +1336,15 @@ Given this, it will be best to compute a correlation index. This will allow to d
 
 #Subset data frame for indicator species analysis
 #Community Data
-ftraits2 <-   ftraits %>%
-rownames_to_column(var = "Unique_ID") %>%
+ftraits2 <-   ftraits |>
+rownames_to_column(var = "Unique_ID") |>
   left_join(rich, by = "Unique_ID")
   
 tpqmax <- as.data.frame(t(pqmax))
-tpqmax <- tpqmax %>%
+tpqmax <- tpqmax |>
   rownames_to_column(var = "Unique_ID")
-cotu <- left_join(tpqmax, ftraits2, by = "Unique_ID") %>%
-  mutate(Elevation_cat = cut(Elevation, breaks = breaks, labels = labels)) %>%
+cotu <- left_join(tpqmax, ftraits2, by = "Unique_ID") |>
+  mutate(Elevation_cat = cut(Elevation, breaks = breaks, labels = labels)) |>
     select(!c(ACI, 
             Thickness,
             Toughness, 
@@ -1350,7 +1352,7 @@ cotu <- left_join(tpqmax, ftraits2, by = "Unique_ID") %>%
             LBI, 
             log10LBI, Elevation, 
             ImageJ_1, 
-            ImageJ_2)) %>%
+            ImageJ_2)) |>
   relocate(Species, Elevation_cat, Site, .after = Unique_ID)
 ```
 
@@ -1381,7 +1383,7 @@ indval.sign <- as.data.table(indval$sign, keep.rownames=TRUE)
 
 #add adjusted p-value
 indval.sign[ , p.value.bh :=   p.adjust(p.value, method="BH")] #This can also be calculated with `dplyr` and `tidyr`
-#indval.table <- indval.sign %>%
+#indval.table <- indval.sign |>
   #mutate(p.value.bh = p.adjust(p.value, method = "BH"))
 
 #now can select only the indicators with adjusted significant p-values
