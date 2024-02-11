@@ -48,6 +48,11 @@ Farrer's
 [code](https://github.com/ecfarrer/LAmarshGradient2/blob/master/BioinformaticsITS.R)
 on github "LAmarshGradient2 ITS code.
 
+::: callout-info
+**To carry out this pipeline in an HPC cluster see section: [Cypress:
+How to submit this as a SLURM job.]**
+:::
+
 ### Packages required
 
 ```{r, Pre-requisites}
@@ -321,9 +326,9 @@ commonly used in the Van Bael Lab.
 #| echo: false
 #| tidy: true
 
-FWD<-"CACTCTTTCCCTACACGACGCTCTTCCGATCTCTTGGTCATTTAGAGGAAGTAA" # Forward ITS1f_adapt from IDT 
+FWD<-"CACTCTTTCCCTACACGACGCTCTTCCGATCTCTTGGTCATTTAGAGGAAGTAA" # 5'- 3' Forward ITS1f_adapt modified with the Illumina TruSeq adaptor
 nchar(FWD) #Number of primer nucleotides.
-REV<-"GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCTGCTGCGTTCTTCATCGATGC" # Reverse primer ITS2r_adapt from IDT
+REV<-"GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCTGCTGCGTTCTTCATCGATGC" # 5'- 3' Reverse primer ITS2r_adapt modified with the Illumina TruSeq adaptor
 nchar(REV)
 ```
 
@@ -1221,241 +1226,6 @@ filters imposed by `filterAndTrim`. We will not pursue this approach
 further. We will move on to decontaminate Aponte_8450_23052601
 sequences.
 
-# Cypress: How to submit this as a SLURM job.
-
-See general guidelines from [Adrià Auladell
-Martín](https://github.com/adriaaula/dada2_guidelines)
-
-## Setting up a virtual environment with anaconda3
-
-See instructions for login into Cypress HPC here:
-
-1.  Navigate to /lustre/project/<your group name>/
-
-Example
-
-```{bash}
-[home@cypress01 baponterolonl]$cd /lustre/project/svanbael/
-```
-
-Result
-
-```{bash}
-[baponterolon@cypress01 svanbael]$ 
-```
-
-2.  Initiate a job node and create a "virtual" environment
-
-```{bash}
-[baponterolon@cypress01 svanbael]$ idev --partition=centos7 #Access one working node for 60 minutes.
-
-[baponterolon@cypress01-033 svanbael]$module load anaconda3/2020.07
-
-[baponterolon@cypress01-033 svanbael]$conda create -n virtual_env #<name however you want
-
-[baponterolon@cypress01-033 svanbael]$source activate virtual_env #Activate environment
-
-(virtual_env) [baponterolon@cypress01-033 svanbael]$  
-```
-
-Notice the change in the username of your session indicating that you
-are operating inside the "virtual" environment. Creating this
-environment allows you to install new packages and dependencies that are
-not available in Cypress. In this self-contained environment you can
-install a new version of R or any other program necessary for analyses.
-
-## Software and packages on Cypress
-
-Once you are in you desired environment you can proceed to install the
-packages and modules necessary. Check the available modules with:
-
-```{bash}
-conda list
-```
-
-You will see what is available and your environment and decide what need
-to be installed.
-
-## Cutadapt
-
-See [Shared installation (on a
-cluster)](https://cutadapt.readthedocs.io/en/stable/installation.html#shared-installation-on-a-cluster)
-for details. Yoi have already created the virtual environment. Install
-using `pip` command:
-
-```{bash}
-pip install cutadapt==4.4 #Select version
-```
-
-Cutadapt can also be installed using the `bioconda` channel:
-
-```{bash}
-conda install -c bioconda cutadapt
-```
-
-**Note**:
-
-<p class="text-danger">
-
-Careful. This will result in the installation of `cutadapt` version
-1.18.
-
-</p>
-
-## R and packages
-
-installation:
-
-```{bash}
-conda search r-base #Search available versions
-conda install r-base=4.3.0 #Select version
-```
-
-Initiate R session
-
-```{bash}
-(virtual_env) [baponterolon@cypress01-033 svanbael]$R #Just type "R"  
-
-(virtual_env) [baponterolon@cypress01-033 svanbael]$ 
-R version 4.3.0 (2023-04-21) -- "Already Tomorrow"
-Copyright (C) 2023 The R Foundation for Statistical Computing
-Platform: x86_64-conda-linux-gnu (64-bit)
-
-R is free software and comes with ABSOLUTELY NO WARRANTY.
-You are welcome to redistribute it under the terms of the
-GNU General Public License versions 2 or 3.
-For more information about these matters see
-https://www.gnu.org/licenses/.
->
-```
-
-Your command-line should look like an R session.
-
-## Packages
-
-You can install packages in R like you do in your computer with
-`install.packages()`. The script below is to install then in an
-interactive session on the HPC cluster or through a BATCH job.
-
-```{r}
-# Installation of packages requires for DADA2 pipeline
-# Bolívar Aponte Rolón
-# 14 June 2023
-
-
-# Activate commands as needed.
-# DADA2 package and associated
-
-#install.packages("gert", repos = c(
-#  ropensci = 'https://ropensci.r-universe.dev',
-#  CRAN = 'https://cloud.r-project.org')) #usethis needs gert Doesn't install on the HPC cluster for some reason.
-#install.packages("usethis") #Doesn't install on the HPC cluster for some reason.
-#install.packages("devtools") #Doesn't install on the HPC cluster for some reason.
-#devtools::install_github("benjjneb/dada2") #change the ref argument to get other versions
-
-install.packages("Rcpp")
-
-# if (!require("BiocManager", quietly = TRUE)){
-#   install.packages("BiocManager", repo="http://cran.rstudio.com/")}
-# BiocManager::install(version = "3.17") #Version 3.17
-# BiocManager::install(c("dada2", "ShortRead", "Biostrings"))
-
-if (!require("BiocManager", quietly = TRUE)){ #Another way of installing the latest version of dada2
-  install.packages("BiocManager", repo="http://cran.rstudio.com/")}
-
-BiocManager::install(version='devel', ask = FALSE) #BiocManager 3.17 (dada2 1.28.0) or developer version (dada2 1.29.0)
-BiocManager::install(c("dada2", "ShortRead", "BioStrings"))
-
-packageVersion("dada2") #checking if it is the latest version
-packageVersion("ShortRead")
-packageVersion("Biostrings")
-```
-
-The script for a batch job goes something like this: Ex. 1
-
-```{bash}
-#!/bin/bash
-
-#SBATCH --qos=normal
-#SBATCH --job-name MIM2_8450
-#SBATCH --error DIRECTORY/<FILENAME>.error          
-#SBATCH --output DIRECTORY/<FILENAME>.output  
-#SBATCH --time=23:00:00
-#SBATCH --mem=64000 #Up to 256000K
-#SBATCH --nodes=1              # One is enough. When running MPIs,anywhere from 2-4 should be good.
-#SBATCH --ntasks-per-node=20    # Number of Tasks per Node
-#SBATCH --cpus-per-task=20`
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=<USER>@tulane.edu
-#SBATCH --partition=centos7    # This is important to run the latest software versions
-
-export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK #$SLURM_CPUS_PER_TASK stores whatever value we assign to cpus-per-task, and is therefore our candidate for passing to OMP_NUM_THREADS
-
-##Modules/Singularity
-module load anaconda3/2020.07
-source activate virtual_env
-
-#Run R script
-R CMD BATCH dada2_mim_pipeline.R # Add your script here
-
-module purge
-
-```
-
-Because each project has different number of samples or target organisms
-each SLURM job is different and will have different memory and
-processing parameters. Adjust accordingly. See this resource:
-[dada2HPC_worload](https://github.com/erictleung/dada2HPCPipe#slurm-workload-manager)
-
-## Assigning taxonomy
-
-The last step in this pipeline can be consume a lot of processing
-memory, even for the HPC cluster. If your job fails at the last step,
-assigning taxonomy, consider submitting this part as separate job.
-
-### Taxonomy batch job
-
-With these parameters it took about \~4.5 hrs. Maybe tasks per node can
-be increase to 10, hence 2 CPU's per task.
-
-```{bash}
-#!/bin/bash
-
-#SBATCH --qos=normal
-#SBATCH --job-name MIM2_8450_tax
-#SBATCH --error /lustre/project/svanbael/bolivar/CH2_sequences/MIM2_8450_tax.error     
-#SBATCH --output /lustre/project/svanbael/bolivar/CH2_sequences/MIM2_8450_tax.output  
-#SBATCH --time=23:00:00
-#SBATCH --mem=256000 #Up to 256000
-#SBATCH --nodes=2               # One is enough. When running MPIs,anywhere from 2-4 should be good.
-#SBATCH --ntasks-per-node=1    # Number of Tasks per Node
-#SBATCH --cpus-per-task=20      # Number of threads per task (OMP threads)
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=baponterolon@tulane.edu
-#SBATCH --partition=centos7    #This is important to run the latest software versions
-
-export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK #$SLURM_CPUS_PER_TASK stores whatever value we assign to cpus-per-task, and is therefore our candidate for passing to OMP_NUM_THREADS
-
-##Modules/Singularity
-module load anaconda3/2020.07
-source activate virtual_env
-
-#Run R script
-R CMD BATCH dada2_tax_pipeline.R
-
-module purge
-```
-
-The memory requirements are different than the batch job submitted for
-the whole pipeline. It has increased RAM memory core (256000k), 20 CPUs
-per task, and 1 task per node. This means that one task has a lot of
-processing memory to operate with. The previous batch job example
-carried out 20 tasks at a time in 20 CPUs, throughout 4 nodes. This
-makes the computation of the pipeline quite fast (\~2hrs), but it fails
-to locate enough processing memory for the `assingtaxonomy()` step.
-Another way of going about this issue is submitting a [job
-array](https://wiki.hpc.tulane.edu/trac/wiki/Workshops/cypress/ManyTaskComputing).
-
 # Decontamination of samples
 
 Let's clean and "decontaminate" our samples. Hopefully you have
@@ -1804,7 +1574,7 @@ decontaminated_p2 <- plate2[!rownames(plate2) %in% cont2, ]
 write.table(decontaminated_p2, file.path(out_dir,"ASV_tables/P2_Mim8450_negsblanks.tsv"), sep="\t")
 ```
 
-### Removal ASV sequences that represent less than 10% of the read in samples.
+### Removal ASV sequences that represent less than 0.1% of the read in samples.
 
 ```{r, removing_10percent}
 #| echo: false
@@ -1843,8 +1613,8 @@ asv_10[ , i] <- apply(asv_10[ , i],2,
 ```
 
 We end up with 688 ASVs in 176 samples after removing those that
-represent less than 10% of all the reads in a sample. Let's recreate the
-phyloseq object with the cleaned ASV table.
+represent less than 0.1% of all the reads in a sample. Let's recreate
+the phyloseq object with the cleaned ASV table.
 
 ```{r, clean_phyloseq}
 #| echo: false
@@ -1921,7 +1691,8 @@ rel_abund_ps_clean <- prune_samples(sample_sums(rel_abund_ps_clean ) > 0, rel_ab
 #saveRDS(rel_abund_ps_clean, file.path(out_dir, "taxonomy/ASV_8450_relabun_nonsingletons.rds"))
 ```
 
-The removal of singletons and samples with no reads of any taxa resulted in 231 ASVs in 160 samples. We have lost 14 samples in the process.
+The removal of singletons and samples with no reads of any taxa resulted
+in 231 ASVs in 160 samples. We have lost 14 samples in the process.
 
 ### Phyloseq objects to data frames
 
@@ -1993,3 +1764,241 @@ plot_richness(ps_clean_3, x="Species", measures=c("Shannon", "Simpson"), color="
 All of these files and objects underwent the complete pipeline and have
 been removed of contaminant ASVs, sample cross-contamination and cut-off
 at 10% representation in samples.
+
+# Cypress: How to submit this as a SLURM job.
+
+The scripts to complete this pipeline as a SLUREM job can be found in
+`/scripts_notes/DADA2_pipeline`.
+
+See also,general guidelines from [Adrià Auladell
+Martín](https://github.com/adriaaula/dada2_guidelines)
+
+## Setting up a virtual environment with anaconda3
+
+See instructions for login into Cypress HPC here:
+
+1.  Navigate to /lustre/project/<your group name>/
+
+Example
+
+```{bash}
+[home@cypress01 baponterolonl]$cd /lustre/project/svanbael/
+```
+
+Result
+
+```{bash}
+[baponterolon@cypress01 svanbael]$ 
+```
+
+2.  Initiate a job node and create a "virtual" environment
+
+```{bash}
+[baponterolon@cypress01 svanbael]$ idev --partition=centos7 #Access one working node for 60 minutes.
+
+[baponterolon@cypress01-033 svanbael]$module load anaconda3/2020.07
+
+[baponterolon@cypress01-033 svanbael]$conda create -n virtual_env #<name however you want
+
+[baponterolon@cypress01-033 svanbael]$source activate virtual_env #Activate environment
+
+(virtual_env) [baponterolon@cypress01-033 svanbael]$  
+```
+
+Notice the change in the username of your session indicating that you
+are operating inside the "virtual" environment. Creating this
+environment allows you to install new packages and dependencies that are
+not available in Cypress. In this self-contained environment you can
+install a new version of R or any other program necessary for analyses.
+
+## Software and packages on Cypress
+
+Once you are in you desired environment you can proceed to install the
+packages and modules necessary. Check the available modules with:
+
+```{bash}
+conda list
+```
+
+You will see what is available and your environment and decide what need
+to be installed.
+
+## Cutadapt
+
+See [Shared installation (on a
+cluster)](https://cutadapt.readthedocs.io/en/stable/installation.html#shared-installation-on-a-cluster)
+for details. Yoi have already created the virtual environment. Install
+using `pip` command:
+
+```{bash}
+pip install cutadapt==4.4 #Select version
+```
+
+Cutadapt can also be installed using the `bioconda` channel:
+
+```{bash}
+conda install -c bioconda cutadapt
+```
+
+**Note**:
+
+<p class="text-danger">
+
+Careful. This will result in the installation of `cutadapt` version
+1.18.
+
+</p>
+
+## R and packages
+
+installation:
+
+```{bash}
+conda search r-base #Search available versions
+conda install r-base=4.3.0 #Select version
+```
+
+Initiate R session
+
+```{bash}
+(virtual_env) [baponterolon@cypress01-033 svanbael]$R #Just type "R"  
+
+(virtual_env) [baponterolon@cypress01-033 svanbael]$ 
+R version 4.3.0 (2023-04-21) -- "Already Tomorrow"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-conda-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under the terms of the
+GNU General Public License versions 2 or 3.
+For more information about these matters see
+https://www.gnu.org/licenses/.
+>
+```
+
+Your command-line should look like an R session.
+
+## Packages
+
+You can install packages in R like you do in your computer with
+`install.packages()`. The script below is to install then in an
+interactive session on the HPC cluster or through a BATCH job.
+
+```{r}
+# Installation of packages requires for DADA2 pipeline
+# Bolívar Aponte Rolón
+# 14 June 2023
+
+
+# Activate commands as needed.
+# DADA2 package and associated
+
+#install.packages("gert", repos = c(
+#  ropensci = 'https://ropensci.r-universe.dev',
+#  CRAN = 'https://cloud.r-project.org')) #usethis needs gert Doesn't install on the HPC cluster for some reason.
+#install.packages("usethis") #Doesn't install on the HPC cluster for some reason.
+#install.packages("devtools") #Doesn't install on the HPC cluster for some reason.
+#devtools::install_github("benjjneb/dada2") #change the ref argument to get other versions
+
+install.packages("Rcpp")
+
+# if (!require("BiocManager", quietly = TRUE)){
+#   install.packages("BiocManager", repo="http://cran.rstudio.com/")}
+# BiocManager::install(version = "3.17") #Version 3.17
+# BiocManager::install(c("dada2", "ShortRead", "Biostrings"))
+
+if (!require("BiocManager", quietly = TRUE)){ #Another way of installing the latest version of dada2
+  install.packages("BiocManager", repo="http://cran.rstudio.com/")}
+
+BiocManager::install(version='devel', ask = FALSE) #BiocManager 3.17 (dada2 1.28.0) or developer version (dada2 1.29.0)
+BiocManager::install(c("dada2", "ShortRead", "BioStrings"))
+
+packageVersion("dada2") #checking if it is the latest version
+packageVersion("ShortRead")
+packageVersion("Biostrings")
+```
+
+The script for a batch job goes something like this: Ex. 1
+
+```{bash}
+#!/bin/bash
+
+#SBATCH --qos=normal
+#SBATCH --job-name MIM2_8450
+#SBATCH --error DIRECTORY/<FILENAME>.error          
+#SBATCH --output DIRECTORY/<FILENAME>.output  
+#SBATCH --time=23:00:00
+#SBATCH --mem=64000 #Up to 256000K
+#SBATCH --nodes=1              # One is enough. When running MPIs,anywhere from 2-4 should be good.
+#SBATCH --ntasks-per-node=20    # Number of Tasks per Node
+#SBATCH --cpus-per-task=20`
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=<USER>@tulane.edu
+#SBATCH --partition=centos7    # This is important to run the latest software versions
+
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK #$SLURM_CPUS_PER_TASK stores whatever value we assign to cpus-per-task, and is therefore our candidate for passing to OMP_NUM_THREADS
+
+##Modules/Singularity
+module load anaconda3/2020.07
+source activate virtual_env
+
+#Run R script
+R CMD BATCH dada2_mim_pipeline.R # Add your script here
+
+module purge
+
+```
+
+Because each project has different number of samples or target organisms
+each SLURM job is different and will have different memory and
+processing parameters. Adjust accordingly. See this resource:
+[dada2HPC_worload](https://github.com/erictleung/dada2HPCPipe#slurm-workload-manager)
+
+## Assigning taxonomy
+
+The last step in this pipeline can be consume a lot of processing
+memory, even for the HPC cluster. If your job fails at the last step,
+assigning taxonomy, consider submitting this part as separate job.
+
+### Taxonomy batch job
+
+With these parameters it took about \~4.5 hrs. Maybe tasks per node can
+be increase to 10, hence 2 CPU's per task.
+
+```{bash}
+#!/bin/bash
+
+#SBATCH --qos=normal
+#SBATCH --job-name MIM2_8450_tax
+#SBATCH --error /lustre/project/svanbael/bolivar/CH2_sequences/MIM2_8450_tax.error     
+#SBATCH --output /lustre/project/svanbael/bolivar/CH2_sequences/MIM2_8450_tax.output  
+#SBATCH --time=23:00:00
+#SBATCH --mem=256000 #Up to 256000
+#SBATCH --nodes=2               # One is enough. When running MPIs,anywhere from 2-4 should be good.
+#SBATCH --ntasks-per-node=1    # Number of Tasks per Node
+#SBATCH --cpus-per-task=20      # Number of threads per task (OMP threads)
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=baponterolon@tulane.edu
+#SBATCH --partition=centos7    #This is important to run the latest software versions
+
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK #$SLURM_CPUS_PER_TASK stores whatever value we assign to cpus-per-task, and is therefore our candidate for passing to OMP_NUM_THREADS
+
+##Modules/Singularity
+module load anaconda3/2020.07
+source activate virtual_env
+
+#Run R script
+R CMD BATCH dada2_tax_pipeline.R
+
+module purge
+```
+
+The memory requirements are different than the batch job submitted for
+the whole pipeline. It has increased RAM memory core (256000k), 20 CPUs
+per task, and 1 task per node. This means that one task has a lot of
+processing memory to operate with. The previous batch job example
+carried out 20 tasks at a time in 20 CPUs, throughout 4 nodes. This
+makes the computation of the pipeline quite fast (\~2hrs), but it fails
+to locate enough processing memory for the `assingtaxonomy()` step.
+Another way of going about this issue is submitting a [job
+array](https://wiki.hpc.tulane.edu/trac/wiki/Workshops/cypress/ManyTaskComputing).
