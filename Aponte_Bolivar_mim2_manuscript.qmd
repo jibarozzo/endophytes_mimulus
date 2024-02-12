@@ -160,7 +160,7 @@ library("ggtext")
 path <-"/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics"
 traits <- read.csv(file.path(path, "mim2_leaf_traits_field_survey.csv"))
 
-#Elevation categories (meters)
+#Elevation_m categories (meters)
 breaks <- c(-Inf, 1219.2, 1828.495, Inf)
 labels <- c("LOW", "MEDIUM", "HIGH")
 
@@ -171,16 +171,15 @@ leaf_traits <-  traits |>
          LBI = Leaf_lobe_index,
          Toughness = Leaf_toughness,
          Thickness = Leaf_thickness) |> 
-  select(!c(6,9:12, 20:22)) |>
+  select(!c(5,12:15, 23:25)) |>
   group_by(Site, Species, Unique_ID) |>
   fill(ImageJ_1, ImageJ_2, LBI, .direction = 'down') |>
-  mutate(Elevation = Elevation*0.3048, 
-         Species = as.factor(Species), 
+  mutate(Species = as.factor(Species), 
          Site = as.factor(Site),
-         Elevation_cat = cut(Elevation, 
+         Elevation_cat = cut(Elevation_m, 
                              breaks = breaks,
                              labels = labels)) |>
-  relocate(Elevation_cat, .before = Elevation)|>
+  relocate(Elevation_cat, .before = Elevation_m)|>
   as_tibble()
 
 # Save file
@@ -194,7 +193,7 @@ leaf_traits <- readRDS(file.path(path, "statistics/leaf_traits.rds"))
 #Plant level for ASV analyses
 plant_traits <- leaf_traits |>
   relocate(Unique_ID, .before = Site) |>
-  group_by(Unique_ID, Site, Species, Elevation, Elevation_cat)|>
+  group_by(Unique_ID, Site, Species, Elevation_m, Elevation_cat, Longitude, Latitude)|>
   summarise(ACI = mean(ACI, na.rm = TRUE),
             Thickness = mean(Thickness, na.rm = TRUE),
             Toughness = mean(Toughness, na.rm =TRUE),
@@ -655,13 +654,13 @@ legend_title <- "Species"
 # Shannon diversity
 
 # Linear model summary
-summary(lm(Shannon ~ Elevation, data = plant_traits))
-elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation)$p.value) # This is just to make the p-value nicer. 
+summary(lm(Shannon ~ Elevation_m, data = plant_traits))
+elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
 
 
 elev_diversity <- ggplot(data = plant_traits  |>
   filter(!Species == "B"), 
-  aes(x = Elevation, y = Shannon, color = Species)) +
+  aes(x = Elevation_m, y = Shannon, color = Species)) +
    geom_jitter(aes(color = plant_traits$Species[plant_traits$Species != "B"]), size = 3, alpha = 0.7) + 
    geom_smooth(method = lm, se = F) + 
    # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
@@ -675,7 +674,7 @@ elev_diversity <- ggplot(data = plant_traits  |>
                      values = met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                       values = met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) + 
-   labs(y = "Shannon diversity index", x = "Elevation (m.a.s.l.)", col = "") + 
+   labs(y = "Shannon diversity index", x = "Elevation_m (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
@@ -700,13 +699,13 @@ elev_diversity
 #| fig-cap: "Scatter plot of Shannon diversity by elevation."
 
 #Linear model summary
-summary(lm(Observed ~ Elevation, data = plant_traits))
-richness_p <- format.p(cor.test(plant_traits$Observed, plant_traits$Elevation)$p.value) # This is just to make the p-value nicer. 
+summary(lm(Observed ~ Elevation_m, data = plant_traits))
+richness_p <- format.p(cor.test(plant_traits$Observed, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
 
 
 rich_diversity <- ggplot(data = plant_traits  |>
   filter(!Species == "B"), 
-  aes(x = Elevation, y = Observed, color = Species)) +
+  aes(x = Elevation_m, y = Observed, color = Species)) +
    geom_jitter(aes(color = plant_traits$Species[plant_traits$Species != "B"]), size = 3, alpha = 0.7) + 
    geom_smooth(method = lm, se = F) + 
    # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
@@ -720,7 +719,7 @@ rich_diversity <- ggplot(data = plant_traits  |>
                      values = met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                       values = met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) + 
-   labs(y = "Observed Richness", x = "Elevation (m.a.s.l.)", col = "") + 
+   labs(y = "Observed Richness", x = "Elevation_m (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),

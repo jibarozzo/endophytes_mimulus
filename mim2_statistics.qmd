@@ -49,7 +49,7 @@ path <-"/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics"
 
 traits <- read.csv(file.path(path, "mim2_leaf_traits_field_survey.csv"))
 
-#Elevation categories (meters)
+#Elevation_m categories (meters)
 breaks <- c(-Inf, 1219.2, 1828.495, Inf)
 labels <- c("LOW", "MEDIUM", "HIGH")
 
@@ -60,16 +60,15 @@ leaf_traits <-  traits |>
          LBI = Leaf_lobe_index,
          Toughness = Leaf_toughness,
          Thickness = Leaf_thickness) |> 
-  select(!c(6,9:12, 20:22)) |>
+  select(!c(5,12:15, 23:25)) |>
   group_by(Site, Species, Unique_ID) |>
   fill(ImageJ_1, ImageJ_2, LBI, .direction = 'down') |>
-  mutate(Elevation = Elevation*0.3048, 
-         Species = as.factor(Species), 
+  mutate(Species = as.factor(Species), 
          Site = as.factor(Site),
-         Elevation_cat = cut(Elevation, 
+         Elevation_cat = cut(Elevation_m, 
                              breaks = breaks,
                              labels = labels)) |>
-  relocate(Elevation_cat, .before = Elevation)|>
+  relocate(Elevation_cat, .before = Elevation_m)|>
   as_tibble()
 
 # Save file
@@ -83,7 +82,7 @@ leaf_traits <- readRDS(file.path(path, "statistics/leaf_traits.rds"))
 #Plant level for ASV analyses
 plant_traits <- leaf_traits |>
   relocate(Unique_ID, .before = Site) |>
-  group_by(Unique_ID, Site, Species, Elevation, Elevation_cat)|>
+  group_by(Unique_ID, Site, Species, Elevation_m, Elevation_cat, Longitude, Latitude)|>
   summarise(ACI = mean(ACI, na.rm = TRUE),
             Thickness = mean(Thickness, na.rm = TRUE),
             Toughness = mean(Toughness, na.rm =TRUE),
@@ -205,16 +204,16 @@ hist(rnorm(n = length(leaf_traits$ACI))) #For comparison: normal distribution ba
 shapiro.test(leaf_traits$ACI[leaf_traits$ACI <20]) #Since p-value is less than 0.05 this means the residuals from the Thickness data are not normally distributed. Data needs transformation.
 
 
-#Elevation
-hist(leaf_traits$Elevation)
-mean(leaf_traits$Elevation, na.rm = TRUE)
-max(leaf_traits$Elevation, na.rm = TRUE)
-min(leaf_traits$Elevation, na.rm = TRUE)
-sd(leaf_traits$Elevation, na.rm = TRUE)
+#Elevation_m
+hist(leaf_traits$Elevation_m)
+mean(leaf_traits$Elevation_m, na.rm = TRUE)
+max(leaf_traits$Elevation_m, na.rm = TRUE)
+min(leaf_traits$Elevation_m, na.rm = TRUE)
+sd(leaf_traits$Elevation_m, na.rm = TRUE)
 
-qqPlot(leaf_traits$Elevation) 
-hist(rnorm(n = length(leaf_traits$Elevation))) #For comparison: normal distribution based on random permutation of my data.
-shapiro.test(leaf_traits$Elevation) #Since p-value is less than 0.05 this means the residuals from the Thickness data are not normally distributed. Data needs transformation.
+qqPlot(leaf_traits$Elevation_m) 
+hist(rnorm(n = length(leaf_traits$Elevation_m))) #For comparison: normal distribution based on random permutation of my data.
+shapiro.test(leaf_traits$Elevation_m) #Since p-value is less than 0.05 this means the residuals from the Thickness data are not normally distributed. Data needs transformation.
 ```
 
 All leaf traits and elevation are not normally distributed. This requires transformation for further analysis. We will proceed weith a log transformation of the data.
@@ -295,8 +294,8 @@ print(kruskal.test(logLBI ~ Site,
                    data = leaf_traits,
                    na.action = na.omit))
 
-# LBI by Elevation
-print(kruskal.test(logLBI ~ Elevation, 
+# LBI by Elevation_m
+print(kruskal.test(logLBI ~ Elevation_m, 
              data = leaf_traits,
              na.action = na.omit))
 
@@ -305,8 +304,8 @@ print(kruskal.test(logLMA ~ Site,
                    data = leaf_traits,
                    na.action = na.omit))
 
-# LMA by Elevation
-print(kruskal.test(logLMA ~ Elevation, 
+# LMA by Elevation_m
+print(kruskal.test(logLMA ~ Elevation_m, 
                    data = leaf_traits,
                    na.action = na.omit))
 
@@ -315,8 +314,8 @@ print(kruskal.test(logLPS ~ Site,
                    data = leaf_traits,
                    na.action = na.omit))
 
-# Toughness by Elevation
-print(kruskal.test(logLPS ~ Elevation, 
+# Toughness by Elevation_m
+print(kruskal.test(logLPS ~ Elevation_m, 
                    data = leaf_traits,
                    na.action = na.omit))
 
@@ -325,8 +324,8 @@ print(kruskal.test(logLT ~ Site,
                    data = leaf_traits,
                    na.action = na.omit))
 
-# Thickness by Elevation
-print(kruskal.test(logLT ~ Elevation, 
+# Thickness by Elevation_m
+print(kruskal.test(logLT ~ Elevation_m, 
                    data = leaf_traits,
                    na.action = na.omit))
 
@@ -335,8 +334,8 @@ print(kruskal.test(logACI ~ Site,
                    data = leaf_traits,
                    na.action = na.omit))
 
-# ACI by Elevation
-print(kruskal.test(logACI ~ Elevation, 
+# ACI by Elevation_m
+print(kruskal.test(logACI ~ Elevation_m, 
                    data = leaf_traits,
                    na.action = na.omit))
 
@@ -345,7 +344,7 @@ print(kruskal.test(logACI ~ Elevation,
 #Post-Hoc tests
 TukeyHSD(two.way, which = "Species")
 pairwise.wilcox.test(imagej1$logLBI, g = imagej1$Site)
-pairwise.wilcox.test(imagej1$logLBI, g = imagej1$Elevation)
+pairwise.wilcox.test(imagej1$logLBI, g = imagej1$Elevation_m)
 pairwise.wilcox.test(imagej1$logLBI, g = imagej1$Genotype)
 
 ?pairwise.wilcox.test()
@@ -747,7 +746,7 @@ ant_arranged_with_caption
 ```
 
 
-#### Elevation vs. Shannon diversity and Richness
+#### Elevation_m vs. Shannon diversity and Richness
 
 ```{r, elevation}
 #| echo: false
@@ -777,13 +776,13 @@ legend_title <- "Species"
 # Shannon diversity
 
 # Linear model summary
-summary(lm(Shannon ~ Elevation, data = plant_traits))
-elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation)$p.value) # This is just to make the p-value nicer. 
+summary(lm(Shannon ~ Elevation_m, data = plant_traits))
+elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
 
 
 elev_diversity <- ggplot(data = plant_traits  |>
   filter(!Species == "B"), 
-  aes(x = Elevation, y = Shannon, color = Species)) +
+  aes(x = Elevation_m, y = Shannon, color = Species)) +
    geom_jitter(aes(color = plant_traits$Species[plant_traits$Species != "B"]), size = 3, alpha = 0.7) + 
    geom_smooth(method = lm, se = F) + 
    # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
@@ -797,7 +796,7 @@ elev_diversity <- ggplot(data = plant_traits  |>
                      values = met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                       values = met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) + 
-   labs(y = "Shannon diversity index", x = "Elevation (m.a.s.l.)", col = "") + 
+   labs(y = "Shannon diversity index", x = "Elevation_m (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
@@ -822,13 +821,13 @@ ggsave(filename = file.path(path, "figures/shannon_elevation.png"), plot = elev_
 #| fig-cap: "Scatter plot of Shannon diversity by elevation."
 
 #Linear model summary
-summary(lm(Observed ~ Elevation, data = plant_traits))
-richness_p <- format.p(cor.test(plant_traits$Observed, plant_traits$Elevation)$p.value) # This is just to make the p-value nicer. 
+summary(lm(Observed ~ Elevation_m, data = plant_traits))
+richness_p <- format.p(cor.test(plant_traits$Observed, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
 
 
 rich_diversity <- ggplot(data = plant_traits  |>
   filter(!Species == "B"), 
-  aes(x = Elevation, y = Observed, color = Species)) +
+  aes(x = Elevation_m, y = Observed, color = Species)) +
    geom_jitter(aes(color = plant_traits$Species[plant_traits$Species != "B"]), size = 3, alpha = 0.7) + 
    geom_smooth(method = lm, se = F) + 
    # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
@@ -842,7 +841,7 @@ rich_diversity <- ggplot(data = plant_traits  |>
                      values = met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                       values = met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) + 
-   labs(y = "Observed Richness", x = "Elevation (m.a.s.l.)", col = "") + 
+   labs(y = "Observed Richness", x = "Elevation_m (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
@@ -863,9 +862,9 @@ rich_diversity
 Regressions presented at Evo 2023.
 ```{r}
 # Regressions
-# Elevation and Thicknes
+# Elevation_m and Thicknes
   
-t <-ggplot(data = leaf_traits, aes(y= Thickness, x = Elevation, color = Species)) +
+t <-ggplot(data = leaf_traits, aes(y= Thickness, x = Elevation_m, color = Species)) +
    geom_jitter(aes(color = Species,), size = 2, alpha = 0.5, na.rm = TRUE)+
 #scale_shape_manual(values=c(1:24)) +
   scale_color_manual(values= met.brewer("Signac", n = 4, type = "discrete"))+
@@ -874,7 +873,7 @@ t <-ggplot(data = leaf_traits, aes(y= Thickness, x = Elevation, color = Species)
   geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
   stat_regline_equation(label.y = 700, label.x = 6000, aes(label = ..eq.label..), sep = "~~~~", size = rel(3), color= "black") +
   stat_regline_equation(label.y = 650 , label.x = 6000, aes(label = ..adj.rr.label..), size = rel(3),color = "black") +
-  labs(y="Leaf thickness (/u03BCm)", x = "Elevation (f.a.s.l.)") +
+  labs(y="Leaf thickness (/u03BCm)", x = "Elevation_m (f.a.s.l.)") +
   theme_minimal(base_size = 10) +
   theme(legend.position="right", legend.title = element_blank(),
         legend.text = element_text(size = 8),
@@ -897,9 +896,9 @@ t
 # pVal <- anova(fit)$'Pr(>F)'[1]
 # pVal
 
-# Elevation and Anthocyanins
+# Elevation_m and Anthocyanins
 
-a <- ggplot(data = leaf_traits, aes(y= ACI, x= Elevation, color = Species))+
+a <- ggplot(data = leaf_traits, aes(y= ACI, x= Elevation_m, color = Species))+
    geom_jitter(aes(color = Species), size = 2, alpha = 0.5) +
   #scale_shape_manual(values=c(15:22)) +
   scale_color_manual(values= met.brewer("Signac", n = 4, type = "discrete")) +
@@ -908,7 +907,7 @@ a <- ggplot(data = leaf_traits, aes(y= ACI, x= Elevation, color = Species))+
   geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
   stat_regline_equation(label.y = 30, label.x = 6000, aes(label = ..eq.label..), size = rel(3), color= "black") +
   stat_regline_equation(label.y = 25 , label.x = 6000, aes(label = ..adj.rr.label..), size = rel(3), color = "black") +
-  labs(y="Anthocyanins (ACI)", x="Elevation (f.a.s.l.)") +
+  labs(y="Anthocyanins (ACI)", x="Elevation_m (f.a.s.l.)") +
   theme_minimal(base_size = 10) +
   theme(legend.position="right", legend.title =element_blank(),
         legend.text = element_text(size = 8),
@@ -1352,13 +1351,13 @@ m1 <- capscale(asv_e.dist ~ ., data = nmds.traits, na.action = na.omit) # Model 
 m1
 
 # Model with species, eload and leaf traits. ####
-m2 <- capscale(asv_e.dist ~ Species + ACI + Thickness + Toughness + LMA + LBI + Elevation,  data = nmds.traits, na.action = na.omit)
+m2 <- capscale(asv_e.dist ~ Species + ACI + Thickness + Toughness + LMA + LBI + Elevation_m,  data = nmds.traits, na.action = na.omit)
 m2
 m2 <- na.omit(m2)
 Anova(m2)
 # Model with just traits ####
 # No species, Trial_type and E_load
-m3 <- capscale(asv_e.dist ~ ACI + Thickness + Toughness + LMA + LBI + Elevation, data = nmds.traits, na.action = na.omit)
+m3 <- capscale(asv_e.dist ~ ACI + Thickness + Toughness + LMA + LBI + Elevation_m, data = nmds.traits, na.action = na.omit)
 m3
 Anova(m3)
 
@@ -1401,7 +1400,7 @@ m3.forsel <- ordistep(m0, scope = formula(m3), Pin = 0.5, Pout = 0.1, trace = T,
 ```{r, m3 dbRDA, tidy = TRUE}
 #m3.forsel 
 # Terms: otu_e.dist ~ Thickness + Toughness + Anthocyanins + LMA
-m3dbRDA <- capscale(asv_e.dist ~ ACI + Thickness + Toughness + LMA + LBI + Elevation,  distance = "bray", data = nmds.traits, na.action = na.omit)
+m3dbRDA <- capscale(asv_e.dist ~ ACI + Thickness + Toughness + LMA + LBI + Elevation_m,  distance = "bray", data = nmds.traits, na.action = na.omit)
 summary(m3dbRDA)
 plot(m3dbRDA)
 anova(m3dbRDA, by = "margin") 
@@ -1471,7 +1470,7 @@ p_m3dbrda <- p_m3 +
   theme(legend.title = element_text(face = "bold")) +
   theme(legend.text = element_markdown()) 
   guides(color = FALSE, size = FALSE)
-  labs(caption = "ACI = anthocyanins, LPS = leaf punch strength, LMA = leaf mass per area, LT = leaf thickness, LBI = leaf lobe index, Elv. = Elevation (f.a.s.l.)", hjust = 0)
+  labs(caption = "ACI = anthocyanins, LPS = leaf punch strength, LMA = leaf mass per area, LT = leaf thickness, LBI = leaf lobe index, Elv. = Elevation_m (f.a.s.l.)", hjust = 0)
      
 # Rearranging the order of layers so arrows are above the points.
 p_m3dbrda$layers
@@ -1490,7 +1489,7 @@ perma <- adonis2(asv_e.dist ~ ACI +
                    Toughness + 
                    LMA + 
                    LBI + 
-                   Elevation,
+                   Elevation_m,
                  data = nmds.traits,
 permutation = 9999, method = "bray", na.action = na.omit, 
 strata = NULL)
@@ -1540,13 +1539,13 @@ tpqmax <- as.data.frame(t(pqmax))
 tpqmax <- tpqmax |>
   rownames_to_column(var = "Unique_ID")
 cotu <- left_join(tpqmax, ftraits2, by = "Unique_ID") |>
-  mutate(Elevation_cat = cut(Elevation, breaks = breaks, labels = labels)) |>
+  mutate(Elevation_cat = cut(Elevation_m, breaks = breaks, labels = labels)) |>
     select(!c(ACI, 
             Thickness,
             Toughness, 
             LMA, 
             LBI, 
-            log10LBI, Elevation, 
+            log10LBI, Elevation_m, 
             ImageJ_1, 
             ImageJ_2)) |>
   relocate(Species, Elevation_cat, Site, .after = Unique_ID)
