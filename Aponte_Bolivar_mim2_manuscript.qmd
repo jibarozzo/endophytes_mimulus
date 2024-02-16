@@ -1,5 +1,5 @@
 ---
-title: "[Working title]: Foliar fungal symbionts in sympatric yellow moenkeyflowers in the Sierra Nevada, CA, USA"
+title: "[Working title]: Foliar fungal symbionts in sympatric yellow monkeyflowers along elevation gradients in the Sierra Nevada"
 date: last-modified
 date-format: "MMMM D, YYYY"
 bibliography: references.bib
@@ -32,10 +32,6 @@ author:
 affiliations:
   - id: tu
     name: Department of Ecology and Evolutionary Biology, Tulane University, 6823 St. Charles Avenue, New Orleans, LA 70118
-  - id: ua
-    name: School of Plant Sciences, University of Arizona, Tucson, AZ 85721
-  - id: ua2
-    name: Department of Ecology and Evolutionary Biology and the Bio5 Institute, University of Arizona, Tucson, AZ 85721 
 
 filters:
   - authors-block
@@ -109,11 +105,11 @@ Upon completion of the leaf traits measurements, we prepared and preserved sampl
 
 We stored leaf tissue in CTAB solution for 2 months at room temperature before extracting DNA at Tulane University. To prepare for sample DNA extraction procedure, we decontaminated all instruments, materials, and surfaces in biosafety cabinet with 0.5 % NaOCl, 70 % EtOH, and 95% EtOH, and subsequently treated with UV light for 30 minutes. We subsampled 0.2 - 0.3 g of leaf tissue from each sample and placed into a sterile 2 mL tubes containing an assortment of beads: 3.2 mm stainless steel beads (Next Advance, Cat# SSB32), 100 µL stainless steel bead blend, 0.9-2.0mm (NextAdvance, Cat# SSB14B) and 2-3 of the autoclaved 2 mm zirconium oxide beads (Next Advance, Cat# ZRoB20). The 2 mL tubes with beads were previously prepared. We then proceeded to lyophilize samples for 72 hours to fully remove CTAB content from tissue. After, we submerged the sample tubes in liquid nitrogen for 30 s and homogenized samples at 30 Hz for 3 minutes in a TissueLyser LT (QIAGEN, Valencia, CA, USA). We stored samples in 20 ℃ until DNA extraction procedure.
 
-We used a DNA extraction protocol for high-molecular weight DNA extraction adapted from Russo et al., [-@russo2022]. Briefly, it is a CTAB:chloroform:isoamyl extraction combined with a solid-phase reversible immobilization (SPRI) bead step [@russo2022; @rohland2012; @liu2023]. Protocol modifications allowed us to optimize extractions for fungal DNA from preserved leaf tissue [see details in @aponterolon2023]. After all genomic DNA was extracted, we quantified the DNA using Quant-iT® dsDNA HS Assay kit with Qubit Flourometer (Thermo Fisher Scientific, Waltham, MA, USA., Cat# Q33120) and followed a two-step amplification approach described by [-@sarmiento2017] and [-@uren2017]. We used standard primers ITS1F [@gardes1993] and ITS2 [@inbook] modified with the Illumina TruSeq adaptor. The modified primers for the first PCR (adapter ligation and ITS1 amplification) were as follows: 5’ CACTCTTTCCCTACACGACGCTCTTCCGATCTCTTGGTCATTTAGAGGAAGTAA 3’ (forward) and 5’ GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCTGCTGCGTTCTTCATCGATGC 3’ (reverse). Every sample was amplified in three parallel reactions at the annealing temperatures 52 ℃, 54 ℃, and 56 ℃ to amplify a wide range of fungal taxa and reduce amplification bias for short ITS sequences [@uren2017; @lumibao2018]. Each PCR (PCR1) reaction contained 2 µL of sample DNA template. We visualized PCR1 reactions with SYBR™ Safe DNA Gel Stain (Thermo Fisher Scientific, Waltham, MA, USA., Cat# S33102) on 2% agarose gel [@oita2021]. We combined 5 µL of amplicon product from parallel reactions in to a single tube per sample and purified using Sera-Mag™ SpeedBead Carboxylate-Modified Magnetic Particles (Hydrophobic) (Thermo Fisher Scientific, Waltham, MA, USA., Cat#09-981-123) prepared as per [-@rohland2012 and -@liu2023] and  used a ratio of 1.2x:1 with 80% EtOH following manufacturers instructions. We used 3 µL of PCR1 product from samples, DNA extraction controls, and PCR1 negative controls for a second PCR (PCR2) with barcoded adapters (IDT, Coralville, Iowa, USA). Each PCR2 reaction (total 30 µL) contained 1X Phusion Flash High Fidelity PCR Master Mix (Thermo Fisher Scientific, Waltham, MA, USA., Cat# F548L), 0.075 µM of barcoded primers (forward and reverse pooled at an initial concentration of 2 µM) and 0.20mg/mL of BSA (Thermo Fisher Scientific, Waltham, MA, USA., Cat# B14) following [-@sarmiento2017 and -@uren2017]. Before final pooling for sequencing, we purified and concentrated amplicons using SPRRI beads to a total volume of 20 µL. We quantified PCR2 product with Quant-iT™ PicoGreen™ dsDNA Assay Kit (Thermo Fisher Scientific, Waltham, MA, USA., Cat# P7589) with the BioTek Synergy LX plate reader (Agilent, Santa Clara, CA) and combined equimolar amounts of libraries, including DNA extraction controls, PCR1, and PCR2 negative controls into a 10nM library pool. We did not detect any contamination visually or fluorometrically. Libraries were sequenced on the Illumina MiSeq platform with Reagent Kit v3 (2 \u00D7 300 bp) at Duke Genome Sequencing and Analysis Core Facility (Durham, NC, USA) we included the DNA extraction blanks and two PCR1 negatives and sequenced with samples. Throughtout al these steps, we used a separate set of sterile pipettes, tips, and equipment to reduce contamination in a designated PCR area to restrict contact with pre-PCR materials [@oita2021].
+We used a DNA extraction protocol for high-molecular weight DNA extraction adapted from Russo et al., [-@russo2022]. Briefly, it is a CTAB:chloroform:isoamyl extraction combined with a solid-phase reversible immobilization (SPRI) bead step [@russo2022; @rohland2012; @liu2023]. Protocol modifications allowed us to optimize extractions for fungal DNA from preserved leaf tissue [see details in @aponterolon2023]. After all genomic DNA was extracted, we quantified the DNA using Quant-iT® dsDNA HS Assay kit with Qubit Flourometer (Thermo Fisher Scientific, Waltham, MA, USA., Cat# Q33120) and followed a two-step amplification approach described by [-@sarmiento2017] and [-@uren2017]. We used standard primers ITS1F [@gardes1993] and ITS2 [@inbook] modified with the Illumina TruSeq adaptor. The modified primers for the first PCR (adapter ligation and ITS1 amplification) were as follows: 5’ CACTCTTTCCCTACACGACGCTCTTCCGATCTCTTGGTCATTTAGAGGAAGTAA 3’ (forward) and 5’ GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCTGCTGCGTTCTTCATCGATGC 3’ (reverse). Every sample was amplified in three parallel reactions at the annealing temperatures 52 ℃, 54 ℃, and 56 ℃ to amplify a wide range of fungal taxa and reduce amplification bias for short ITS sequences [@uren2017; @lumibao2018]. Each PCR (PCR1) reaction contained 2 µL of sample DNA template. We visualized PCR1 reactions with SYBR™ Safe DNA Gel Stain (Thermo Fisher Scientific, Waltham, MA, USA., Cat# S33102) on 2% agarose gel [@oita2021]. We combined 5 µL of amplicon product from parallel reactions in to a single tube per sample and purified using Sera-Mag™ SpeedBead Carboxylate-Modified Magnetic Particles (Hydrophobic) (Thermo Fisher Scientific, Waltham, MA, USA., Cat#09-981-123) prepared as per [-@rohland2012 and -@liu2023] and  used a ratio of 1.2x:1 with 80% EtOH following manufacturers instructions. We used 3 µL of PCR1 product from samples, DNA extraction controls, and PCR1 negative controls for a second PCR (PCR2) with barcoded adapters (IDT, Coralville, Iowa, USA). Each PCR2 reaction (total 30 µL) contained 1X Phusion Flash High Fidelity PCR Master Mix (Thermo Fisher Scientific, Waltham, MA, USA., Cat# F548L), 0.075 µM of barcoded primers (forward and reverse pooled at an initial concentration of 2 µM) and 0.20mg/mL of BSA (Thermo Fisher Scientific, Waltham, MA, USA., Cat# B14) following [-@sarmiento2017 and -@uren2017]. Before final pooling for sequencing, we purified and concentrated amplicons using SPRI beads to a total volume of 20 µL. We quantified PCR2 product with Quant-iT™ PicoGreen™ dsDNA Assay Kit (Thermo Fisher Scientific, Waltham, MA, USA., Cat# P7589) with the BioTek Synergy LX plate reader (Agilent, Santa Clara, CA) and combined equimolar amounts of libraries, including DNA extraction controls, PCR1, and PCR2 negative controls into a 10nM library pool. We did not detect any contamination visually or fluorometrically. Libraries were sequenced on the Illumina MiSeq platform with Reagent Kit v3 (2 \u00D7 300 bp) at Duke Genome Sequencing and Analysis Core Facility (Durham, NC, USA). Throughout all these steps, we used a separate set of sterile pipettes, tips, and equipment to reduce contamination in a designated PCR area to restrict contact with pre-PCR materials [@oita2021].
 
 ### Bioinformatic analyses
 
-We assessed the quality of the reads using FastQc v0.12.1 [ v0.12.1; @andrews2010] and MultiQC [@ewels2016] tools. A total of 60,696,808 total ITS1 reads yielded from 343 (including 27 controls) libraries sequenced in two separate sequencing events. The first sequencing event yielded 32,117,684 and the second 28,579,124 ITS1 reads. We tailored the open-source DADA2 [@callahan2016] bioinformatic pipeline for our data set. We filtered our reads for ambiguous calls before removing the adapters by using `filterAndTrim` function and argument `maxN = 0` from the `dada2` package [v1.28.0; @callahan2016] in *R* programming language [@rcoreteam2023]. We removed forward and reverse primer adapters (and their reverse compliments) and eliminated reads shorter than 20 bp using the `cutadapt` tool [v4.6, @martin2011]. Based on our initial quality assessment, both forward and reverse reads were of low quality, with base calls deteriorating after 100bp. We applied stringent filter and truncation parameters to ensure quality of reads when assigning taxonomy. We filtered and truncated reads based on maximum expected errors (maxEE) rather than read length as it provides a reliable quality filtering [@edgar2015]. For this we set set the arguments `trunQ = 2`, `maxEE = c(2,20)` for forward and reverse reads, and minimum read length of 50 bp with `minLen = 50` in the used the `filterAndTrim` function [@callahan2016]. These parameters eliminated 151 samples from our data set, all from our second sequencing event. After this filter, we dereplicated reads with the `derepFastq` function and merged pairs using `mergePairs` functions with an overlap of 20 bp, minimum. We then inferred composition of the samples with `dada` function, which applies the DADA algorithm [@callahan2016; @rosen2012]. We removed chimeras via the "consensus"method with the `removeBimeraDenovo` function and ultimately we used the `assignTaxonomy` function to assign taxonomy the amplicon sequence variants (ASV) referenced against the UNITE database [@abarenkov2023a]. After taxonomy assignment we used the `phyloseq` package [@mcmurdie2013] to create a phyloseq object for downstream analyses.
+We assessed the quality of the reads using FastQc v0.12.1 [ v0.12.1; @andrews2010] and MultiQC [@ewels2016] tools. A total of 60,696,808 total ITS1 reads yielded from 343 (including 27 controls) libraries sequenced in two separate sequencing runs. The first sequencing event yielded 32,117,684 and the second 28,579,124 ITS1 reads. We tailored the open-source DADA2 [@callahan2016] bioinformatic pipeline for our data set. We filtered our reads for ambiguous calls before removing the adapters by using `filterAndTrim` function and argument `maxN = 0` from the `dada2` package [v1.28.0; @callahan2016] in *R* programming language [@rcoreteam2023]. We removed forward and reverse primer adapters (and their reverse compliments) and eliminated reads shorter than 20 bp using the `cutadapt` tool [v4.6, @martin2011]. Based on our initial quality assessment, both forward and reverse reads were of low quality, with base calls deteriorating after 100bp. We applied stringent filter and truncation parameters to ensure quality of reads when assigning taxonomy. We filtered and truncated reads based on maximum expected errors (maxEE) rather than read length as it provides a reliable quality filtering [@edgar2015]. For this we set set the arguments `trunQ = 2`, `maxEE = c(2,20)` for forward and reverse reads, and minimum read length of 50 bp with `minLen = 50` in the used the `filterAndTrim` function [@callahan2016]. These parameters eliminated 151 samples from our data set, all from our second sequencing event. After this filter, we dereplicated reads with the `derepFastq` function and merged pairs using `mergePairs` functions with an overlap of 20 bp, minimum. We then inferred composition of the samples with `dada` function, which applies the DADA algorithm [@callahan2016; @rosen2012]. We removed chimeras via the "consensus"method with the `removeBimeraDenovo` function and ultimately we used the `assignTaxonomy` function to assign taxonomy the amplicon sequence variants (ASV) referenced against the UNITE database [@abarenkov2023a]. After taxonomy assignment we used the `phyloseq` package [@mcmurdie2013] to create a phyloseq object for downstream analyses.
 
 We used the `decontam` package [v1.20.0; @davis2018] to statistically determine which ASVs are likely contaminants based on their frequency in our samples and remove them using `prune_taxa` function from the `phyloseq` package [v1.44.0; @mcmurdie2013]. After which, we calculated the average read count found in DNA and PCR extraction controls, considered to be laboratory contaminants, and subtracted that from the samples' read counts. We then used custom scripts to remove any ASV that represented less than 0.1% of the abundance per sample on the assumption that it originates from contamination throughout handling of samples in the DNA and PCR processes. We removed singletons ASVs with the `prune_taxa` function [@mcmurdie2013]. All these steps were performed in *R* [v.4.3.2; @rcoreteam2023].
 
@@ -139,12 +135,12 @@ We used the `decontam` package [v1.20.0; @davis2018] to statistically determine 
 #| eval: true
 #| tidy: true
 
-library("tidyverse")
 library("data.table")
 library("ggplot2")
 library("ggpubr")
 library("ggfortify")
 library("ggthemes")
+library("ggtext")
 library("ggiraphExtra")
 library("wesanderson")
 library("MetBrewer")
@@ -155,7 +151,7 @@ library("nlme")
 
 library("vegan")
 library("phyloseq")
-library("ggtext")
+library("hillR")
 
 path <-"/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics"
 traits <- read.csv(file.path(path, "mim2_leaf_traits_field_survey.csv"))
@@ -304,17 +300,18 @@ lma <- ggplot(leaf_traits_noB, aes(y = logLMA, x = Species)) +
              size = 1.7, 
              position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-                    values = met.brewer("Signac", n = 4, type = "discrete")) +
+                    values = met.brewer("Archambault", n = 4, type = "discrete")) +
   scale_color_manual(aes(color = "black")) +
-  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Archambault", n = 4, type = "discrete")) +
   theme_classic(base_size = 12) +
   theme(legend.title = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
         legend.text = element_markdown(size = 12), #Make legend text italic
-        axis.text.x = element_text(face="italic", 
-                                    size = 14,  
-                                    hjust = 1,
-                                    angle = 30)) +
+        # axis.text.x = element_text(face="italic", 
+        #                             size = 10,  
+        #                             hjust = 1,
+        #                             angle = 30),
+        axis.text.x = element_blank()) +
   labs(y = "log10[Leaf Mass per Area (LMA) (mg/mm)]", x = "") +
   #scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
   stat_compare_means(comparisons = my_comparisons,
@@ -374,17 +371,18 @@ aci <- ggplot(leaf_traits_noB, aes(y = logACI, x = Species)) +
              size=1.7, 
              position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-                    values= met.brewer("Signac", n = 4, type = "discrete")) +
+                    values= met.brewer("Archambault", n = 4, type = "discrete")) +
   scale_color_manual(aes(color = "black")) +
-  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Archambault", n = 4, type = "discrete")) +
   theme_classic(base_size = 12) +
   theme(legend.title = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
         legend.text = element_markdown(size = 12), #Make legend text italic
-        axis.text.x = element_text(face="italic", 
-                                    size = 14,  
-                                    hjust = 1,
-                                    angle = 30)) +
+        # axis.text.x = element_text(face="italic", 
+        #                             size = 14,  
+        #                             hjust = 1,
+        #                             angle = 30)) +
+        axis.text.x = element_blank()) +
   labs(y = expression(paste("log[ACI (% ", italic("A") [lambda]," at 931 nm / % ", italic("A") [lambda]," at 530 nm)]")), x = "") +
   #scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
   stat_compare_means(comparisons = my_comparisons,
@@ -449,9 +447,9 @@ lbi <- ggplot(leaf_traits_noB, aes(y = logLBI, x = Species)) +
              size = 1.7,
              position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-                    values = met.brewer("Signac", n = 4, type = "discrete")) +
+                    values = met.brewer("Archambault", n = 4, type = "discrete")) +
   scale_color_manual(aes(color = "black")) +
-  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Archambault", n = 4, type = "discrete")) +
   theme_classic(base_size = 12) +
   theme(legend.title = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
@@ -522,9 +520,9 @@ lps <- ggplot(leaf_traits_noB, aes(y = logLPS, x = Species)) +
              size = 1.7,
              position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-                    values = met.brewer("Signac", n = 4, type = "discrete")) +
+                    values = met.brewer("Archambault", n = 4, type = "discrete")) +
   scale_color_manual(aes(color = "black")) +
-  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Archambault", n = 4, type = "discrete")) +
   theme_classic(base_size = 12) +
   theme(legend.title = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
@@ -596,9 +594,9 @@ lt <- ggplot(leaf_traits_noB, aes(y= logLT, x = Species)) +
              size = 1.7,
              position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-                    values = met.brewer("Signac", n = 4, type = "discrete")) +
+                    values = met.brewer("Archambault", n = 4, type = "discrete")) +
   scale_color_manual(aes(color = "black")) +
-  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Signac", n = 4, type = "discrete")) +
+  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Archambault", n = 4, type = "discrete")) +
   theme_classic(base_size = 12) +
   theme(legend.title = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
@@ -633,7 +631,7 @@ lt
 #| fig-width: 5
 #| fig-height: 5
 #| label: elevation
-#| fig-cap: "Scatter plots of leaf traits by elevation category."
+#| fig-cap: "Scatter plots of Shannon Diversity Index by elevation category."
 
 
 # Formatting formula for p value
@@ -671,9 +669,9 @@ elev_diversity <- ggplot(data = plant_traits  |>
    stat_regline_equation(label.y = 2.7, label.x = 1900, 
                           aes(label = ..adj.rr.label.., ), size = rel(4), color = "black") + 
    scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
-                     values = met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) + 
+                     values = met.brewer("Archambault", n = 4, type = "discrete", direction = c(1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
-                      values = met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) + 
+                      values = met.brewer("Archambault", n = 4, type = "discrete", direction = c(1))) + 
    labs(y = "Shannon diversity index", x = "Elevation_m (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
@@ -716,9 +714,9 @@ rich_diversity <- ggplot(data = plant_traits  |>
   stat_regline_equation(label.y = 45, label.x = 1900, 
                           aes(label = ..adj.rr.label..), size = rel(4), color = "black") + 
    scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
-                     values = met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) + 
+                     values = met.brewer("Archambault", n = 4, type = "discrete", direction = c(1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
-                      values = met.brewer("Signac", n = 4, type = "discrete", direction = c(1))) + 
+                      values = met.brewer("Archambault", n = 4, type = "discrete", direction = c(1))) + 
    labs(y = "Observed Richness", x = "Elevation_m (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
@@ -788,6 +786,40 @@ INSERT dbRDA HERE
 
 ## Figure 12
 
-![Beta diversity by elevation category.](figures/BETA_evo2023.png){width="6" height="4"}
+
+```{r}
+#| echo: false
+#| eval: true
+#| tidy: true
+#| fig-width: 5
+#| fig-height: 5
+#| label: BETA_evo2023
+#| 
+my_comparisons3 <- list(c("LOW", "MEDIUM"), c("LOW", "HIGH"), c("MEDIUM", "HIGH"))
+
+beta_diversity <- plot_richness(ps_clean_3, "Elevation_cat", color = "Elevation_cat",measures = "Shannon", scales="free")
+beta_diversity
+bbe <-  be +  geom_violin(aes(fill=Elevation_cat, color = Elevation_cat)) +
+  geom_crossbar(stat="summary", fun = mean, fun.max = mean, fun.min = mean,  fatten = 2, width = 0.5, color="black") +
+  geom_point(aes(shape =Species),color="black", alpha = 0.4,size=1.7, position = position_jitter(w=0.05)) +  scale_color_manual(labels=c('Low', 'Medium', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
+  scale_fill_manual(labels=c('Low', 'Medium', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
+  scale_shape_manual(values=c(15:18),labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
+  theme_bw() +
+  theme(panel.grid.major = element_line(colour = "grey90")) +
+  theme(panel.grid.minor = element_line(colour = "grey90")) +
+  theme(strip.background = element_rect(fill = "white")) +
+  theme(strip.text.x = element_text(colour = "black", face = "bold")) +
+  theme(legend.title = element_text(face = "bold")) +
+  theme(panel.border = element_rect(linetype = "blank", fill = NA)) +
+  theme(legend.text = element_markdown()) +
+  theme(axis.text.x = element_text(face="italic", size = 14)) +
+  scale_x_discrete(labels = c('', '', '', '')) +
+  stat_compare_means(comparisons = my_comparisons3,method = "t.test", label = "p.format") +
+  labs(y = "Beta Diversity", x = "", caption = "n = 167") +theme(axis.title.x = element_text(size = 14))
+bbe
+p
+ggsave(file.path(path, "Plots", "/BETA_evo2023.svg") , plot = bbe, dpi=300, units=c("mm"), width=200, height=150)
+
+```
 
 # Supplementary Material
