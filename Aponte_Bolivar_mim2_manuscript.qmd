@@ -165,8 +165,8 @@ leaf_traits <-  traits |>
   slice(-c(959:973))|> #Removing control samples
   rename(LMA = LMA.mg., 
          LBI = Leaf_lobe_index,
-         Toughness = Leaf_toughness,
-         Thickness = Leaf_thickness) |> 
+         LPS = Leaf_toughness,
+         LT = Leaf_thickness) |> 
   select(!c(5,12:15, 23:25)) |>
   group_by(Site, Species, Unique_ID) |>
   fill(ImageJ_1, ImageJ_2, LBI, .direction = 'down') |>
@@ -191,8 +191,8 @@ plant_traits <- leaf_traits |>
   relocate(Unique_ID, .before = Site) |>
   group_by(Unique_ID, Site, Species, Elevation_m, Elevation_cat, Longitude, Latitude)|>
   summarise(ACI = mean(ACI, na.rm = TRUE),
-            Thickness = mean(Thickness, na.rm = TRUE),
-            Toughness = mean(Toughness, na.rm =TRUE),
+            Thickness = mean(LT, na.rm = TRUE),
+            Toughness = mean(LPS, na.rm =TRUE),
             LMA = mean(LMA, na.rm = TRUE),
             ImageJ_1 = mean(ImageJ_1, na.rm = TRUE),
             ImageJ_2 = mean(ImageJ_2, na.rm = TRUE),
@@ -210,12 +210,12 @@ plant_traits <- readRDS(file.path(path, "statistics/plant_traits.rds"))
 #names <- column_to_rownames(all_decontaminated, var = "X")
 #samples <- rownames(names) #Using the colname to filter out 
 
-# Leaft traits transformed
+# Leaf traits transformed
 leaf_traits <- leaf_traits |>
   mutate(logLBI = log10(LBI),
          logACI = log10(ACI),
-         logLT = log10(Thickness),
-         logLPS = log10(Toughness),
+         logLT = log10(LT),
+         logLPS = log10(LPS),
          logLMA = log10(LMA))
 
 #Removing species B
@@ -226,10 +226,9 @@ leaf_traits_noB <- leaf_traits |>
 plant_traits <- plant_traits |>
   mutate(logLBI = log10(LBI),
          logACI = log10(ACI),
-         logLT = log10(Thickness),
-         logLPS = log10(Toughness),
+         logLT = log10(LT),
+         logLPS = log10(LPS),
          logLMA = log10(LMA))
-
 
 ## Phyloseq objects
 
@@ -252,7 +251,48 @@ plant_traits <- ps_clean_3 |> #Estimating community richness and shannon diversi
   right_join(plant_traits, by = "Unique_ID") |>
   relocate(Observed, Shannon, .after = logLMA)
  
+# Matrices
+# ASV abundance matrix
+asv_matrix <- ps_clean_3_df |>
+  select(!c(2:8)) |>
+  column_to_rownames(var = "OTU") |>
+  as.matrix()
 
+names_list <- colnames(asv_matrix)
+
+#Bray-Curtis dissimilarity matrix
+asv_dist <- vegdist(t(asv_matrix), method = "bray", binary = FALSE, upper = FALSE) |>
+  as.matrix()
+
+# Adding column and rownames
+rownames(asv_dist) <- names_list
+colnames(asv_dist) <- names_list
+
+# #Data frame for NDMS sample
+# nmds.names <- colnames(relmax)
+# #Using the colname to filter out 
+# 
+# nmds.traits <- ptraits |>
+#   filter(Unique_ID %in% nmds.names)
+# 
+# #nmds.traits2 <- nmds.traits |>
+#   #filter(!Species == "B") |>
+#   #na.omit()
+
+
+# Geographical matrix
+#geo_matrix <- distm(plant_traits[,c("Longitude", "Latitude")], fun = distHaversine)
+geo_matrix <- distm(plant_traits |>
+                      filter(Unique_ID %in% names_list) |>
+                     # column_to_rownames(var = "Unique_ID") |>
+                      select(Longitude, Latitude), fun = distHaversine)
+                      
+# Adding column and rownames
+rownames(geo_matrix) <- names_list
+colnames(geo_matrix) <- names_list
+
+# Converting to distance object
+#geo_dist <- as.dist(geo_matrix)
 ```
 
 ## Figure 1
@@ -624,6 +664,69 @@ lt
 
 ## Figure 6
 
+```{r, pca}
+#| echo: false
+#| eval: true
+#| tidy: true
+#| fig-width: 5
+#| fig-height: 5
+#| label: pca
+#| fig-cap: "PCA of leaf traits by species."
+
+# PCA using covariates to explain species richness/abundance ####
+data.pca <- leaf_traits_noB |>
+  na.omit() |>
+  select(c(12:15,18))
+
+leaf_traits.pca <- na.omit(leaf_traits_noB) 
+
+
+###Run this to create pca with prcomp function
+pca <- prcomp(data.pca, scale = TRUE)
+pca$rotation=-pca$rotation
+pca$x=-pca$x
+
+#Checking the PCA
+plot(pca,type = "lines")
+biplot(pca) # Base type PCA
+
+# PCA using autoplot() and prcomp()and modifying with ggplot syntax ####
+pca_auto <- autoplot((pca), data = data.frame(leaf_traits.pca), # For some reason this functions require data to be data= data.frame()
+         alpha = 0, #Setting alpha to zero render the automatic circle point null.Manipulate shapes with geom_point(). 
+         loadings = TRUE,loadings.colour = "black",
+         loadings.label=TRUE, loadings.label.colour="black",
+         loadings.label.size = 4, size = 7, loadings.label.vjust = 0, 
+         loadings.label.hjust = -0.3) + 
+  geom_point(aes(fill = Species, color = Species), alpha = 0.5, size = 3) +
+  geom_hline(yintercept = 0, colour = "gray45") +
+  geom_vline(xintercept = 0, colour = "gray45") +
+  scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'), 
+                    values = met.brewer("Archambault", n = 4, type = "discrete")) +
+  scale_color_manual(labels = c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),
+                     values = met.brewer("Archambault", n = 4, type = "discrete")) +
+  stat_ellipse(aes(color = Species), 
+               geom = "path", 
+               size = 1.3, 
+               position = "identity", 
+               type = "t", 
+               linetype = 1, 
+               level = 0.95, 
+               segments = 51, na.rm = TRUE, show.legend = NA, inherit.aes = TRUE) +
+  theme_classic(base_size = 12) +
+  theme(legend.text = element_markdown(),
+        legend.title = element_text(face = "bold")) 
+  # labs(caption = expression("ACI = anthocyanins, LPS = leaf punch strength, LMA = leaf mass per area, LT = leaf thickness. LBI = Leaf lobe index. All leaf replicates per species ("~ italic("n") ~ "= 501)."))
+
+
+pca_auto$layers <- c(pca_auto$layers, pca_auto$layers[[2]], pca_auto$layers[[3]]) # This adds/copies layers 2-3 and overlays them. It makes the arrows be on top of the points. There must be a better ways of doing this.
+
+pca_auto
+
+#ggsave(filename = file.path(path, "figures/pca.png"), plot = pca_auto, dpi=300, units=c("mm"), width=150, height=150)
+```
+
+## Figure 7
+
 ```{r, elevation}
 #| echo: false
 #| eval: true
@@ -685,7 +788,7 @@ elev_diversity
 #ggsave(filename = file.path(path, "figures/shannon_elevation.png"), plot = elev_diversity, dpi=300, units=c("mm"), width=250, height=150)
 ```
 
-## Figure 7
+## Figure 8
 
 ```{r, richness}
 #| echo: false
@@ -734,11 +837,6 @@ rich_diversity
 #ggsave(filename = file.path(path, "figures/richness_elevation.png"), plot = rdv, dpi=300, units=c("mm"), width=250, height=150)
 ```
 
-## Figure 8
-
-```{r, pca}
-
-```
 
 ## Figure 9
 
@@ -822,4 +920,56 @@ ggsave(file.path(path, "Plots", "/BETA_evo2023.svg") , plot = bbe, dpi=300, unit
 
 ```
 
+
+# Figure 13
+
+```{r, mantel}
+#| echo: false
+#| eval: true
+#| tidy: true
+#| fig-width: 5
+#| fig-height: 5
+#| label: mantel
+#| fig-cap: "Scatter plot of Bray-Curtis dissimilarity by geographic distance."
+
+# Prepare the data for correlation plot
+# Longer format
+asv_bray <- asv_dist |>
+  as_tibble(rownames = "A") |>
+  pivot_longer(-A, names_to = "B", values_to = "bray_diss")
+
+geo_long <- geo_matrix |>
+  as_tibble(rownames = "A") |>
+  pivot_longer(-A, names_to = "B", values_to = "geo_dist")
+
+# Merge the two dataframes
+asv_geo_matrix_long <- inner_join(asv_bray, geo_long, by = c("A", "B")) |>
+  inner_join(plant_traits |>
+               dplyr::select(Unique_ID, Site, Species, Elevation_cat), by = c("A" = "Unique_ID"))
+
+# Visualize the correlation
+ggplot(asv_geo_matrix_long |>
+         filter(A < B, !Species == "B"), aes(y = bray_diss, x = geo_dist)) +
+  geom_jitter(aes(color = Species), alpha = 0.5) +
+  geom_smooth(method = "lm", se = F, color = "black") +
+   #stat_regline_equation(label.y = 0.5, label.x = 1900, 
+                          #aes(label = ..eq.label..), size = rel(4), color = "black") +
+  #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
+                     #values = met.brewer("Archambault", n = 4, type = "discrete", direction = c(1))) + 
+   scale_color_manual("Species", labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
+                      values = met.brewer("Archambault", n = 4, type = "discrete", direction = c(1))) + 
+   labs(y = "Bray_Curtis dissimilarity", x = "Geographic distance", col = "") + 
+   theme_classic(base_size = 12) +
+   theme(legend.title = element_text(face = "bold"),
+        panel.border = element_rect(linetype = "blank", fill = NA),
+        legend.text = element_markdown(size = 12), #Make legend text italic
+        axis.text.x = element_text(size = 12),
+        axis.title.x = element_text(size = 14))
+
+
+# Mantel test
+abund_geo  = mantel(asv_dist, geo_matrix, method = "spearman", permutations = 9999, na.rm = TRUE)
+abund_geo
+
+```
 # Supplementary Material
