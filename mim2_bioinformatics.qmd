@@ -743,11 +743,11 @@ dim(seqtab_seq1)
 table(nchar(getSequences(seqtab_seq1)))
 
 #Save file R object, and .csv
-#saveRDS(seqtab_seq1, file.path(out_dir, "ASV_tables/ASV_seqtab_8450.rds")) #Functions to write a single R object to a file, and to restore it.
-#write.csv(seqtab_seq1, file.path(out_dir, "ASV_tables/ASV_seqtab_8450.rds"))
+#saveRDS(seqtab_seq1, file.path(out_dir, "ASV_tables/ASV_8450_seqtable_raw.rds")) #Functions to write a single R object to a file, and to restore it.
+#write.csv(seqtab_seq1, file.path(out_dir, "ASV_tables/ASV_8450_seqtable_raw.rds"))
 
 #Open from here in case R crashes
-seqtab <- readRDS(file.path(out_dir, "ASV_tables/ASV_seqtab_8450.rds"))
+seqtab <- readRDS(file.path(out_dir, "ASV_tables/ASV_8450_seqtable_raw.rds"))
 ```
 
 ### Remove chimeras
@@ -769,10 +769,10 @@ seqtab_seq1_nochim <- removeBimeraDenovo(seqtab_seq1,
 sum(seqtab_seq1_nochim)/sum(seqtab_seq1)
 
 #Save file
-#saveRDS(seqtab_seq1_nochim, file.path(out_dir, "ASV_tables/ASV_seqtab_nochim_8450.rds"))
-#write.csv(seqtab_seq1_nochim, file.path(out_dir, "ASV_tables/ASV_seqtab_nochim_denoise_8450.csv")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
+#saveRDS(seqtab_seq1_nochim, file.path(out_dir, "ASV_tables/ASV_8450_seqtable_nochim_denoise.rds"))
+#write.csv(seqtab_seq1_nochim, file.path(out_dir, "ASV_tables/ASV_8450_seqtable_nochim_denoise.csv")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
 
-seqtab_seq1_nochim <- readRDS(file.path(out_dir,"ASV_tables/ASV_seqtab_nochim_8450.rds"))
+seqtab_seq1_nochim <- readRDS(file.path(out_dir,"ASV_tables/ASV_8450_seqtable_nochim_denoise.rds"))
 ```
 
 Inspect distribution of sequence lengths
@@ -1241,18 +1241,17 @@ contaminants and remove them.
 
 ## Decontam pipeline
 
-### Formatting ASV table
+### Formatting ASV and taxonomic tables
 
-```{r, Tax table for Phyloseq, tidy=TRUE}
+```{r, ASV_TAXA_tables}
 library("phyloseq")
 library("decontam")
 library("data.table")
 library("tidyverse")
 out_dir <- file.path("/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics")
 taxa <- read.csv(file.path(out_dir, "taxonomy/assign_tax_8450.csv"))
-#saveRDS(taxa, file.path(out_dir, "taxonomy", "/assign_tax_mim2.rds"))
 
-# Adding ASV_ to the taxonomical assignment
+# Adding "ASV_" to the taxonomical assignment
 rownames(taxa)<-paste0("ASV_",1:nrow(taxa))
 taxa <- taxa |> 
   select(!X) |>
@@ -1260,9 +1259,12 @@ taxa <- taxa |>
 
 # Save file
 saveRDS(taxa, file.path(out_dir, "taxonomy/assign_tax_8450.rds"))
+# Read file
+taxa <- readRDS(file.path(out_dir, "taxonomy/assign_tax_8450.rds"))
+
 
 #Sequences (ASV) per sample table 
-seqtab.nochim <- readRDS(file.path(out_dir, "ASV_tables/ASV_seqtab_nochim_8450.rds"))
+seqtab.nochim <- readRDS(file.path(out_dir, "ASV_tables/ASV_8450_seqtable_nochim_denoise.rds"))
 samples.out <- rownames(seqtab.nochim)
 
 #Code from Astrobiomike
@@ -1276,18 +1278,18 @@ asv_headers <- vector(dim(seqtab.nochim)[2], mode="character")
 
 # Making and writing out a fasta of our final ASV seqs:
 asv_fasta <- c(rbind(asv_headers, asv_seqs))
-#write(asv_fasta, file.path(out_dir, "ASV_tables/ASVs_8450.fa"))
+#write(asv_fasta, file.path(out_dir, "ASV_tables/ASVs_8450_amplicons.fa"))
 
 # count table:
-asv_tab <- t(seqtab.nochim) #Transposing
-row.names(asv_tab) <- sub(">", "", asv_headers) #Substituting sequences for shorthand ASV identifier.
+asv_tab_raw <- t(seqtab.nochim) #Transposing
+row.names(asv_tab_raw) <- sub(">", "", asv_headers) #Substituting sequences for shorthand ASV identifier.
 
 # Save file
-#write.table(asv_tab, file.path(out_dir, "ASV_tables/ASVs_8450_counts.tsv") , sep="\t", quote=F, col.names=NA) #Also saved as a .csv
-#saveRDS(asv_tab, file.path(out_dir, "ASV_tables/ASVs_8450_counts.rds"))
+#write.table(asv_tab_raw, file.path(out_dir, "ASV_tables/ASVs_8450_counts_raw.tsv") , sep="\t", quote=F, col.names=NA) #Also saved as a .csv
+#saveRDS(asv_tab_raw, file.path(out_dir, "ASV_tables/ASVs_8450_counts_raw.rds"))
 
 # Load file
-asv_tab <- readRDS(file.path(out_dir, "ASV_tables/ASVs_8450_counts.rds"))
+asv_tab_raw <- readRDS(file.path(out_dir, "ASV_tables/ASVs_8450_counts_raw.rds"))
 ```
 
 We now have a table with ASV ID's for each of our samples. Now we clean
@@ -1298,18 +1300,67 @@ and decontaminate
 Phyloseq joins various objects that we have already prepare: taxonomic
 table, ASV table and our sample data.
 
+It is important to remove contaminants from the corresponding sample
+batch (e.g. PCR plate). Each DNA extraction and PCR plate have their
+"contamination" events (i.e. people coughing or mishandling of samples).
+Here we will remove contaminants of a PCR plate basis. This means that
+all the DNA controls in the plate and the negative PCR control will be
+used to remove contaminant from the whole plate. Another way of doing it
+is removing the contamination found in each control and matching it to
+the samples it was extracted with.
+
+```{r, DNA_PCR_controls}
+#| echo: false
+#| eval: true
+#| tidy: true
+
+#Make subset tables from each sequence plate run
+#This way we check if all our samples are in the dataset and remove contamination according to PCR plate. The filter tables are the names of each sample in long format exactly as they were sent off for sequencing. Thes must match in order to remove contamination from the samples.
+
+## Plate1 ##
+filter_table1<- read.csv(file.path(out_dir, "ASV_tables/P1_Mim8450_filter.csv"))
+names(filter_table1)
+str(filter_table1)
+
+tasv_tab_raw <- t(asv_tab_raw) #Transposing ASV table
+
+tasv_tab_raw <- tasv_tab_raw |>
+  data.frame() |>
+  setDT(keep.rownames = "Sample_ID")
+
+plate1 <- semi_join(tasv_tab_raw, filter_table1, by = "Sample_ID") #Somehow plate1 ends up with 95 row instead of 96.
+
+plate1 <- plate1 |>
+  mutate(across(!Sample_ID, as.numeric))
+
+filter_filter <- anti_join(filter_table1, plate1, by = c("Sample_ID" = "Sample_ID")) #Corroborating if indeed all match. Supposed to be ZERO. 
+
+
+## Plate2 ##
+
+filter_table2<- read.csv(file.path(out_dir, "ASV_tables/P2_Mim8450_filter.csv"))
+
+names(filter_table2)
+
+plate2 <- semi_join(tasv_tab_raw, filter_table2, by= c("Sample_ID" = "Sample_ID"))
+
+plate2 <- plate2 |>
+  mutate(across(!Sample_ID, as.numeric))
+
+filter_filter2 <- anti_join( filter_table2, plate2, by = c("Sample_ID" = "Sample_ID")) #Corroborating if indeed all match.
+```
+
 ```{r, PQ_objects}
 #| echo: false
 #| eval: true
 #| tidy: true
 
-# #Joint ASV and taxonomy table:
 #ASV table
-asv_tab <- asv_tab |>
+asv_tab_raw <- asv_tab_raw |>
   as.matrix()
-ASV <- otu_table(asv_tab, taxa_are_rows = TRUE)
+ASV <- otu_table(asv_tab_raw, taxa_are_rows = TRUE)
 
-class(asv_tab) #Should be matrix
+class(asv_tab_raw) #Should be matrix
 taxa_names(ASV) #Should be ASV_#
 
 #Taxonomixc table
@@ -1319,6 +1370,7 @@ taxa <- taxa |>
 TAX <- tax_table(taxa) #726 ASVs (raw)
 
 #Sample data
+#DNA concentration and sample and control information
 #From Mim2_stat_analyses.Rmd
 dna_data <- read.csv(file.path(out_dir, "mim2_dna_pcr.csv"))
 
@@ -1352,42 +1404,56 @@ SAMP <- sample_data(dna_data)
 class(SAMP)
 sample.names(SAMP)
 
-#Phyloseq main
+
+#Phyloseq main object
 ps <- phyloseq(ASV, TAX, SAMP)
 
+```
 
-
-# Phyloseq Raw summary statistics
-
+#### Phyloseq RAW summary statistics
+```{r, Phyloseq_summary}
 dna_data2 <- dna_data |>
   slice(-c(1:11)) |> #Removes one sneaky sample.
   mutate(concentration = as.numeric(DNA_conc._ng.µl)) |>
   as.data.frame()
+
 SAMP2 <- sample_data(dna_data2)
 
-ps2 <- phyloseq(ASV, TAX, SAMP2)
+ps2 <- phyloseq(ASV, TAX, SAMP2) #Just SAMP2 as the new phyloseq object
 
 #How many ASVs per Phyla are there before decontamination? Represent by percentage
-phyloseq_summary(ps2) #Overall summary
+phyloseq_summary(ps2, more_stats = F, long = F) #Overall summary
+
+## This summary does not include the relative abundance of phyla represented in the total reads. We will calculate this below. ###
+
+# Relative abundance of Phyla based on the total reads
+raw_relabundance_phyla <- tax_glom(ps2, 
+                 taxrank = "Phylum", 
+                 NArm = FALSE, bad_empty=c(NA, "", " ", "\t")) |>
+  phyloseq_to_df() |>
+  select(-OTU) |> #Remove OTU column. It represents the first ASV of Phylum
+  mutate(total_reads_phy = rowSums(across(where(is.numeric))),
+         relabun_reads_phy = total_reads_phy/sum(total_reads_phy)*100) |> #Relative abundance of phyla
+  select(Kingdom, Phylum, total_reads_phy, relabun_reads_phy) #Select columns of interest)
+
+
+# How many samples with ASVs per phyla are there before decontamination?
 percent_phyla_raw <- phyloseq_ntaxa_by_tax(
   ps2,
   TaxRank = "Phylum",
   relative = F,
   add_meta_data = F
-)  |>
+) |>
   as.data.frame() |>
+  mutate(sum = sum(N.OTU)) |>
   group_by(Phylum) |>
-  summarise(n_ASVs = n()) |> # Count the number of ASV per phylum
-  mutate(total = sum(n_ASVs),
-         total_raw = 726,# ASV total count from raw data
-    percentage = n_ASVs/total_raw*100) # Percentage of ASV per phylum
+  summarise(occurance_in_samples = n())# Count the number of ASV per phylum
 ```
 
 **Check which sample are actually lost in the cleaning and
 decontaminating process. Some samples don't have enough reads. It's
 worth knowing which samples are those.**
 
-The difference between `total` and `total_raw` is the missed BLAST hits (48.8%).
 
 ### Identifying contaminants by frequency in samples
 
@@ -1451,12 +1517,12 @@ ps.noncontam
 #Now that we know which ASVs are likely contaminants, we can remove them from the dataset.
 
 # Remove contaminants from ASV table
-asv_tab <- asv_tab |>
+asv_tab_raw <- asv_tab_raw |>
   data.frame() |>
   slice(-c(85, 309, 352, 396)) |>
   as.matrix()
 
-class(asv_tab) #Should be matrix
+class(asv_tab_raw) #Should be matrix
 taxa_names(ASV) #Should be ASV_#
 ```
 
@@ -1472,57 +1538,6 @@ If the value is negative it replaces it with 0. It substracts the sum of
 the average of the DNA controls and PCR negative controls per plate,
 then removes control rows.
 
-### Preparing our data
-
-It is important to remove contaminants from the corresponding sample
-batch (e.g. PCR plate). Each DNA extraction and PCR plate have their
-"contamination" events (i.e. people coughing or mishandling of samples).
-Here we will remove contaminants of a PCR plate basis. This means that
-all the DNA controls in the plate and the negative PCR control will be
-used to remove contaminant from the whole plate. Another way of doing it
-is removing the contamination found in each control and matching it to
-the samples it was extracted with.
-
-```{r, DNA_PCR_controls}
-#| echo: false
-#| eval: true
-#| tidy: true
-
-#Make subset tables from each sequence plate run
-#This way we check if all our samples are in the dataset and remove contamination according to PCR plate. The filter tables are the names of each sample in long format exactly as they were sent off for sequencing. Thes must match in order to remove contamination from the samples.
-
-## Plate1 ##
-filter_table1<- read.csv(file.path(out_dir, "ASV_tables/P1_Mim8450_filter.csv"))
-names(filter_table1)
-str(filter_table1)
-
-tasv_tab <- t(asv_tab) #Transposing ASV table
-
-tasv_tab <- tasv_tab |>
-  data.frame() |>
-  setDT(keep.rownames = "Sample_ID")
-
-plate1 <- semi_join(tasv_tab, filter_table1, by = "Sample_ID") #Somehow plate1 ends up with 95 row instead of 96.
-
-plate1 <- plate1 |>
-  mutate(across(!Sample_ID, as.numeric))
-
-filter_filter <- anti_join(filter_table1, plate1, by = c("Sample_ID" = "Sample_ID")) #Corroborating if indeed all match. Supposed to be ZERO. 
-
-
-## Plate2 ##
-
-filter_table2<- read.csv(file.path(out_dir, "ASV_tables/P2_Mim8450_filter.csv"))
-
-names(filter_table2)
-
-plate2 <- semi_join(tasv_tab, filter_table2, by= c("Sample_ID" = "Sample_ID"))
-
-plate2 <- plate2 |>
-  mutate(across(!Sample_ID, as.numeric))
-
-filter_filter2 <- anti_join( filter_table2, plate2, by = c("Sample_ID" = "Sample_ID")) #Corroborating if indeed all match.
-```
 
 ### Contaminant removal using DNA and PCR controls
 
@@ -1718,29 +1733,47 @@ rel_abund_ps_clean <- prune_samples(sample_sums(rel_abund_ps_clean ) > 0, rel_ab
 #saveRDS(ps_clean_3, file.path(out_dir, "taxonomy/ASV_8450_assigned_nonsingletons.rds"))
 #saveRDS(rel_abund_ps_clean, file.path(out_dir, "taxonomy/ASV_8450_relabun_nonsingletons.rds"))
 
+# Load file
+ps_clean_3 <- readRDS(file.path(out_dir, "taxonomy/ASV_8450_assigned_nonsingletons.rds"))
+```
 
-
-# Phyloseq CLEANED summary statistics
+#### Phyloseq CLEANED summary statistics
+```{r, Phyloseq_clean_summary}
 # How mansy ASVs per Phyla are there after decontamination? Represent by percentage
-phyloseq_summary(ps_clean_3) #Overall summary
+phyloseq_summary(ps_clean_3, more_stats = F, long = F) #Overall summary
 
+## This summary does not include the relative abundance of phyla represented in the total reads. We will calculate this below. ###
+
+# Relative abundance of Phyla based on the total reads
+clean_relabundance_phyla <- tax_glom(ps_clean_3, 
+                                     taxrank = "Phylum", 
+                                     NArm = FALSE, bad_empty=c(NA, "", " ", "\t")) |>
+  phyloseq_to_df() |>
+  select(-OTU) |> #Remove OTU column. It represents the first ASV of Phylum
+  mutate(total_reads_phy = rowSums(across(where(is.numeric))),
+         relabun_reads_phy = total_reads_phy/sum(total_reads_phy)*100) |> #Relative abundance of phyla
+  select(Kingdom, Phylum, total_reads_phy, relabun_reads_phy) #Select columns of interest)
+
+
+# How many samples with ASVs per phyla are there AFTER decontamination?
 percent_phyla_clean <- phyloseq_ntaxa_by_tax(
   ps_clean_3,
   TaxRank = "Phylum",
   relative = F,
   add_meta_data = F
-)  |>
+) |>
   as.data.frame() |>
+  mutate(sum = sum(N.OTU)) |>
   group_by(Phylum) |>
-  summarise(n_ASVs = n()) |> # Count the number of phyla
-  mutate(total = sum(n_ASVs),
-         total_raw = 231,# ASV total count from raw data
-    percentage = n_ASVs/total_raw*100) # Percentage of ASV per phylum
-#
+  summarise(occurance_in_samples = n())# Count the number of ASV per phylum
 ```
 
 The removal of singletons and samples with no reads of any taxa resulted
 in 231 ASVs in 160 samples. We have lost 14 samples in the process.
+
+We see that Ascomycota is present in 147 samples, Basidiomycota in 155 samples. The rest of the phyla are present in less than 6 samples.
+
+
 
 ### Phyloseq objects to data frames
 
@@ -1768,23 +1801,6 @@ CSVs. We can treat the data set like any other and visualize with
 ggplot. Phyloseq does provide the means of doings this also, but that is
 beyond the scope of this notebook.
 
-### Joining cleaned ASV table with taxonomy
-
-```{r, ASV and taxonomy, tidy=TRUE}
-# #Joint ASV and taxonomy table:
-#asv_10 <- readRDS(file.path(out_dir, "ASV_tables/ASVs_8450_cleaned_10_percent.rds")) # If loaded from this point, asv_10 will need new header for ASV_ID
-# 
-asv_10 <- setDT(asv_10, keep.rownames = "ASV_ID")
-taxa_df <- taxa |>
-  data.frame() |>
-  setDT(keep.rownames = "ASV_ID")
-
-asv_tax <- right_join(taxa_df, asv_10, by = "ASV_ID")
-
-# Save file
-#write.table(asv_tax, file.path(out_dir, "ASV_tables/ASVs_taxonomy_8450.tsv"), sep = "\t", quote=F, col.names=NA) #Also save as a .csv
-#saveRDS(asv_tax, file.path(out_dir, "ASV_tables/asv_tax_8450.rds"))
-```
 
 ### Brief exploration of the data set
 
@@ -1807,7 +1823,6 @@ plot_richness(ps_clean_3, x="Species", measures=c("Shannon", "Simpson"), color="
 -   ps_clean_3_df == taxonomy/ASV_8450_assigned_nonsingletons.csv
 -   rel_abund_ps_clean == taxonomy/ASV_8450_relabun_nonsingletons.rds
 -   rel_ps_clean_df == taxonomy/ASV_8450_relabun_nonsingletons.csv
--   asv_tax == ASV_tables/ASVs_taxonomy_8450.tsv
 
 All of these files and objects underwent the complete pipeline and have
 been removed of contaminant ASVs, sample cross-contamination and cut-off

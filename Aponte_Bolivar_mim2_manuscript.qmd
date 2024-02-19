@@ -163,7 +163,7 @@ Ultimately, we calculated distance matrix of geographical distances between site
 
 # Results
 
-We obtained 5,082,229 reads representing 726 ASVs from 174 samples after processing samples through the DADA2 pipeline. The raw ASVs obtained were composed of 20.39% Ascomycota, 43.55% Basidiomycota, 1.79% Chytridiomycota,  1.52% Mortierellomycota, <1.0% Olpidiomycota, <0.5% Rozellomycota, <0.5% Aphelidiomycota, and 48.8% missed BLAST hits. After decontamination, and removal of singletons we obtained 4,971,645 reads representing 231 ASVs from 160 samples composed of 63.6% Ascomycota, 67.10% Basidiomycota, <1.0% Chytridiomycota,  2.60% Mortierellomycota, 1.30% Olpidiomycota, <1.0% Rozellomycota.
+We obtained 5,082,229 reads representing 726 ASVs from 174 samples after processing samples through the DADA2 pipeline. The raw reads obtained were composed of 26.81% Ascomycota, 71.53% Basidiomycota, <0.05% Chytridiomycota,  <0.5% Mortierellomycota, <0.03% Olpidiomycota, 0.01% Rozellomycota, <0.001% Aphelidiomycota, and 1.19% missed BLAST hits. After decontamination, and removal of singletons we obtained 4,971,645 reads representing 231 ASVs from 160 samples composed of 25.88% Ascomycota, 73.1% Basidiomycota, 0.01% Chytridiomycota,  <0.1% Mortierellomycota, 0.02% Olpidiomycota, <0.002% Rozellomycota and <1.0% unknown reads. 
 
 NEEDS TO BE UPDATED.
 
