@@ -880,7 +880,7 @@ rownames(taxa.print_seq1) <- NULL
 head(taxa.print_seq1)
 
 # Save file
-write.csv(taxa.print_seq1, file.path(out_dir, "taxonomy/assign_tax_8450.csv"))
+#write.csv(taxa.print_seq1, file.path(out_dir, "taxonomy/assign_tax_8450.csv"))
 ```
 
 Done!
@@ -1287,7 +1287,7 @@ row.names(asv_tab) <- sub(">", "", asv_headers) #Substituting sequences for shor
 #saveRDS(asv_tab, file.path(out_dir, "ASV_tables/ASVs_8450_counts.rds"))
 
 # Load file
-#asv_tab <- readRDS(file.path(out_dir, "ASV_tables/ASVs_8450_counts.rds"))
+asv_tab <- readRDS(file.path(out_dir, "ASV_tables/ASVs_8450_counts.rds"))
 ```
 
 We now have a table with ASV ID's for each of our samples. Now we clean
@@ -1355,11 +1355,39 @@ sample.names(SAMP)
 #Phyloseq main
 ps <- phyloseq(ASV, TAX, SAMP)
 
+
+
+# Phyloseq Raw summary statistics
+
+dna_data2 <- dna_data |>
+  slice(-c(1:11)) |> #Removes one sneaky sample.
+  mutate(concentration = as.numeric(DNA_conc._ng.µl)) |>
+  as.data.frame()
+SAMP2 <- sample_data(dna_data2)
+
+ps2 <- phyloseq(ASV, TAX, SAMP2)
+
+#How many ASVs per Phyla are there before decontamination? Represent by percentage
+phyloseq_summary(ps2) #Overall summary
+percent_phyla_raw <- phyloseq_ntaxa_by_tax(
+  ps2,
+  TaxRank = "Phylum",
+  relative = F,
+  add_meta_data = F
+)  |>
+  as.data.frame() |>
+  group_by(Phylum) |>
+  summarise(n_ASVs = n()) |> # Count the number of ASV per phylum
+  mutate(total = sum(n_ASVs),
+         total_raw = 726,# ASV total count from raw data
+    percentage = n_ASVs/total_raw*100) # Percentage of ASV per phylum
 ```
 
 **Check which sample are actually lost in the cleaning and
 decontaminating process. Some samples don't have enough reads. It's
 worth knowing which samples are those.**
+
+The difference between `total` and `total_raw` is the missed BLAST hits (48.8%).
 
 ### Identifying contaminants by frequency in samples
 
@@ -1689,6 +1717,26 @@ rel_abund_ps_clean <- prune_samples(sample_sums(rel_abund_ps_clean ) > 0, rel_ab
 # Save file
 #saveRDS(ps_clean_3, file.path(out_dir, "taxonomy/ASV_8450_assigned_nonsingletons.rds"))
 #saveRDS(rel_abund_ps_clean, file.path(out_dir, "taxonomy/ASV_8450_relabun_nonsingletons.rds"))
+
+
+
+# Phyloseq CLEANED summary statistics
+# How mansy ASVs per Phyla are there after decontamination? Represent by percentage
+phyloseq_summary(ps_clean_3) #Overall summary
+
+percent_phyla_clean <- phyloseq_ntaxa_by_tax(
+  ps_clean_3,
+  TaxRank = "Phylum",
+  relative = F,
+  add_meta_data = F
+)  |>
+  as.data.frame() |>
+  group_by(Phylum) |>
+  summarise(n_ASVs = n()) |> # Count the number of phyla
+  mutate(total = sum(n_ASVs),
+         total_raw = 231,# ASV total count from raw data
+    percentage = n_ASVs/total_raw*100) # Percentage of ASV per phylum
+#
 ```
 
 The removal of singletons and samples with no reads of any taxa resulted
