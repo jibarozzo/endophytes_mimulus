@@ -23,6 +23,6 @@
 preprocess/pre_8450/derepFs_8450.rds
 preprocess/pre_8450/derepRs_8450.rds
 filtered/
-taxonomy/sh_general_release_dynamic_s_25.07.2023_dev.fasta
-taxonomy/sh_general_release_dynamic_s_25.07.2023.fasta
+clean_data/taxonomy/sh_general_release_dynamic_s_25.07.2023_dev.fasta
+clean_data/taxonomy/sh_general_release_dynamic_s_25.07.2023.fasta
 /.quarto/

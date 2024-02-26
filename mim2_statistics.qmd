@@ -53,7 +53,7 @@ This section cleans and shapes the raw data into two main data frames: `leaf_tra
 #| eval: true
 #| tidy: true
 
-traits <- read.csv(file.path(path, "mim2_leaf_traits_field_survey.csv")) # Main raw data set
+traits <- read.csv(file.path(path, "field_data/mim2_leaf_traits_field_survey.csv")) # Main raw data set
 
 #Elevation_m categories (meters)
 breaks <- c(-Inf, 1219.2, 1828.495, Inf)
@@ -120,12 +120,12 @@ plant_traits <- plant_traits |>
 #Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data. These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
 
 # Load Phyloseq object cleaned of singletons (231 ASVs)
-ps_clean_3 <- readRDS(file.path(path, "taxonomy/ASV_8450_assigned_nonsingletons.rds"))
-ps_clean_3_df  <- read.csv(file.path(path, "taxonomy/ASV_8450_assigned_nonsingletons.csv"))
+ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.rds"))
+ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.csv"))
 
 # Load Relative abundance phyloseq
-rel_abund_ps_clean <- readRDS(file.path(path, "taxonomy/ASV_8450_relabun_nonsingletons.rds"))
-rel_ps_clean_df <- read.csv(file.path(path, "taxonomy/ASV_8450_relabun_nonsingletons.csv"))
+rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.rds"))
+rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.csv"))
 
 
 #### Leaf traits with community data ####
@@ -150,16 +150,16 @@ plant_traits <- ps_clean_3 |> #Estimating community richness and shannon diversi
 
 # Save file
 # Leaf traits
-#saveRDS(leaf_traits, file.path(path, "statistics/leaf_traits.rds"))
-#write.csv(leaf_traits, file.path(path, "statistics/leaf_traits.csv"))
+#saveRDS(leaf_traits, file.path(path, "clean_data/statistics/leaf_traits.rds"))
+#write.csv(leaf_traits, file.path(path, "clean_data/statistics/leaf_traits.csv"))
 
 # Plant traits with community data
-#saveRDS(plant_traits, file.path(path, "statistics/plant_traits.rds"))
-#write.csv(plant_traits, file.path(path, "statistics/plant_traits.csv"))
+#saveRDS(plant_traits, file.path(path, "clean_data/statistics/plant_traits.rds"))
+#write.csv(plant_traits, file.path(path, "clean_data/statistics/plant_traits.csv"))
 
 #### Load master files ####
-leaf_traits <- readRDS(file.path(path, "statistics/leaf_traits.rds"))
-plant_traits <- readRDS(file.path(path, "statistics/plant_traits.rds"))
+leaf_traits <- readRDS(file.path(path, "clean_data/statistics/leaf_traits.rds"))
+plant_traits <- readRDS(file.path(path, "clean_data/statistics/plant_traits.rds"))
 
 # Samples with species to subset/filter matrices downstream
 # M. laciniatus

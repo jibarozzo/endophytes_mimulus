@@ -113,10 +113,10 @@ path <- "/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics" # Chan
 
 
 #### Load leaf traits master files ####
-traits <- read.csv(file.path(path, "mim2_leaf_traits_field_survey.csv")) #Raw file just in case
-leaf_traits <- readRDS(file.path(path, "statistics/leaf_traits.rds"))
+traits <- read.csv(file.path(path, "field_data/mim2_leaf_traits_field_survey.csv")) #Raw file just in case
+leaf_traits <- readRDS(file.path(path, "clean_data/statistics/leaf_traits.rds"))
 
-plant_traits <- readRDS(file.path(path, "statistics/plant_traits.rds"))
+plant_traits <- readRDS(file.path(path, "clean_data/statistics/plant_traits.rds"))
 
 #Removing species B
 leaf_traits_noB <- leaf_traits |>
@@ -146,12 +146,12 @@ nas_names <- plant_traits |>
 #These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
 
 #Load Phyloseq object cleaned of singletons (231 ASVs)
-ps_clean_3 <- readRDS(file.path(path, "taxonomy/ASV_8450_assigned_nonsingletons.rds"))
-ps_clean_3_df  <- read.csv(file.path(path, "taxonomy/ASV_8450_assigned_nonsingletons.csv"))
+ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.rds"))
+ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.csv"))
 
 #Load Relative abundance phyloseq
-rel_abund_ps_clean <- readRDS(file.path(path, "taxonomy/ASV_8450_relabun_nonsingletons.rds"))
-rel_ps_clean_df <- read.csv(file.path(path, "taxonomy/ASV_8450_relabun_nonsingletons.csv"))
+rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.rds"))
+rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.csv"))
 
 
 #### Matrices ####
