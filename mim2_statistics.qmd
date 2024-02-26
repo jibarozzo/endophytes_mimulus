@@ -27,8 +27,8 @@ library("car")
 library("nlme")
 
 library("vegan")
-library("phyloseq")
 library("hillR")
+library("phyloseq")
 library("metagMisc")
 library("iNEXT")
 library("geosphere")
@@ -56,7 +56,7 @@ traits <- read.csv(file.path(path, "mim2_leaf_traits_field_survey.csv"))
 
 #Elevation_m categories (meters)
 breaks <- c(-Inf, 1219.2, 1828.495, Inf)
-labels <- c("LOW", "MEDIUM", "HIGH")
+labels <- c("LOW", "MID", "HIGH")
 
 #Leaf level data set
 leaf_traits <-  traits |>
@@ -1071,7 +1071,7 @@ First let's create a dissimilarity and distance matrix.
 # ASV abundance matrix
 #remove NaN
 asv_matrix <- ps_clean_3_df |>
-  select(!c(2:8)) |>
+  select(!c(2:8, SDSB_B001, SDSB_B002, SDSB_B005)) |>#Removing samples from species "B"
   column_to_rownames(var = "OTU") |>
   as.matrix()
 
@@ -1455,7 +1455,7 @@ hill_numbers_species
 #### Beta diversity ####
 #### Across elevation ####
 #################################
-my_comparisons3 <- list(c("LOW", "MEDIUM"), c("LOW", "HIGH"), c("MEDIUM", "HIGH"))
+my_comparisons3 <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
 
 # Observed richness
 # Hill number 0
@@ -1471,8 +1471,8 @@ hill0_beta <-  ggplot(plant_traits |>
                 width = 0.5, 
                 color="black") +
   geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
-  scale_color_manual(labels=c('Low', 'Medium', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
-  scale_fill_manual(labels=c('Low', 'Medium', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
+  scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
+  scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
   scale_shape_manual(values=c(15:18),labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
   theme_classic(base_size = 14) +
   theme(strip.text.x = element_text(colour = "black", face = "bold"),
@@ -1505,8 +1505,8 @@ hill1_beta <- ggplot(plant_traits |>
                 width = 0.5, 
                 color="black") +
   geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
-  scale_color_manual(labels=c('Low', 'Medium', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
-  scale_fill_manual(labels=c('Low', 'Medium', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
+  scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
+  scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
   scale_shape_manual(values=c(15:18),labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
   theme_classic(base_size = 14) +
   theme(strip.text.x = element_text(colour = "black", face = "bold"),
@@ -1539,8 +1539,8 @@ hill2_beta <- ggplot(plant_traits |>
                 width = 0.5, 
                 color="black") +
   geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
-  scale_color_manual(labels=c('Low', 'Medium', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
-  scale_fill_manual(labels=c('Low', 'Medium', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
+  scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
+  scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
   scale_shape_manual(values=c(15:18),labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
   theme_classic(base_size = 14) +
   theme(strip.text.x = element_text(colour = "black", face = "bold"),
@@ -1627,7 +1627,7 @@ mantel_test
 # Mantel test
 # All data points
 set.seed(859)
-abund_geo  <- mantel(asv_vegdist, geo_distm, method = "spearman", permutations = 9999, na.rm = TRUE)
+abund_geo  <- mantel(asv_vegdist, geo_distm, method = "spearman", permutations = 999, na.rm = TRUE)
 #abund_geo
 
 # Mantel test by species
@@ -1643,8 +1643,8 @@ lac_mantel  <- mantel(asv_long |> # Subset the data
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
-                      method = "spearman", permutations = 9999, na.rm = TRUE)
-#lac_mantel
+                      method = "spearman", permutations = 999, na.rm = TRUE)
+lac_mantel
 
 # M. nasutus
 nas_mantel  <- mantel(asv_long |> # Subset the data
@@ -1657,8 +1657,8 @@ nas_mantel  <- mantel(asv_long |> # Subset the data
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(), 
-                     method = "spearman", permutations = 9999, na.rm = TRUE)
-#nas_mantel
+                     method = "spearman", permutations = 999, na.rm = TRUE)
+nas_mantel
 
 # M. guttatus
 # Subset the data
@@ -1672,8 +1672,8 @@ gut_mantel  <- mantel(asv_long |> # Subset the data
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
-                     method = "spearman", permutations = 9999, na.rm = TRUE)
-#gut_mantel
+                     method = "spearman", permutations = 999, na.rm = TRUE)
+gut_mantel
 ```
 
 The correlation plot for Bray-Curtis dissimilarity and geographical distance shows a positive correlation. The more distant two sites are, the more dissimilar their FEF communities are (bray = 1). The Mantel test shows a significant correlation between the two matrices (r = 0.054, p \< 0.02).
@@ -1827,33 +1827,52 @@ ant_arranged_with_caption
 
 #### ASV barplot
 
-```{r, tidy = TRUE}
+```{r, asv_barplot}
 # Just OTUs without singletons ps_clean_3
-ps_melt <- psmelt(ps_clean_3) # Melting data to create accurate relative abundance plot
+ps_melt <- psmelt(ps_clean_3) # Melting data to create accurate relative abunddance plot
+
+# Phylum level
 p1 <- ggplot(ps_melt |>
   filter(!sample_Species == "B"), aes(x = sample_Species, y = Abundance)) +
-  geom_bar(aes(fill = Phylum), stat="identity", position = "fill") +
-  scale_fill_manual(labels=c('Ascomycota', 'Basidiomycota', 'Chytridiomycota', 'Fungi_ord_Incertae_sedis', 'Mortierellomycota', 'Olpidiomycota'),values= met.brewer("Lakota", n = , type = "discrete", override.order = TRUE)) +
-  theme_bw(base_size = 14) +
-  theme(panel.grid.major = element_line(colour = "grey90"),
-        panel.grid.minor = element_line(colour = "grey90"),
-        strip.background = element_rect(fill = "white"),
+  geom_bar(aes(fill = Phylum, color = Phylum), stat="identity", position = "fill") +
+  scale_fill_manual(labels=c('Ascomycota', 'Basidiomycota', 'Chytridiomycota', 'Fungi_ord_Incertae_sedis', 'Mortierellomycota', 'Olpidiomycota'),values= met.brewer("Lakota", n = 6 , type = "discrete", override.order = TRUE)) +
+  scale_color_manual(labels=c('Ascomycota', 'Basidiomycota', 'Chytridiomycota', 'Fungi_ord_Incertae_sedis', 'Mortierellomycota', 'Olpidiomycota'), values = met.brewer("Lakota", n = 6, type = "discrete", override.order = TRUE)) +
+  theme_classic(base_size = 14) +
+  theme(strip.background = element_rect(fill = "white"),
         strip.text.x = element_text(colour = "black", face = "bold"),
         legend.text = element_text(size = 12),
-        legend.title = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
         axis.text.y = element_text(size = 12),
         axis.text.x = element_text(face="italic", 
-                                    size = 14,  
+                                    size = 10,  
                                     hjust = 1,
                                     angle = 30)) +
   scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
-  labs(y = "Abundance", x = "", caption = "n = 160") +
+  labs(y = "Relative Abundance", x = "") +
   facet_grid(~Elevation_cat)
 
   
 p1 
 #ggsave(file.path(path, "figures/relabun_barplot.png") , plot = p1, dpi=300, units=c("mm"), width=200, height=150)
+
+
+summarize_taxa(ps_clean_3, "Phylum")
+
+library(dplyr)
+tb <- ps_melt |>
+  filter(!is.na(Phylum), !sample_Species == "B") %>%
+  group_by(sample_Species, Elevation_cat, Phylum) %>%
+  # Add abundances within each phylum and sample
+  summarize_at("Abundance", sum) 
+  # Get phylum proportions within each sample
+  summarize_at("Abundance", ~ . / sum(.)) 
+  # Get the mean proportion each phylum across samples within the `Sex` (Male/Female) variable
+  mutate(Proportion = mean(Abundance)) 
+  
+  str(tb)
+  ggplot(tb, aes(x = sample_Species, y = Abundance)) +
+  geom_bar(aes(fill = Phylum, color = Phylum), stat="identity", position = "dodge") 
+
 ```
 
 
@@ -1868,7 +1887,7 @@ p1
 #| 
 set.seed(123)
 #Ordination - NMDS with bray-curtis #########
-x <- as.matrix(asv_dist)
+x <- as.matrix(asv_vegdist)
 #x <- replace(x, x == "NaN", 0)
 x <- na.omit(x) #apparently there are some NAs in the matrix fro "Bray-Curtis"
 # Choosing the number of dimensions
@@ -1928,14 +1947,14 @@ NMDS
 
 ```{r}
 # Model with intercept only ####
-m0 <- dbrda(asv_dist ~ 1, data = nmds_traits) #Model with intercept only.
+m0 <- dbrda(asv_vegdist ~ 1, data = nmds_traits) #Model with intercept only.
 m0
 m0 <- na.omit(m0)
-m1 <- dbrda(asv_dist ~ ., data = nmds_traits, na.action = na.omit) # Model with all explanatory variables.
+m1 <- dbrda(asv_vegdist ~ ., data = nmds_traits, na.action = na.omit) # Model with all explanatory variables.
 m1
 
 # Model with species, leaf traits and elevation. ####
-m2 <- dbrda(asv_dist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m,  data = nmds_traits, na.action = na.omit)
+m2 <- dbrda(asv_vegdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m,  data = nmds_traits, na.action = na.omit)
 m2
 m2 <- na.omit(m2)
 Anova(m2)
@@ -1975,7 +1994,7 @@ m3.forsel <- ordistep(m0, scope = formula(m3), Pin = 0.5, Pout = 0.1, trace = T,
 ##### Plot dbRDA
 
 ```{r, m2dbRDA}
-m2dbRDA <- dbrda(asv_dist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m, distance = "bray", data = nmds_traits, na.action = na.omit)
+m2dbRDA <- dbrda(asv_vegdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m, distance = "bray", data = nmds_traits, na.action = na.omit)
 
 summary(m2dbRDA)
 plot(m2dbRDA)
@@ -2073,7 +2092,7 @@ p_m2dbrda
 
 ```{r, adonis2}
 set.seed(123)
-perma <- adonis2(asv_dist ~ logACI + 
+perma <- adonis2(asv_vegdist ~ logACI + 
                    logLT + 
                    logLPS + 
                    logLMA + 
@@ -2093,8 +2112,7 @@ fwrite(dfperma, file.path(path, "Plots", "/permanova.csv"))
 ```{r, PERMDISP}
 set.seed(123)
 # By Species
-beta <- betadisper(as.dist(asv_dist), nmds_traits$Species, type = "median", sqrt.dist = FALSE)
-
+beta <- betadisper(as.dist(asv_vegdist), nmds_traits$Species, type = "centroid", sqrt.dist = FALSE)
 beta
 anova(beta)
 permutest(beta, permutations = 9999)
@@ -2103,21 +2121,23 @@ plot(beta, hull=FALSE, ellipse=TRUE)
 TukeyHSD(beta)
 boxplot(beta, xlab = "", las = 2, cex.axis = 0.8)
 
-
+# No significant differences in the dispersion of the fungal community across species.
 
 # By Elevation
-beta2 <- betadisper(as.dist(asv_dist), nmds_traits$Elevation_cat, type = "centroid", sqrt.dist = FALSE)
+beta2 <- betadisper(as.dist(asv_vegdist), nmds_traits$Elevation_cat, type = "centroid", sqrt.dist = FALSE)
 anova(beta2)
 TukeyHSD(beta2)
 boxplot(beta2, xlab = "", las = 2, cex.axis = 0.8)
 plot(beta2, hull=FALSE, ellipse=TRUE)
+
+# We see significant differences in the dispersion of the fungal community across elevation categories. 
 
 ```
 
 Who contributes more to differneces in the community composition?
 
 ```{r, SIMPER}
-(sim <- with(nmds_traits, simper(asv_dist, Elevation_cat, permutations = 999)))
+(sim <- with(nmds_traits, simper(asv_vegdist, Elevation_cat, permutations = 999)))
 summary(sim)
 ```
 
