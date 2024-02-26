@@ -14,7 +14,6 @@ knitr::opts_chunk$set(out.width ='70%', fig_align = 'center', echo = TRUE, colla
 ```{r}
 library("tidyverse")
 library("data.table")
-library("ggplot2")
 library("ggpubr")
 library("ggfortify")
 library("ggthemes")
@@ -40,19 +39,21 @@ library("geosphere")
 #| echo: false
 #| eval: true
 #| tidy: true
-path <-"/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics"
+path <- "/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics" # Change accordingly
 ```
 
 # Data sets
 
-## Cleaning and Shaping leaf traits data
-Includes custom functions for p-value formatting.
-```{r, main_data_sets}
+## Cleaning and Shaping
+
+This section cleans and shapes the raw data into two main data frames: `leaf_traits` and `plant_traits`. The first has all data point for leaf trait measurements at the leaf level (raw) and the second one represents the average per plant while incorporating FEF community data. The FEF community data is only available for 160/320 samples. For the downstream analyses, we eliminated *M. bicolor* or species "B" in the data set. The removal of this is due to a small sample size for leaf trait measurements and even smaller for FEF community data (*n* = 3). The removal is not explicit in `plant_traits` it is only explicit in the subset `leaf_traits_noB` and latter on in the `asv_matrix` that gives way for community analyses in [Community Diversity]. We include a custom function for p-value formatting.
+
+```{r, cleaning_chaping_data}
 #| echo: false
 #| eval: true
 #| tidy: true
 
-traits <- read.csv(file.path(path, "mim2_leaf_traits_field_survey.csv"))
+traits <- read.csv(file.path(path, "mim2_leaf_traits_field_survey.csv")) # Main raw data set
 
 #Elevation_m categories (meters)
 breaks <- c(-Inf, 1219.2, 1828.495, Inf)
@@ -89,7 +90,9 @@ plant_traits <- leaf_traits |>
             LBI = mean(LBI, na.rm = TRUE))
 
 
-# All variables are non-normal. We will proceed with a log transformation of the data.
+#### Log transformation ####
+
+# All variables are non-normal. We proceed with a log transformation of the data.
 # See Descriptive Statistics section for reference on this decision. Leaf_trait_transformation block.
 # Leaft traits transformed
 leaf_traits <- leaf_traits |>
@@ -114,8 +117,7 @@ plant_traits <- plant_traits |>
 
 #### Phyloseq objects ####
 
-#Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data.
-#These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
+#Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data. These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
 
 # Load Phyloseq object cleaned of singletons (231 ASVs)
 ps_clean_3 <- readRDS(file.path(path, "taxonomy/ASV_8450_assigned_nonsingletons.rds"))
@@ -127,6 +129,7 @@ rel_ps_clean_df <- read.csv(file.path(path, "taxonomy/ASV_8450_relabun_nonsingle
 
 
 #### Leaf traits with community data ####
+
 # Calculating Hill orders
 plant_traits <- ps_clean_3 |> #Estimating community richness and shannon diversity from phyloseq object
   estimate_richness(split = TRUE, measures = c("Observed","Shannon", "Simpson")) |>
@@ -154,7 +157,7 @@ plant_traits <- ps_clean_3 |> #Estimating community richness and shannon diversi
 #saveRDS(plant_traits, file.path(path, "statistics/plant_traits.rds"))
 #write.csv(plant_traits, file.path(path, "statistics/plant_traits.csv"))
 
-# Load master files
+#### Load master files ####
 leaf_traits <- readRDS(file.path(path, "statistics/leaf_traits.rds"))
 plant_traits <- readRDS(file.path(path, "statistics/plant_traits.rds"))
 
@@ -189,6 +192,10 @@ format.p <- function(p, precision = 0.001) {
   sub("0", "0", p)
 }
 ######################################################
+
+# Comparisons
+my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
+my_comparisons3 <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
 ```
 
 ##Descriptive stats
@@ -446,8 +453,6 @@ lma_compare_means <- compare_means(logLMA ~ Species,
 errbar_lims <- group_by(leaf_traits_noB, Site) |> 
               summarize(mean = mean(logLMA), se = sd(logLMA)/sqrt(n()), 
                         upper = mean+(2*se), lower = mean-(2*se))
-#Comparisons
-my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
 
 #By Site discrete comparison
 lma <- ggplot(leaf_traits_noB, aes(y = logLMA, x = Species)) +
@@ -1059,9 +1064,7 @@ pca_auto
 
 # Community Diversity
 
-Here we are going to explore the relationship between elevation and FEF community composition through richness and species diversity. Let's calculate Hill numbers for the FEF community and plot them against elevation.
-
-First let's create a dissimilarity and distance matrix.
+Here we are going to explore the relationship between elevation and FEF community composition through richness and species diversity. We have already calculated Hill numbers in [Cleaning and Shaping data]. He we create a dissimilarity matrix and calculate the distance between samples. We remove *M. bicolor* (species "B") from the analysis (see [Cleaning and Shaping data] for more details). 
 
 ```{r, dist_matrix}
 #| echo: false
@@ -1069,12 +1072,13 @@ First let's create a dissimilarity and distance matrix.
 #| tidy: true
 
 # ASV abundance matrix
-#remove NaN
 asv_matrix <- ps_clean_3_df |>
-  select(!c(2:8, SDSB_B001, SDSB_B002, SDSB_B005)) |>#Removing samples from species "B"
+  select(!c(2:8, SDSB_B001, SDSB_B002, SDSB_B005)) |> #Removing samples from species "B"
   column_to_rownames(var = "OTU") |>
   as.matrix()
+# Results in 157 x 157 matrix
 
+# Names of the samples
 names_list <- colnames(asv_matrix)
 
 #Bray-Curtis dissimilarity matrix
@@ -1166,7 +1170,7 @@ hill1_diversity <- ggplot(data = plant_traits  |>
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", 
                                           direction = c(-1))) + 
-  labs(y = print(expression("\U1D492 = 1")), x = "Elevation (m.a.s.l.)", col = "") +
+  labs(y = "\U1D492 = 1"), x = "Elevation (m.a.s.l.)", col = "") +
   #labs(y = expression("*q* = 1"), x = "Elevation (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
@@ -1228,7 +1232,7 @@ hill0_diversity <- ggplot(data = plant_traits  |>
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                       values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
-   labs(y =  print(expression("\U1D492 = 0")), x = "Elevation (m.a.s.l.)", col = "") + 
+   labs(y =  "\U1D492 = 0"), x = "Elevation (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
          strip.text = element_text(face = "italic", size = 14),
@@ -1285,7 +1289,7 @@ hill2_diversity <- ggplot(data = plant_traits  |>
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", 
                                           direction = c(-1))) + 
-  labs(y = print(expression("\U1D492 = 2")), x = "Elevation (m.a.s.l.)", col = "") +
+  labs(y = "\U1D492 = 2"), x = "Elevation (m.a.s.l.)", col = "") +
   #labs(y = expression("*q* = 1"), x = "Elevation (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
@@ -1349,7 +1353,7 @@ hill0_species <- ggplot(data = plant_traits  |>
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
-   labs(y =  print(expression("\U1D492 = 0")), x = "", col = "") + 
+   labs(y =  "\U1D492 = 0"), x = "", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
          strip.text = element_text(face = "italic", size = 14),
@@ -1387,7 +1391,7 @@ hill1_species <- ggplot(data = plant_traits  |>
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
-   labs(y =  print(expression("\U1D492 = 1")), x = "", col = "") + 
+   labs(y =  "\U1D492 = 1"), x = "", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
          strip.text = element_text(face = "italic", size = 14),
@@ -1423,7 +1427,7 @@ hill2_species <- ggplot(data = plant_traits  |>
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
-   labs(y =  print(expression("\U1D492 = 2")), x = "", col = "") + 
+   labs(y =  "\U1D492 = 2"), x = "", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
          strip.text = element_text(face = "italic", size = 14),
@@ -1455,7 +1459,6 @@ hill_numbers_species
 #### Beta diversity ####
 #### Across elevation ####
 #################################
-my_comparisons3 <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
 
 # Observed richness
 # Hill number 0
@@ -1484,7 +1487,7 @@ hill0_beta <-  ggplot(plant_traits |>
   stat_compare_means(comparisons = my_comparisons3,
                      method = "wilcox.test", 
                      label = "p.signif") +
-  labs(y = print(expression("\U1D492 = 0")), x = "") +
+  labs(y = "\U1D492 = 0"), x = "") +
   guides(fill = guide_legend(title = "Elevation"), shape = guide_legend(title = "Species"))
 
 hill0_beta
@@ -1518,7 +1521,7 @@ hill1_beta <- ggplot(plant_traits |>
   stat_compare_means(comparisons = my_comparisons3,
                      method = "wilcox.test", 
                      label = "p.signif") +
-  labs(y = print(expression("\U1D492 = 1")), x = "") +
+  labs(y = "\U1D492 = 1"), x = "") +
   guides(fill = guide_legend(title = "Elevation"), shape = guide_legend(title = "Species"))
 
 hill1_beta
@@ -1552,7 +1555,7 @@ hill2_beta <- ggplot(plant_traits |>
   stat_compare_means(comparisons = my_comparisons3,
                      method = "wilcox.test", 
                      label = "p.signif") +
-  labs(y = print(expression("\U1D492 = 2")), x = "") +
+  labs(y = "\U1D492 = 2"), x = "") +
   guides(fill = guide_legend(title = "Elevation"), shape = guide_legend(title = "Species"))
 
 hill2_beta
@@ -1568,7 +1571,6 @@ hill_beta <- ggarrange(hill0_beta, hill1_beta, hill2_beta,
 hill_beta
 #ggsave(file.path(path, "figures/figure3.png"), plot = hill_beta, dpi=300, units=c("mm"), width=300, height=100)
 ```
-
 
 #### Mantel tests and correlations
 
@@ -1874,9 +1876,6 @@ tb <- ps_melt |>
   geom_bar(aes(fill = Phylum, color = Phylum), stat="identity", position = "dodge") 
 
 ```
-
-
-
 
 ### NMDS
 
