@@ -39,7 +39,7 @@ library("geosphere")
 #| echo: false
 #| eval: true
 #| tidy: true
-path <- "/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics" # Change accordingly
+path <- "../mim2_bioinformatics" # Change accordingly
 ```
 
 # Data sets
