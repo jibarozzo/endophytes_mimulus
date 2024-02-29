@@ -31,6 +31,7 @@ library("phyloseq")
 library("metagMisc")
 library("iNEXT")
 library("geosphere")
+library("indicspecies")
 ```
 
 # File Path
@@ -1170,7 +1171,7 @@ hill1_diversity <- ggplot(data = plant_traits  |>
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", 
                                           direction = c(-1))) + 
-  labs(y = "\U1D492 = 1"), x = "Elevation (m.a.s.l.)", col = "") +
+  labs(y = "\U1D492 = 1", x = "Elevation (m.a.s.l.)", col = "") +
   #labs(y = expression("*q* = 1"), x = "Elevation (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
@@ -2106,7 +2107,8 @@ dfperma <- as.data.frame(perma)
 fwrite(dfperma, file.path(path, "Plots", "/permanova.csv"))
 ```
 
-### Analysis of multivariate homogeneity of group dispersions.
+### PERMDISP
+Analysis of multivariate homogeneity of group dispersions.
 
 ```{r, PERMDISP}
 set.seed(123)
@@ -2144,45 +2146,44 @@ summary(sim)
 
 This analysis allows us to determine what endophytes are associated with particular groups (e.g. tree species). According to this vgnette from Cáceres ([2022](https://cran.r-project.org/web/packages/indicspecies/vignettes/IndicatorSpeciesAnalysis.html)) `multipatt` function can provides us with Indicators Value Index and correlation index. Both are similar, but the differences lies in the question they help answer. Indicator value index "\[...\]are used for assessing the predictive values of species as indicators of the conditions prevailing in site groups, e.g. for field determination of community types or ecological monitoring." While the correlation index can be used for "\[...\] determining the ecological preferences of species among a set of alternative site groups or site group combinations."
 
-Given this, it will be best to compute a correlation index. This will allow to determine what endophytes are correlated with particular tree species or across treatment types (E-+).
 
-```{r, Indicator species, tidy = TRUE}
+```{r, indicspp}
 
 #Subset data frame for indicator species analysis
 #Community Data
-ftraits2 <-   ftraits |>
-rownames_to_column(var = "Unique_ID") |>
-  left_join(rich, by = "Unique_ID")
-  
-tpqmax <- as.data.frame(t(pqmax))
-tpqmax <- tpqmax |>
-  rownames_to_column(var = "Unique_ID")
-cotu <- left_join(tpqmax, ftraits2, by = "Unique_ID") |>
-  mutate(Elevation_cat = cut(Elevation_m, breaks = breaks, labels = labels)) |>
-    select(!c(ACI, 
-            Thickness,
-            Toughness, 
-            LMA, 
-            LBI, 
-            log10LBI, Elevation_m, 
-            ImageJ_1, 
-            ImageJ_2)) |>
-  relocate(Species, Elevation_cat, Site, .after = Unique_ID)
+
+asv_matrix_df <- as.data.frame(t(asv_matrix))
+asv_matrix_df <- asv_matrix|>
+  t()|>
+  as.data.frame() |>
+  rownames_to_column(var = "Unique_ID") #This data set can also be created from ps_clean_3_df
+
+asv_indicspp <- left_join(asv_matrix_df, nmds_traits, by = "Unique_ID") |># Joining to the NMDS traits data frame which has the same number of rows as the asv_matrix_df
+    select(!c(237:255)) |>
+  relocate(Species, Site, Elevation_cat, Elevation_m, .after = Unique_ID)
 ```
 
-```{r}
+
+```{r indicspp}
 #Making vector of groups for analysis
-indiabun <- cotu[, 5:ncol(cotu)]
+set.seed(123)
+indiabun <- asv_indicspp[, 6:ncol(asv_indicspp)]
 
-species <- cotu$Species
-elecat <- cotu$Elevation_cat
-site <- cotu$Site
+species <- asv_indicspp$Species
+elecat <- asv_indicspp$Elevation_cat
+site <- asv_indicspp$Site
 
-indval = multipatt(indiabun, species, func = "r.g", control = how(nperm=999)) #By using abundance data and not presence-absence we are calculating the "point biserial correlation coefficient"
-indval
-summary(indval, indvalcomp = TRUE)
+# Indicator species analysis`
+multipatt_analysis = multipatt(indiabun, species, func = "r.g", control = how(nperm=999)) #By using abundance data and not presence-absence we are calculating the "point biserial correlation coefficient"
+multipatt_analysis
+summary(multipatt_analysis, indvalcomp = TRUE)
 
-#round(head(indval$str), 7)
+
+# Indicator species analysis by elevation category
+multipatt_analysis_ele <- multipatt(indiabun, elecat, func = "r.g", control = how(nperm=999))
+multipatt_analysis_ele
+summary(multipatt_analysis_ele, indvalcomp = TRUE)
+
 ```
 
 ```{r, Type I errror and data table, tidy = TRUE}
@@ -2190,20 +2191,44 @@ summary(indval, indvalcomp = TRUE)
 #code from this post
 #https://stats.stackexchange.com/questions/370724/indiscpecies-multipatt-and-overcoming-multi-comparrisons/401277#401277
 
+# By Mimulus Species
+#Extract table of stats
+multipatt_analysis_sign <- as.data.table(multipatt_analysis$sign, keep.rownames=TRUE)
 
-#extract table of stats
-indval.sign <- as.data.table(indval$sign, keep.rownames=TRUE)
+# #Add adjusted p-value
+multipatt_analysis_sign[, p.adj := p.adjust(p.value, method = "BH")] #This can also be calculated with `dplyr` and `tidyr`
+# #indval.table <- indval.sign |>
+#   #mutate(p.value.bh = p.adjust(p.value, method = "BH"))
+ 
+# #Now we can select only the indicators with adjusted significant p-values
+multipatt_analysis_sign <- multipatt_analysis_sign[p.adj <= 0.06,]
 
-#add adjusted p-value
-indval.sign[ , p.value.bh :=   p.adjust(p.value, method="BH")] #This can also be calculated with `dplyr` and `tidyr`
-#indval.table <- indval.sign |>
-  #mutate(p.value.bh = p.adjust(p.value, method = "BH"))
+#Renaming the first column
+colnames(multipatt_analysis_sign)[1]  <- "ASV" 
 
-#now can select only the indicators with adjusted significant p-values
-indval.sign[p.value.bh <= 0.05,]
+# By Elevation
+#Extract table of stats
+multipatt_analysis_elev_sign <- as.data.table(multipatt_analysis_ele$sign, keep.rownames=TRUE)
 
-#renaming the first column
-colnames(indval.sign)[1]  <- "OTU" 
+# #Add adjusted p-value
+multipatt_analysis_elev_sign[, p.adj := p.adjust(p.value, method = "BH")] #This can also be calculated with `dplyr` and `tidyr`
+# #indval.table <- indval.sign |>
+#   #mutate(p.value.bh = p.adjust(p.value, method = "BH"))
+ 
+# #Now we can select only the indicators with adjusted significant p-values
+multipatt_analysis_elev_sign <- multipatt_analysis_elev_sign[p.adj <= 0.06,]
+
+#Renaming the first column
+colnames(multipatt_analysis_sign)[1]  <- "ASV" 
 ```
 
-P-value adjustments are computed with the "BH" method. Which "\[...\] control the false discovery rate, the expected proportion of false discoveries amongst the rejected hypotheses. The false discovery rate is a less stringent condition than the family-wise error rate, so these methods are more powerful than the others." Information for the R documentation page of `p.adjust()`.
+No ASVs significantly correlated with Mimulus species. When we test for correlations in elevation categories and adjust the p value for multiple comparison we are left with only 0 ASVs. 
+
+NO evidence of a core ASV community associated with Mimulus or elevation types. 
+
+
+```{r}
+
+
+```
+

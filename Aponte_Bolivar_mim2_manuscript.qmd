@@ -99,6 +99,7 @@ library("hillR")
 library("metagMisc")
 library("iNEXT")
 library("geosphere")
+library("indicspecies")
 
 # File path
 
@@ -224,16 +225,13 @@ format.p <- function(p, precision = 0.001) {
 ######################################################
 ```
 
-
 ## Keywords
 
 # Abstract
 
 # Introduction
 
-Phenotypic plasticity and genetic adaptation are key drivers of evolution, and both processes may aid in plant adaptation to a warming climate [@jump2005]. Plant’s colonization of land across multiples climates has been aided by their parallel evolution with fungi and bacteria; however, little is known about how plant microbiomes influence or are influenced by local adaptation or phenotypic plasticity of plants. Lack of knowledge about this is a problem because ecology aims to predict how plant distribution may change as the climate becomes further altered. Previous studies have suggested that foliar endophytic fungi (FEF) can alter plant traits under stressful conditions such as drought [@song2016]. FEF live in plant leaves and they may contribute to local adaptation and/or phenotypic plasticity. Host genetics may shape the foliar microbiomes of plants. For example, a study on the classical plant model, *Arabidopsis thaliana*, revealed that bacterial and fungal communities in leaves are shaped by host genotype, at least for the most common OTUs [@horton2014]. Another ideal model system to explore the interactions between leaf traits and FEF are the yellow monkeyflowers in the *Mimulus guttatus* species complex. Over the last 2 decades, the *M. guttatus* species complex has become a model system for answering questions about local adaptation and phenotypic plasticity [@wu2008; @yuan2019]. Experimental manipulation is relatively easy due to its small genome (about 430 Mb), short generation time, high fecundity, self-compatibility, and ease of greenhouse propagation [@society2019; @wu2008] Currently, studies of the *M. guttatus* species complex focus on the genetic and environmental factors driving local adaptation and phenotypic plasticity. The evolution of leaf shape for 3 edaphic species in the *M. guttatus* complex is controlled by overlapping genetic regions [@ferris2015]. Ferris et al., [-@ferris2015] points to multiple events of leaf shape evolution in the *M. guttatus* species complex and their associated habitats. Recent work has narrowed the genetic architecture at play in incomplete reproductively isolated sympatric populations of *Mimulus laciniatus* and *Mimulus guttatus*, shedding light on the location of quantitative trait loci (QTL) for the first flower node, flowering time, corolla width, corolla length, and leaf shape and suggesting that large-effect loci underlie these traits [@ferris2017]. There is scarce research that focuses on the symbionts of *Mimulus* spp. Beslile et al. [-@beslile2012] reported on the distribution of diverse fungal communities in the flower nectar of *Mimulus aurantiacus*. The authors considered flowers as islands in a metapopulation system and found that the frequency of micro fungi (i.e., yeasts) was significantly correlated to the location of the plant and marginally correlated with the density of the flowers in the plant [@beslile2012]. To our knowledge, no previous studies have considered symbionts in leaf tissue of *Mimulus* spp. and how leaf functional traits influence symbiont community composition. Given the potential benefits FEF can provide their hosts under stressful conditions (CITE) and the wide range of habitats the *M. guttatus* species complex occupies, it is important to understand the role of FEF communities play in *Mimulus* spp. The aim of this study was to explore some baseline questions about the FEF communities in sympatric populations of *Mimulus* spp.along an elevation gradient. We formulated the following questions: Q1) Are there differences in leaf functional traits and FEF communities *among* sympatric *Mimulus* spp. populations? Q2) Do leaf functional traits and FEF communities differ *between* species along an elevational gradient? Q3) Are FEF community patterns influenced by leaf functional traits and/or elevation gradient?  Q4) How do FEF community composition differs in response to geographic distance at the genus and host species level?
-<!-- Does an interaction exist between elevation and species regarding leaf functional traits and FEF communities? -->
-We expect the abundance, diversity, richness, and community composition of FEF will be more similar among the same sites (alpha diversity) than between sites (beta diversity) regardless of host species.
+Phenotypic plasticity and genetic adaptation are key drivers of evolution, and both processes may aid in plant adaptation to a warming climate [@jump2005]. Plant’s colonization of land across multiples climates has been aided by their parallel evolution with fungi and bacteria; however, little is known about how plant microbiomes influence or are influenced by local adaptation or phenotypic plasticity of plants. Lack of knowledge about this is a problem because ecology aims to predict how plant distribution may change as the climate becomes further altered. Previous studies have suggested that foliar endophytic fungi (FEF) can alter plant traits under stressful conditions such as drought [@song2016]. FEF live in plant leaves and they may contribute to local adaptation and/or phenotypic plasticity. Host genetics may shape the foliar microbiomes of plants. For example, a study on the classical plant model, *Arabidopsis thaliana*, revealed that bacterial and fungal communities in leaves are shaped by host genotype, at least for the most common OTUs [@horton2014]. Another ideal model system to explore the interactions between leaf traits and FEF are the yellow monkeyflowers in the *Mimulus guttatus* species complex. Over the last 2 decades, the *M. guttatus* species complex has become a model system for answering questions about local adaptation and phenotypic plasticity [@wu2008; @yuan2019]. Experimental manipulation is relatively easy due to its small genome (about 430 Mb), short generation time, high fecundity, self-compatibility, and ease of greenhouse propagation [@society2019; @wu2008] Currently, studies of the *M. guttatus* species complex focus on the genetic and environmental factors driving local adaptation and phenotypic plasticity. The evolution of leaf shape for 3 edaphic species in the *M. guttatus* complex is controlled by overlapping genetic regions [@ferris2015]. Ferris et al., [-@ferris2015] points to multiple events of leaf shape evolution in the *M. guttatus* species complex and their associated habitats. Recent work has narrowed the genetic architecture at play in incomplete reproductively isolated sympatric populations of *Mimulus laciniatus* and *Mimulus guttatus*, shedding light on the location of quantitative trait loci (QTL) for the first flower node, flowering time, corolla width, corolla length, and leaf shape and suggesting that large-effect loci underlie these traits [@ferris2017]. There is scarce research that focuses on the symbionts of *Mimulus* spp. Beslile et al. [-@beslile2012] reported on the distribution of diverse fungal communities in the flower nectar of *Mimulus aurantiacus*. The authors considered flowers as islands in a metapopulation system and found that the frequency of micro fungi (i.e., yeasts) was significantly correlated to the location of the plant and marginally correlated with the density of the flowers in the plant [@beslile2012]. To our knowledge, no previous studies have considered symbionts in leaf tissue of *Mimulus* spp. and how leaf functional traits influence symbiont community composition. Given the potential benefits FEF can provide their hosts under stressful conditions (CITE) and the wide range of habitats the *M. guttatus* species complex occupies, it is important to understand the role of FEF communities play in *Mimulus* spp. The aim of this study was to explore some baseline questions about the FEF communities in sympatric populations of *Mimulus* spp.along an elevation gradient. We formulated the following questions: Q1) Are there differences in leaf functional traits and FEF communities *among* sympatric *Mimulus* spp. populations? Q2) Do leaf functional traits and FEF communities differ *between* species along an elevational gradient? Q3) Are FEF community patterns influenced by leaf functional traits and/or elevation gradient? Q4) How do FEF community composition differs in response to geographic distance at the genus and host species level? <!-- Does an interaction exist between elevation and species regarding leaf functional traits and FEF communities? --> We expect the abundance, diversity, richness, and community composition of FEF will be more similar among the same sites (alpha diversity) than between sites (beta diversity) regardless of host species.
 
 # Materials and Methods
 
@@ -267,9 +265,9 @@ We used the `decontam` package [v1.20.0; @davis2018] to statistically determine 
 
 Before performing statistical analyses, we checked for normality and homoscedasticity of the leaf traits measured. We used Shapiro-Wilk and Fligner-Killen tests from the `stats` package [@rcoreteam2023] to check for normality and homoscedasticity, respectively. We established that the data was not normally distributed and not homoscedastic. We then used non-parametric tests, the Wilcoxon Rank Sum test, to compare leaf functional trait means among species and sites to answer the first portion of Q1 and Q2. We used the `compare_means` and `'stat_compare_means`functions from the `ggpubr` package [@kassambara2023] to perform these tests and properly visualize them. We adjusted *p* values to account for false discovery rates in multiple comparisons by using “BH” method [@benjamini1995]. We performed Principal Component Analysis (PCA) to understand patterns and relationships among leaf traits of host species. We used the `prcomp` function from the `vegan` package [@oksanen2022] compute the PCA analysis with variables ACI, LT, LPS, LMA, and LBI, all log-transformed. We used only complete raw leaf functional traits measurements to compute the PCA analysis (*n* = 504), samples with missing values were omitted.
 
-To answer how FEF communities differ *among* host species (Q1) and *between* sites (Q2) and facilitate our understanding of the effects of elevation on FEF communities, we categorized elevation as "low" (\< 1219 m.a.s.l), "mid" (1220 - 1828 m.a.s.l.) and "high" (\> 1829 m.a.s.l.). We then calculated alpha diversity per sample as in different measure of Hill orders, the observed richness (𝑞 = 0), the exponent of Shannon's Diversity (𝑞 = 1), and the Inverse Simpson's Diversity (𝑞 = 2) with `phyloseq`'s `estimated-richness` function [@mcmurdie2013]. We used the `vegdist` function from the `vegan` package [@oksanen2022] to calculate the Bray-Curtis dissimilarity matrix, a measure of beta diversity, to compare the FEF communities within each monkeyflower species across sites and elevation (Q1 \- Q2). Additionally, we used a distance-based Redundancy Analysis (dbRDA) to statistically compare the FEF community similarities within each host species per site (Q3). We modeled the dbRDA analysis with all leaf functional traits included and elevation as a continuous variable. Its visualizations effectively portray underlying patterns of compositional differences [@anderson2017; @legendre1999; @mcardle2001], akin to permutational analysis of variance. We used the `anova.cca` function to assess the marginal significance of constraining variables [@legendre2011; @legendre2012; @oksanen2022]. We corroborated homogeneous dispersion of variances with a permutational analysis of multivariate dispersion (PERMDISP) using the `betadisper` with parameter `type = "centroid"`, and `permutest` functions from the `vegan` package [@oksanen2022]. We used a post-hoc Tukey's test to compare the differences in the dispersion of the FEF communities among sites and elevation categories. We used the `simper` function from the `vegan` package to discriminate which species contribute the most to compositional differences between groups [@oksanen2022].
+To answer how FEF communities differ *among* host species (Q1) and *between* sites (Q2) and facilitate our understanding of the effects of elevation on FEF communities, we categorized elevation as "low" (\< 1219 m.a.s.l), "mid" (1220 - 1828 m.a.s.l.) and "high" (\> 1829 m.a.s.l.). We then calculated alpha diversity per sample as in different measure of Hill orders, the observed richness (𝑞 = 0), the exponent of Shannon's Diversity (𝑞 = 1), and the Inverse Simpson's Diversity (𝑞 = 2) with `phyloseq`'s `estimated-richness` function [@mcmurdie2013]. We used the `vegdist` function from the `vegan` package [@oksanen2022] to calculate the Bray-Curtis dissimilarity matrix, a measure of beta diversity, to compare the FEF communities within each monkeyflower species across sites and elevation (Q1 - Q2). Additionally, we used a distance-based Redundancy Analysis (dbRDA) to statistically compare the FEF community similarities within each host species per site (Q3). We modeled the dbRDA analysis with all leaf functional traits included and elevation as a continuous variable. Its visualizations effectively portray underlying patterns of compositional differences [@anderson2017; @legendre1999; @mcardle2001], akin to permutational analysis of variance. We used the `anova.cca` function to assess the marginal significance of constraining variables [@legendre2011; @legendre2012; @oksanen2022]. We corroborated homogeneous dispersion of variances with a permutational analysis of multivariate dispersion (PERMDISP) using the `betadisper` with parameter `type = "centroid"`, and `permutest` functions from the `vegan` package [@oksanen2022]. We used a post-hoc Tukey's test to compare the differences in the dispersion of the FEF communities among sites and elevation categories. We used the `simper` function from the `vegan` package to discriminate which species contribute the most to compositional differences between groups [@oksanen2022]. To determine if there is a core FEF community associated with host species or elevation categories, we conducted an indicators species analyses (ISA) using the `multipatt` function from the `indicspecies` package [@decaceres2009].
 
-Ultimately, to test the correlation between the geographical distance matrix and FEF community dissimilarity (Bray-Curtis dissimilarity) per host species (Q4), we calculated distance matrix of geographical distances between sites using the Vicenty (ellipsoid) method with the `geosphere` package [@hijmans2022].  We then computed a Mantel test with the `mantel` function from the `vegan` package [@oksanen2022]. We set used the method "spearman" and 999 permutations. All statistical analyses were performed in *R* programming language[v.4.3.2; @rcoreteam2023].
+Ultimately, to test the correlation between the geographical distance matrix and FEF community dissimilarity (Bray-Curtis dissimilarity) per host species (Q4), we calculated distance matrix of geographical distances between sites using the Vicenty (ellipsoid) method with the `geosphere` package [@hijmans2022]. We then computed a Mantel test with the `mantel` function from the `vegan` package [@oksanen2022]. We set used the method "spearman" and 999 permutations. All statistical analyses were performed in *R* programming language[v.4.3.2; @rcoreteam2023].
 
 # Results
 
@@ -279,18 +277,13 @@ We found that leaf functional traits differed among and within *Mimulus* species
 
 Our PCA analysis showed how leaf functional traits were related. We plotted leaf functional traits according to species groups on the PCA axes to show how the variance in the complete data set is explained by PC1 (\~43%) and PC2 (22.5%) (@pca). The PCA analyses showed ACI, LT, LPS, and LMA loadings tracked along PC1 towards positive values, showing correlation among the traits (@pca). We observed that LBI loading is orthogonal along PC2 to the other traits, indicative of low correlation. We note distinct groupings by species along PC2 such that *M. laciniatus*, the most lobed species, is distinct from *M.gutatus* and *M. nasutus*. The latter two overlap along PC1 and PC2 (@pca).
 
-To determine the correlation between FEF diversity and elevation, we calculated simple linear regressions between elevation and alpha diversity (Q3). At the species level, we did not observe a significant change in alpha diversity as elevation increased (@scatter_hill_ordersA - @scatter_hill_ordersC). Nevertheless, the general trend points to a decrease in alpha diversity as elevation increases (@scatter_hill_orders). When we observed the complete data set we did see a statistically significant negative correlation between elevation and observed richness (𝑞 = 0) (R^2^-adjusted= 0.05, *F*~158~= 6.795, *p* = 0.01), the exponent of Shannon's Diversity index (𝑞 = 1) (R^2^-adjusted= 0.08, *F*~158~= 15.06, *p* \< 0.001), and the Inverse Simpson's Diversity (𝑞 = 2) (R^2^-adjusted= 0.08, *F*~158~= 14.24, *p* \< 0.001). We found statistically significant differences in alpha diversity between *M. laciniatus* and *M. guttatus* (Fig. 3A - 3C), while *M. nasutus* differed significantly from *M. laciniatus* in Hill order 1 (𝑞 = 1) (*p* \<0.01) and Hill order 2 (𝑞 = 2) (*p* \<0.05). We observed statistically significant differences in beta diversity between low and high elevation sites for Hill order 1 (*p* \<0.01) and 2 (*p* \< 0.05)(@violin_hill_ordersE - @violin_hill_ordersF). We also observed statistically significant differences in Hill order 0 (𝑞 = 0) between mid in high elevation sites (@violin_hill_ordersD). 
-The presence of Ascomycota and Basidiomycota was consistent across all sites and species, with Basidiomycota being the most abundant phylum across all samples (@rabun_plot). MAYBE ADD SOME MORE INFO HERE. 
+To determine the correlation between FEF diversity and elevation, we calculated simple linear regressions between elevation and alpha diversity (Q3). At the species level, we did not observe a significant change in alpha diversity as elevation increased (@scatter_hill_ordersA - @scatter_hill_ordersC). Nevertheless, the general trend points to a decrease in alpha diversity as elevation increases (@scatter_hill_orders). When we observed the complete data set we did see a statistically significant negative correlation between elevation and observed richness (𝑞 = 0) (R^2^-adjusted= 0.05, *F*~158~= 6.795, *p* = 0.01), the exponent of Shannon's Diversity index (𝑞 = 1) (R^2^-adjusted= 0.08, *F*~158~= 15.06, *p* \< 0.001), and the Inverse Simpson's Diversity (𝑞 = 2) (R^2^-adjusted= 0.08, *F*~158~= 14.24, *p* \< 0.001). We found statistically significant differences in alpha diversity between *M. laciniatus* and *M. guttatus* (Fig. 3A - 3C), while *M. nasutus* differed significantly from *M. laciniatus* in Hill order 1 (𝑞 = 1) (*p* \<0.01) and Hill order 2 (𝑞 = 2) (*p* \<0.05). We observed statistically significant differences in beta diversity between low and high elevation sites for Hill order 1 (*p* \<0.01) and 2 (*p* \< 0.05)(@violin_hill_ordersE - @violin_hill_ordersF). We also observed statistically significant differences in Hill order 0 (𝑞 = 0) between mid in high elevation sites (@violin_hill_ordersD). The presence of Ascomycota and Basidiomycota was consistent across all sites and species, with Basidiomycota being the most abundant phylum across all samples (@rabun_plot). MAYBE ADD SOME MORE INFO HERE.
 
-To test for differences in FEF community composition, we used a distance-based Redundancy Analysis (dbRDA) to model the relationship between FEF communities, leaf functional traits and elevation (Q3). The analyses revealed that 4.30% of the overall variance inf FEF communities was accounted for by the leaf functional traits and elevation, the constraining variables. We saw that the first axis (dbRDA1) explained 40.8% and the second axis (dbRDA2) explained 27% of the constrained variance (@dbrda). We observed a distinct, yet overlapping, grouping of FEF communities by species (@dbrdaA),  as well as when visualized by elevation category (@dbrdaB). Elevation tracks along dbRDA1 while leaf functional traits track along dbRDA2 (@dbrda5). We found that LBI and elevation are significantly correlated with FEF communities (PERMANOVA TABLE COMMING SOON). To corroborate our findings, we used a permutational analysis of multivariate dispersion (PERMDISP) to test for homogeneity of variances in FEF communities. We found that FEF communities were homogeneous across all species (*F*~157~= 2.66, *p* \= 0.07). The post-hoc Tukey's test revealed that all species comparison were not significant.  We did find statistically significant differences in the dispersion of FEF communities by elevation category (*F*~157~= 3.89, *p* \= 0.02). The post-hoc Tukey's test showed that low and high elevation sites had significantly different dispersion of FEF communities (*p* \< 0.05). 
-Finally, we tested for FEF community dissimilarity by geographical distance and found a statistically significant positive correlation when we observed all host species (*r* = 0.06, *p* \< 0.01) (@mantel_plotA). At the host species level, we saw no significant correlation between FEF community and geographical distance for *M. laciniatus* (*r* = 0.03, *p* = 0.26) and *M. guttatus* (*r* = 0.05, *p* = 0.15) (@mantel_plotB). For *M. nasutus* we saw an opposite trend,  we saw a negative correlation between FEF communities and geographic distance (*r* = 0.20, *p* = 0.001)(@mantel_plotB).
-
-
+To test for differences in FEF community composition, we used a distance-based Redundancy Analysis (dbRDA) to model the relationship between FEF communities, leaf functional traits and elevation (Q3). The analyses revealed that 4.30% of the overall variance inf FEF communities was accounted for by the leaf functional traits and elevation, the constraining variables. We saw that the first axis (dbRDA1) explained 40.8% and the second axis (dbRDA2) explained 27% of the constrained variance (@dbrda). We observed a distinct, yet overlapping, grouping of FEF communities by species (@dbrdaA), as well as when visualized by elevation category (@dbrdaB). Elevation tracks along dbRDA1 while leaf functional traits track along dbRDA2 (@dbrda5). We found that LBI and elevation are significantly correlated with FEF communities (PERMANOVA TABLE COMMING SOON). To corroborate our findings, we used a permutational analysis of multivariate dispersion (PERMDISP) to test for homogeneity of variances in FEF communities. We found that FEF communities were homogeneous across all species (*F*~157~= 2.66, *p* = 0.07). The post-hoc Tukey's test revealed that all species comparison were not significant. We did find statistically significant differences in the dispersion of FEF communities by elevation category (*F*~157~= 3.89, *p* = 0.02). The post-hoc Tukey's test showed that low and high elevation sites had significantly different dispersion of FEF communities (*p* \< 0.05). Finally, we tested for FEF community dissimilarity by geographical distance and found a statistically significant positive correlation when we observed all host species (*r* = 0.06, *p* \< 0.01) (@mantel_plotA). At the host species level, we saw no significant correlation between FEF community and geographical distance for *M. laciniatus* (*r* = 0.03, *p* = 0.26) and *M. guttatus* (*r* = 0.05, *p* = 0.15) (@mantel_plotB). For *M. nasutus* we saw an opposite trend, we saw a negative correlation between FEF communities and geographic distance (*r* = 0.20, *p* = 0.001)(@mantel_plotB).
 
 # Discussion
 
-Our results show how leaf functional traits differ among and within *Mimulus* species across elevation. We found that leaf functional traits, specifically LMA, LBI, LPS and LT, are positively correlated with elevation at the genus level. Functional leaf traits do differ among *Mimulus* species and elevation categories, but the patterns are not consistent across all traits.  *Mimulus laciniatus* is considered the most lobed species of the three evaluated in this study (Fig. 1)[CITE all evidence here], however *M. laciniatus* is known to be at higher elevation, which confounds our interpretation of the results for the complete data set. When we observed closely at *M. laciniatus* blah blah blah. 
-
+Our results show how leaf functional traits differ among and within *Mimulus* species across elevation. We found that leaf functional traits, specifically LMA, LBI, LPS and LT, are positively correlated with elevation at the genus level. Functional leaf traits do differ among *Mimulus* species and elevation categories, but the patterns are not consistent across all traits. *Mimulus laciniatus* is considered the most lobed species of the three evaluated in this study (Fig. 1)\[CITE all evidence here\], however *M. laciniatus* is known to be at higher elevation, which confounds our interpretation of the results for the complete data set. When we observed closely at *M. laciniatus* blah blah blah.
 
 # Conclusion
 
@@ -310,6 +303,7 @@ The authors declare no competing interests.
 :::
 
 # Figures
+
 ## Figure 1
 
 ```{r, figure1}
@@ -922,7 +916,7 @@ m2dbRDA <- dbrda(asv_vegdist ~ logACI + logLT + logLPS + logLMA + logLBI + Eleva
 
 #summary(m2dbRDA)
 #plot(m2dbRDA)
-#anova(m2dbRDA, by = "margin")
+anova(m2dbRDA, by = "margin")
 #anova(m2dbRDA, by = "axis")
 #anova(m2.forsel, by="axis", perm.max=500)
 
@@ -954,7 +948,7 @@ A.4 <- data.frame(vegan::scores(m2dbRDA, display = "bp"))
 # Define the arrow aesthetic mapping
 arrow_map <- aes(xend = (dbRDA1*2), yend = (dbRDA2*2), x = 0, y = 0, shape = NULL, color = NULL, fill = NULL)
 label_map <- aes(x = 2*dbRDA1, y = 2*dbRDA2, label = row.names(A.4), shape = NULL, color = NULL, fill = NULL)
-arrowhead = arrow(length = unit(0.02, "npc"))
+arrowhead = arrow(length = unit(0.02, "npc"), type = "closed")
 
 #subset A4 for labeling
 A.4 <- A.4[sort(rownames(A.4)),]
@@ -972,15 +966,16 @@ A4.sub6 <- A.4[6,] #LT.
 # dbRDA plot based on species
 p_m2dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +
   geom_point(data = A.3, aes(color = Species, shape = Species), size = rel(4), alpha = 0.7, stroke = 0.5) +
-  geom_segment(arrow_map, size = rel(.8), data = A.4, color = "black", arrow = arrowhead) +
+  geom_segment(arrow_map, size = rel(.8), data = A.4[c(1,3),], color = "black", arrow = arrowhead) +
+  geom_segment(arrow_map, size = rel(.8), data = A.4[c(2,4:6),], color = "black", arrow = arrowhead, linetype = "dashed") +
   geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") + # plot vertical line
   geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") + # plot horizontal line
-  geom_text(label_map, size = rel(4), data = A4.sub1, fontface = "bold", show.legend = FALSE, label = c("Elv."), nudge_x = -0.1) +
-  geom_text(label_map, size = rel(4), data = A4.sub2, fontface = "bold", show.legend = FALSE, label = c("logACI"), nudge_y = 0.1, nudge_x = -0.1) +
-  geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI"), nudge_y = 0.1) +
-  geom_text(label_map, size = rel(4), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA"), nudge_y = 0.1, nudge_x = -0.1) +
-  geom_text(label_map, size = rel(4), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS"), nudge_y = 0.1, nudge_x = 0.2) +
-  geom_text(label_map, size = rel(4), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT"), nudge_x = 0.2) +
+  geom_text(label_map, size = rel(4), data = A4.sub1, fontface = "bold", show.legend = FALSE, label = c("Elv."), nudge_x = -0.3) +
+  geom_text(label_map, size = rel(3), data = A4.sub2, fontface = "bold", show.legend = FALSE, label = c("logACI"), nudge_y = -0.05, nudge_x = 0.4) +
+  geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI"), nudge_y = -0.2) +
+  geom_text(label_map, size = rel(3), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA"), nudge_y = -0.1, nudge_x = -0.3) +
+  geom_text(label_map, size = rel(3), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS"), nudge_y = -0.15, nudge_x = 0.2) +
+  geom_text(label_map, size = rel(3), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT"), nudge_y = 0.1, nudge_x = 0.4) +
   xlab(label = paste("dbRDA1 (", round(B$concont$importance[2,1]*100, digits = 1), "%)", sep="")) +
   ylab(label = paste("dbRDA2 (", round(B$concont$importance[2,2]*100, digits = 1), "%)", sep="")) + 
   scale_color_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
@@ -1004,8 +999,8 @@ p_m2dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +
      
 # Rearranging the order of layers so arrows are above the points.
 
-p_m2dbrda$layers <- c(p_m2dbrda$layers, p_m2dbrda$layers[[2]], p_m2dbrda$layers[[5]], p_m2dbrda$layers[[6]], p_m2dbrda$layers[[7]], p_m2dbrda$layers[[8]])
-#p_m2dbrda
+p_m2dbrda$layers <- c(p_m2dbrda$layers, p_m2dbrda$layers[[2]], p_m2dbrda$layers[[5]], p_m2dbrda$layers[[6]], p_m2dbrda$layers[[7]], p_m2dbrda$layers[[8]], p_m2dbrda$layers[[9]], p_m2dbrda$layers[[10]])
+p_m2dbrda
 
 #ggsave(filename=file.path(path, "figures/dbRDA_species.png"), plot = p_m2dbrda, dpi=600, units=c("mm"), width=150, height=150)
 
@@ -1016,15 +1011,16 @@ p_m2dbrda$layers <- c(p_m2dbrda$layers, p_m2dbrda$layers[[2]], p_m2dbrda$layers[
 # dbRDA plot based on elevation
 elev_cat_dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +
   geom_point(data = A.3, aes(color = Elevation_cat, shape = Species), size = rel(4), alpha = 0.7, stroke = 0.5) +
-  geom_segment(arrow_map, size = rel(.8), data = A.4, color = "black", arrow = arrowhead) +
+    geom_segment(arrow_map, size = rel(.8), data = A.4[c(1,3),], color = "black", arrow = arrowhead) +
+  geom_segment(arrow_map, size = rel(.8), data = A.4[c(2,4:6),], color = "black", arrow = arrowhead, linetype = "dashed") +
   geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") + # plot vertical line
   geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") + # plot horizontal line
-  geom_text(label_map, size = rel(4), data = A4.sub1, fontface = "bold", show.legend = FALSE, label = c("Elv."), nudge_x = -0.1) +
-  geom_text(label_map, size = rel(4), data = A4.sub2, fontface = "bold", show.legend = FALSE, label = c("logACI"), nudge_y = 0.1, nudge_x = -0.1) +
-  geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI"), nudge_y = 0.1) +
-  geom_text(label_map, size = rel(4), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA"), nudge_y = 0.1, nudge_x = -0.1) +
-  geom_text(label_map, size = rel(4), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS"), nudge_y = 0.1, nudge_x = 0.2) +
-  geom_text(label_map, size = rel(4), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT"), nudge_x = 0.2) +
+  geom_text(label_map, size = rel(4), data = A4.sub1, fontface = "bold", show.legend = FALSE, label = c("Elv."), nudge_x = -0.3) +
+  geom_text(label_map, size = rel(3), data = A4.sub2, fontface = "bold", show.legend = FALSE, label = c("logACI"), nudge_y = -0.05, nudge_x = 0.4) +
+  geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI"), nudge_y = -0.2) +
+  geom_text(label_map, size = rel(3), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA"), nudge_y = -0.1, nudge_x = -0.3) +
+  geom_text(label_map, size = rel(3), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS"), nudge_y = -0.15, nudge_x = 0.2) +
+  geom_text(label_map, size = rel(3), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT"), nudge_y = 0.1, nudge_x = 0.4) +
   xlab(label = paste("dbRDA1 (", round(B$concont$importance[2,1]*100, digits = 1), "%)", sep="")) +
   ylab(label = paste("dbRDA2 (", round(B$concont$importance[2,2]*100, digits = 1), "%)", sep="")) + 
   scale_color_manual(labels=c('LOW', 'MID', 'HIGH'),
@@ -1047,9 +1043,8 @@ elev_cat_dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +
   #labs(caption = "ACI = anthocyanins, LPS = leaf punch strength, LMA = leaf mass per area, LT = leaf thickness, LBI = leaf lobe index, Elv. = Elevation_m (f.a.s.l.)", hjust = 0)
      
 # Rearranging the order of layers so arrows are above the points.
-
-elev_cat_dbrda$layers <- c(elev_cat_dbrda$layers, elev_cat_dbrda$layers[[2]], elev_cat_dbrda$layers[[5]], elev_cat_dbrda$layers[[6]], elev_cat_dbrda$layers[[7]], elev_cat_dbrda$layers[[8]])
-#elev_cat_dbrda
+elev_cat_dbrda$layers <- c(elev_cat_dbrda$layers, elev_cat_dbrda$layers[[2]], elev_cat_dbrda$layers[[5]], elev_cat_dbrda$layers[[6]], elev_cat_dbrda$layers[[7]], elev_cat_dbrda$layers[[8]], elev_cat_dbrda$layers[[9]], elev_cat_dbrda$layers[[10]])
+elev_cat_dbrda
 
 double_dbrda <- ggarrange(p_m2dbrda, elev_cat_dbrda, ncol = 1, nrow = 2, 
           labels = c("A", "B"),
@@ -1059,7 +1054,6 @@ double_dbrda
 #Save the plot
 #ggsave(file.path(path, "figures/figure5.png"), plot = double_dbrda, dpi=300, units=c("mm"), width=180, height=200)
 ```
-
 
 # Figure 6
 
@@ -1209,6 +1203,7 @@ ggsave(file.path(path, "figures/figure6.png") , plot = mantel, dpi = 600, units=
 # Supplementary Material
 
 ## Figure S1
+
 ```{r}
 
 ```
