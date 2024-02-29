@@ -1000,7 +1000,7 @@ p_m2dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +
 # Rearranging the order of layers so arrows are above the points.
 
 p_m2dbrda$layers <- c(p_m2dbrda$layers, p_m2dbrda$layers[[2]], p_m2dbrda$layers[[5]], p_m2dbrda$layers[[6]], p_m2dbrda$layers[[7]], p_m2dbrda$layers[[8]], p_m2dbrda$layers[[9]], p_m2dbrda$layers[[10]])
-p_m2dbrda
+#p_m2dbrda
 
 #ggsave(filename=file.path(path, "figures/dbRDA_species.png"), plot = p_m2dbrda, dpi=600, units=c("mm"), width=150, height=150)
 
@@ -1023,7 +1023,7 @@ elev_cat_dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +
   geom_text(label_map, size = rel(3), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT"), nudge_y = 0.1, nudge_x = 0.4) +
   xlab(label = paste("dbRDA1 (", round(B$concont$importance[2,1]*100, digits = 1), "%)", sep="")) +
   ylab(label = paste("dbRDA2 (", round(B$concont$importance[2,2]*100, digits = 1), "%)", sep="")) + 
-  scale_color_manual(labels=c('LOW', 'MID', 'HIGH'),
+  scale_color_manual(name = "Elevation", labels=c('LOW', 'MID', 'HIGH'),
                     values= met.brewer("Cassatt2", n = 3 , type = "discrete", direction = -1)) +
   scale_shape_manual(values=c(15:18),labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
   stat_ellipse(aes(color = Elevation_cat), 
@@ -1044,8 +1044,9 @@ elev_cat_dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +
      
 # Rearranging the order of layers so arrows are above the points.
 elev_cat_dbrda$layers <- c(elev_cat_dbrda$layers, elev_cat_dbrda$layers[[2]], elev_cat_dbrda$layers[[5]], elev_cat_dbrda$layers[[6]], elev_cat_dbrda$layers[[7]], elev_cat_dbrda$layers[[8]], elev_cat_dbrda$layers[[9]], elev_cat_dbrda$layers[[10]])
-elev_cat_dbrda
+#elev_cat_dbrda
 
+# Joining plots
 double_dbrda <- ggarrange(p_m2dbrda, elev_cat_dbrda, ncol = 1, nrow = 2, 
           labels = c("A", "B"),
           common.legend = F, legend = "right")

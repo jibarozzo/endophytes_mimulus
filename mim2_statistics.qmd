@@ -63,6 +63,7 @@ labels <- c("LOW", "MID", "HIGH")
 #Leaf level data set
 leaf_traits <-  traits |>
   slice(-c(959:973))|> #Removing control samples
+  filter(!Unique_ID == "TRTB_L001") |>#Removing misidentified sample
   rename(LMA = LMA.mg., 
          LBI = Leaf_lobe_index,
          LPS = Leaf_toughness,
