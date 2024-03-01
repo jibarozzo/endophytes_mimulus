@@ -318,7 +318,7 @@ The authors declare no competing interests.
 # PCA using covariates to explain species richness/abundance ####
 data.pca <- leaf_traits_noB |>
   na.omit() |>
-  select(c(19:23))
+  select(c(19:23)) #Selecting only the log-transformed leaf trait columns. We use the log transformed data due to our findings of non-normality in the data. See this post for a hot take: https://stats.stackexchange.com/questions/164381/why-log-transforming-the-data-before-performing-principal-component-analysis
 
 leaf_traits.pca <- na.omit(leaf_traits_noB) 
 
@@ -343,9 +343,9 @@ pca_auto <- autoplot((pca), data = data.frame(leaf_traits.pca), # For some reaso
   geom_point(aes(fill = Species, color = Species), alpha = 0.5, size = 3) +
   geom_hline(yintercept = 0, colour = "gray45") +
   geom_vline(xintercept = 0, colour = "gray45") +
-  scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'), 
+  scale_fill_manual(labels=c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                     values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
-  scale_color_manual(labels = c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),
+  scale_color_manual(labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
   stat_ellipse(aes(color = Species), 
                geom = "path", 
@@ -897,7 +897,7 @@ p1 <- ggplot(ps_melt |>
 
   
 p1 
-ggsave(file.path(path, "figures/figure4.png") , plot = p1, dpi = 600, units=c("mm"), width=200, height=250)
+#ggsave(file.path(path, "figures/figure4.png") , plot = p1, dpi = 600, units=c("mm"), width=200, height=250)
 ```
 
 ## Figure 5
@@ -909,14 +909,14 @@ ggsave(file.path(path, "figures/figure4.png") , plot = p1, dpi = 600, units=c("m
 #| fig-width: 6
 #| fig-height: 6
 #| label: dbrda_plot
-#| fig-cap: "FEF community composition association with leaf functional traits, especially log(LBI) and Elevation, per host species. Distance-based Redundancy Analysis (dbRDA) plot of leaf functional traits by species. Each point represents a FEF community sample from one host species; colors represent host species"
+#| fig-cap: "FEF community composition association with leaf functional traits and elevation per host species. Distance-based Redundancy Analysis (dbRDA) plot of FEF community and leaf functional traits by species. Each point represents a FEF community sample from one host species; colors represent host species. Solid lines represent significant associations (*p* <0.01), while dashed lines represent non-significant associations. The length and direction of the arrows indicate the strength and direction of the association between the traits and the FEF community composition. The labels on the arrows represent the traits. The plot is based on the Bray-Curtis dissimilarity matrix."
 
 # dbRDA using Elevation as continuous variable
 m2dbRDA <- dbrda(asv_vegdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m, distance = "bray", data = nmds_traits, na.action = na.omit)
 
 #summary(m2dbRDA)
 #plot(m2dbRDA)
-anova(m2dbRDA, by = "margin")
+#anova(m2dbRDA, by = "margin")
 #anova(m2dbRDA, by = "axis")
 #anova(m2.forsel, by="axis", perm.max=500)
 

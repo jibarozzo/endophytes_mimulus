@@ -29,9 +29,14 @@ library("vegan")
 library("hillR")
 library("phyloseq")
 library("metagMisc")
+library("microbiome")
 library("iNEXT")
 library("geosphere")
 library("indicspecies")
+
+library("conflicted")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("alpha", "ggplot2")
 ```
 
 # File Path
@@ -1012,7 +1017,7 @@ ant_arranged_with_caption
 # PCA using covariates to explain species richness/abundance ####
 data.pca <- leaf_traits_noB |>
   na.omit() |>
-  select(c(19:23))
+  select(c(19:23)) #Selecting only the log-transformed leaf trait columns. We use the log transformed data due to our findings of non-normality in the data. See this post for a hot take: https://stats.stackexchange.com/questions/164381/why-log-transforming-the-data-before-performing-principal-component-analysis
 
 leaf_traits.pca <- na.omit(leaf_traits_noB) 
 
@@ -1037,9 +1042,9 @@ pca_auto <- autoplot((pca), data = data.frame(leaf_traits.pca), # For some reaso
   geom_point(aes(fill = Species, color = Species), alpha = 0.5, size = 3) +
   geom_hline(yintercept = 0, colour = "gray45") +
   geom_vline(xintercept = 0, colour = "gray45") +
-  scale_fill_manual(labels=c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'), 
+    scale_fill_manual(labels=c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                     values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
-  scale_color_manual(labels = c('*M. guttatus*', '*M. laciniatus*', '*M. nasutus*'),
+  scale_color_manual(labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
   stat_ellipse(aes(color = Species), 
                geom = "path", 
@@ -1234,7 +1239,7 @@ hill0_diversity <- ggplot(data = plant_traits  |>
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                       values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
-   labs(y =  "\U1D492 = 0"), x = "Elevation (m.a.s.l.)", col = "") + 
+   labs(y =  "\U1D492 = 0", x = "Elevation (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
          strip.text = element_text(face = "italic", size = 14),
@@ -1291,7 +1296,7 @@ hill2_diversity <- ggplot(data = plant_traits  |>
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", 
                                           direction = c(-1))) + 
-  labs(y = "\U1D492 = 2"), x = "Elevation (m.a.s.l.)", col = "") +
+  labs(y = "\U1D492 = 2", x = "Elevation (m.a.s.l.)", col = "") +
   #labs(y = expression("*q* = 1"), x = "Elevation (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
@@ -1308,7 +1313,7 @@ hill2_diversity <- ggplot(data = plant_traits  |>
 
 hill2_diversity
 
-ggsave(filename = file.path(path, "figures/invsimpson_elevation.png"), plot = hill2_diversity, dpi=300, units=c("mm"), width=250, height=150)
+#ggsave(filename = file.path(path, "figures/invsimpson_elevation.png"), plot = hill2_diversity, dpi=300, units=c("mm"), width=250, height=150)
 
 # Linear models per species
 # Linear model summary
@@ -1393,7 +1398,7 @@ hill1_species <- ggplot(data = plant_traits  |>
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
-   labs(y =  "\U1D492 = 1"), x = "", col = "") + 
+   labs(y =  "\U1D492 = 1", x = "", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
          strip.text = element_text(face = "italic", size = 14),
@@ -1429,7 +1434,7 @@ hill2_species <- ggplot(data = plant_traits  |>
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
-   labs(y =  "\U1D492 = 2"), x = "", col = "") + 
+   labs(y =  "\U1D492 = 2", x = "", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
          strip.text = element_text(face = "italic", size = 14),
@@ -1489,7 +1494,7 @@ hill0_beta <-  ggplot(plant_traits |>
   stat_compare_means(comparisons = my_comparisons3,
                      method = "wilcox.test", 
                      label = "p.signif") +
-  labs(y = "\U1D492 = 0"), x = "") +
+  labs(y = "\U1D492 = 0", x = "") +
   guides(fill = guide_legend(title = "Elevation"), shape = guide_legend(title = "Species"))
 
 hill0_beta
@@ -1523,7 +1528,7 @@ hill1_beta <- ggplot(plant_traits |>
   stat_compare_means(comparisons = my_comparisons3,
                      method = "wilcox.test", 
                      label = "p.signif") +
-  labs(y = "\U1D492 = 1"), x = "") +
+  labs(y = "\U1D492 = 1", x = "") +
   guides(fill = guide_legend(title = "Elevation"), shape = guide_legend(title = "Species"))
 
 hill1_beta
@@ -1557,7 +1562,7 @@ hill2_beta <- ggplot(plant_traits |>
   stat_compare_means(comparisons = my_comparisons3,
                      method = "wilcox.test", 
                      label = "p.signif") +
-  labs(y = "\U1D492 = 2"), x = "") +
+  labs(y = "\U1D492 = 2", x = "") +
   guides(fill = guide_legend(title = "Elevation"), shape = guide_legend(title = "Species"))
 
 hill2_beta
@@ -1833,7 +1838,7 @@ ant_arranged_with_caption
 
 ```{r, asv_barplot}
 # Just OTUs without singletons ps_clean_3
-ps_melt <- psmelt(ps_clean_3) # Melting data to create accurate relative abunddance plot
+ps_melt <- psmelt(ps_clean_3)
 
 # Phylum level
 p1 <- ggplot(ps_melt |>
@@ -1867,17 +1872,66 @@ tb <- ps_melt |>
   filter(!is.na(Phylum), !sample_Species == "B") %>%
   group_by(sample_Species, Elevation_cat, Phylum) %>%
   # Add abundances within each phylum and sample
-  summarize_at("Abundance", sum) 
+  summarize_at("Abundance", sum) |>
+  mutate(Proportion = mean(Abundance)) 
   # Get phylum proportions within each sample
   summarize_at("Abundance", ~ . / sum(.)) 
   # Get the mean proportion each phylum across samples within the `Sex` (Male/Female) variable
   mutate(Proportion = mean(Abundance)) 
   
   str(tb)
-  ggplot(tb, aes(x = sample_Species, y = Abundance)) +
+  ggplot(tb, aes(x = sample_Species, y = Proportion)) +
   geom_bar(aes(fill = Phylum, color = Phylum), stat="identity", position = "dodge") 
+  geom_errorbar( aes(x=sample_Species, ymin=Proportion-sd(Proportion), ymax=Proportion+sd(Proportion)), width=0.4, colour="orange", alpha=0.9, size=1.3) +
 
+  scale_fill_manual(values= met.brewer("Lakota", n = 6 , type = "discrete", override.order = TRUE)) 
+  
+  
+
+test <- ggplot(ps_melt,
+                aes(x = Phylum, y = mean_abundance, color = Phylum, fill = Phylum)) +
+  geom_col(stat = "identity", position = "dodge") +
+  geom_errorbar(aes(ymin = mean_abundance - se, ymax = mean_abundance + se), position = "dodge", color = "black")
+
+# Uncomment the following line if you want to facet by sample_Species
+# test + facet_grid(~sample_Species)
+
+test
+
+ps_melt <- ps_melt %>%
+                 filter(!sample_Species == "B") %>%
+                 group_by(Phylum, Elevation_cat) %>%
+                 mutate(mean_abundance = mean(Abundance), 
+                        se = sd(Abundance)/sqrt(length(Abundance)))
+
+ggbarplot(ps_melt, x = "Phylum", y = "mean_abundance", 
+  add = c("mean_se"),
+  color= "sample_Species", 
+  #color = "black",
+  position = position_dodge(0.8),
+  error.plot = "errorbar",
+  ) + 
+  geom_hline(yintercept = mean(ps_melt$mean_abundance), linetype = 2)+
+  #stat_compare_means(method = "anova") +
+  stat_compare_means(aes(group = "sample_Species"),label = "p.signif", method = "t.test",
+                     #comparisons = list(c("N", "L"), c("N", "G"), c("L", "G")), 
+                     hide.ns = TRUE)    
+compare_means(mean_abundance ~ sample_Species,
+         data = ps_melt,
+         group.by = "Phylum",
+         method = "wilcox.test",
+         p.adjust.method = "BH",
+  paired = FALSE,
+  alternative = "two.sided", 
+  mu = 0, 
+  var.equal = FALSE,
+  conf.level = 0.95)
+species_list <- names(as.list(distinct(as.data.frame(ps_melt$sample_Species))))
 ```
+
+
+
+
 
 ### NMDS
 
