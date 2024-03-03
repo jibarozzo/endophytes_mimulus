@@ -16,9 +16,9 @@ library("tidyverse")
 library("data.table")
 library("ggpubr")
 library("ggfortify")
-library("ggthemes")
 library("ggtext")
-library("ggiraphExtra")
+library("ggpmisc")
+library("broom")
 library("MetBrewer")
 library("rstatix")
 
@@ -189,14 +189,14 @@ nas_names <- plant_traits |>
 
 #####################################################
 # Formatting formula for p value
-format.p <- function(p, precision = 0.001) {
+format.p <- function(p, precision = .001) {
   digits <- -log(precision, base = 10)
   p <- formatC(p, format = 'f', digits = digits)
-  if (p < 0.001) {
+  if (p < .001) {
     p = paste0('< ', precision)}
-  if (p >= 0.001) {
+  if (p >= .001) {
     p = paste0('= ', p)    }
-  sub("0", "0", p)
+  sub("", "", p)
 }
 ######################################################
 
@@ -1360,7 +1360,7 @@ hill0_species <- ggplot(data = plant_traits  |>
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
-   labs(y =  "\U1D492 = 0"), x = "", col = "") + 
+   labs(y =  "\U1D492 = 0", x = "", col = "") + 
    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
          strip.text = element_text(face = "italic", size = 14),
@@ -1839,6 +1839,9 @@ ant_arranged_with_caption
 ```{r, asv_barplot}
 # Just OTUs without singletons ps_clean_3
 ps_melt <- psmelt(ps_clean_3)
+plot_bar(ps_clean_3, x = "sample_Species", fill = "Phylum", facet_grid = "Elevation_cat")
+
+hist(ps_melt$Abundance)
 
 # Phylum level
 p1 <- ggplot(ps_melt |>
