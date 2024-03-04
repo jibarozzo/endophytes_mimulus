@@ -2009,10 +2009,10 @@ m0 <- dbrda(asv_vegdist ~ 1, data = nmds_traits) #Model with intercept only.
 m0
 m0 <- na.omit(m0)
 m1 <- dbrda(asv_vegdist ~ ., data = nmds_traits, na.action = na.omit) # Model with all explanatory variables.
-m1
+m1 <- 
 
-# Model with species, leaf traits and elevation. ####
-m2 <- dbrda(asv_vegdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m,  data = nmds_traits, na.action = na.omit)
+# Model with species, site, leaf traits and elevation. ####
+m2 <- dbrda(asv_vegdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_cat + Site + Species,  data = nmds_traits, na.action = na.omit)
 m2
 m2 <- na.omit(m2)
 Anova(m2)
@@ -2036,8 +2036,7 @@ m2.forsel <-  ordistep(m1, scope = formula(m2), Pin = 0.5, Pout = 0.05 ,trace = 
 #anova(m2.forsel, by = "margin") # test for sign. environ. variables 
 #anova(m2.forsel, by = "axis") # test axes for significance
 #anova(m2.forsel, by="axis", perm.max=500) #tests for sign. variables, but adds them sequentially.
-
-#m3 taking E_load out. Again not relevant. What I want to know is the influence the leaf traits have on the fungal community. 
+ 
 m3.forsel <- ordistep(m0, scope = formula(m3), Pin = 0.5, Pout = 0.1, trace = T, pstep = 1000, direction = "forward")
 #m3.forsel$terms
 #summary(m3.forsel)
@@ -2045,8 +2044,6 @@ m3.forsel <- ordistep(m0, scope = formula(m3), Pin = 0.5, Pout = 0.1, trace = T,
 #anova(m3.forsel, by = "margin") 
 #anova(m3.forsel, by = "axis")
 #anova(m3.forsel, by="axis", perm.max=500) 
-
-## Model 3 and 5 keep species and trial type as the most significant explanatory variables. Yes, the community composition will be different across spcies but this is due to the inherent leaf traits of each species. Not "species" itself. 
 ```
 
 ##### Plot dbRDA
