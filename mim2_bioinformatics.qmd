@@ -1246,9 +1246,10 @@ contaminants and remove them.
 ```{r, ASV_TAXA_tables}
 library("phyloseq")
 library("decontam")
+library("microbiome")
 library("data.table")
 library("tidyverse")
-out_dir <- file.path("/home/baponte/Boxx/Dissertation/Mimulus/Data/CH2/bioinformatics")
+out_dir <- file.path("../mim2_bioinformatics")
 taxa <- read.csv(file.path(out_dir, "clean_data/taxonomy/assign_tax_8450.csv"))
 
 # Adding "ASV_" to the taxonomical assignment
@@ -1375,7 +1376,7 @@ TAX <- tax_table(taxa) #726 ASVs (raw)
 dna_data <- read.csv(file.path(out_dir, "field_data/mim2_dna_pcr.csv"))
 
 dna_data <- dna_data |>
-  select(c(7, 15, 22)) |>
+  dplyr::select(c(7, 15, 22)) |>
   filter(!Unique_ID == "S1",
          !Unique_ID == "S2", 
          !Unique_ID == "#NAME?") |>
@@ -1402,12 +1403,11 @@ dna_data <- dna_data |>
 
 SAMP <- sample_data(dna_data)
 class(SAMP)
-sample.names(SAMP)
+sample_names(SAMP)
 
 
 #Phyloseq main object
 ps <- phyloseq(ASV, TAX, SAMP)
-
 ```
 
 #### Phyloseq RAW summary statistics
@@ -1431,10 +1431,10 @@ raw_relabundance_phyla <- tax_glom(ps2,
                  taxrank = "Phylum", 
                  NArm = FALSE, bad_empty=c(NA, "", " ", "\t")) |>
   phyloseq_to_df() |>
-  select(-OTU) |> #Remove OTU column. It represents the first ASV of Phylum
+  dplyr::select(-OTU) |> #Remove OTU column. It represents the first ASV of Phylum
   mutate(total_reads_phy = rowSums(across(where(is.numeric))),
          relabun_reads_phy = total_reads_phy/sum(total_reads_phy)*100) |> #Relative abundance of phyla
-  select(Kingdom, Phylum, total_reads_phy, relabun_reads_phy) #Select columns of interest)
+  dplyr::select(Kingdom, Phylum, total_reads_phy, relabun_reads_phy) #Select columns of interest)
 
 
 # How many samples with ASVs per phyla are there before decontamination?
@@ -1448,6 +1448,9 @@ percent_phyla_raw <- phyloseq_ntaxa_by_tax(
   mutate(sum = sum(N.OTU)) |>
   group_by(Phylum) |>
   summarise(occurance_in_samples = n())# Count the number of ASV per phylum
+
+# Micorobiome packge summary
+summarize_phyloseq(ps2) #Microbiome package summary
 ```
 
 **Check which sample are actually lost in the cleaning and
@@ -1723,6 +1726,7 @@ ntaxa(ps_clean_3) # The result is 231 taxa in 174 samples.
 
 # Relative abundance calculation ####
 rel_abund_ps_clean <- transform_sample_counts(ps_clean_3, function(x)x/sum(x))
+# microbiome::transform(ps_clean_3, "compositional") #This is the same as the line above.
 
 #Eliminating samples that have 0 reads of any taxa
 ps_clean_3 <- prune_samples(sample_sums(ps_clean_3) > 0, ps_clean_3)
@@ -1766,6 +1770,9 @@ percent_phyla_clean <- phyloseq_ntaxa_by_tax(
   mutate(sum = sum(N.OTU)) |>
   group_by(Phylum) |>
   summarise(occurance_in_samples = n())# Count the number of ASV per phylum
+
+# Micorobiome packge summary
+summarize_phyloseq(ps_clean_3) #Microbiome package summary
 ```
 
 The removal of singletons and samples with no reads of any taxa resulted
