@@ -59,7 +59,7 @@ path <- "../mim2_bioinformatics" # Change accordingly
 
 ## Cleaning and Shaping
 
-This section cleans and shapes the raw data into two main data frames: `leaf_traits` and `plant_traits`. The first has all data point for leaf trait measurements at the leaf level (raw) and the second one represents the average per plant while incorporating FEF community data. The FEF community data is only available for 160/320 samples. For the downstream analyses, we eliminated *M. bicolor* or species "B" from the leaf trait data set and the phyloseq object. The removal of this is due to a small sample size for leaf trait measurements and even smaller for FEF community data (*n* = 3). The removal is not explicit in `plant_traits` it is only explicit in the subset `leaf_traits_noB` and and phyloseq objects. This is important for the rarefaction of sequence dept and later on in the `asv_matrix` that gives way for community analyses in [Community Diversity]. I include a custom function for p-value formatting.
+This section cleans and shapes the raw data into two main data frames: `leaf_traits` and `plant_traits`. The first has all data point for leaf trait measurements at the leaf level (raw) and the second one represents the average per plant while incorporating FEF community data. The FEF community data is only available for 160/320 samples. For the downstream analyses, we eliminated *M. bicolor* or species "B" from the leaf trait data set and the phyloseq object (see `mim2_bioinformatics.qmd`). The removal of this is due to a small sample size for leaf trait measurements and even smaller for FEF community data (*n* = 3). The removal is not explicit in `plant_traits` it is only explicit in the subset `leaf_traits_noB` and and phyloseq objects. This is important for the rarefaction of sequence dept and later on in the `asv_matrix` that gives way for community analyses in [Community Diversity]. I include a custom function for p-value formatting.
 
 ```{r, cleaning_chaping_data}
 #| echo: false
@@ -137,24 +137,10 @@ plant_traits <- plant_traits |>
 # Load Phyloseq object cleaned of singletons (231 ASVs)
 ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.rds"))
 ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.csv"))
-ps_clean_3_df <- ps_clean_3_df[, -1]
 
 # Load Relative abundance phyloseq
 rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
 rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
-
-# Remove species B from the phyloseq object
-# bicolor <- c("SDSB_B001", "SDSB_B002", "SDSB_B005")
-# Sample <- rownames(sample_data(ps_clean_3@sam_data)) 
-# 
-# ps_clean_3 <- subset_samples(ps_clean_3, !Sample %in% bicolor)
-# rel_abund_ps_clean <- subset_samples(rel_abund_ps_clean, !Sample %in% bicolor)
-
-# saveRDS(ps_clean_3, file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.rds"))
-# ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
-#write.csv(ps_clean_3_df, file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.csv"))
-# saveRDS(rel_abund_ps_clean, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
-# write.csv(rel_ps_clean_df, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
 
 
 #### Leaf traits with community data ####
@@ -208,7 +194,7 @@ ps_melt <- ps_clean_3 |>
 #write.csv(ps_melt, file.path(path, "clean_data/statistics/ps_melt.csv"))
 
 #### Load master files ####
-leaf_traits <- readRDS(file.path(path, "clean_data/statistics/leaf_traits.rds"))
+leaf_traits <- readRDS(file.path(path, "clean_data/statistics/leaf_traits.rds")) # Post all the processing aboove, lod from here.
 plant_traits <- readRDS(file.path(path, "clean_data/statistics/plant_traits.rds"))
 
 # Samples with species to subset/filter matrices downstream
@@ -1298,6 +1284,74 @@ pseq_rrf <- phyloseq_mult_raref(ps_clean_3,
                                 iter = 1000,
                                 replace = FALSE,
                                 multithread = TRUE)
+alpha_df <- alphadivDF(pseq_rrf5, diversity = c("shannon", "simpson", "invsimpson")) # Alpha diversity indices
+repotu_df(pseq_rrf5) # Report of the rarefaction process
+div_values <- vegan::diversity(t(repotu_df(pseq_rrf5)), index = "shannon")
+#Replicate OTU Table to Dataframe - Single Library Size
+repotu_df <- function(x) {
+
+  newdat <- lapply(x, otu_table)
+
+  finaldat <- matrix(ncol = ncol(newdat[[1]]) * length(newdat), nrow = nrow(newdat[[1]]),
+    dimnames = list(rownames(newdat[[1]]),
+      paste0(rep(seq_len(length(newdat)), each = ncol(newdat[[1]])), "-",
+        rep(colnames(newdat[[1]]), times = length(newdat)))))
+
+  for (i in seq_along(newdat)) {
+    finaldat[, (1 + (i - 1) * ncol(newdat[[1]])):(i * ncol(newdat[[1]]))] <- newdat[[i]]
+  }
+
+  finaldat
+
+}
+
+alphadivDF <- function(x, diversity="all", zeroes=TRUE){
+  md <- sample_data(x[[1]])
+  div <- microbiome::diversity(t(repotu_df(x)), index=diversity)
+  final <- suppressWarnings(cbind(md, DiversityIndex = div))
+  final
+}
+
+alphadivDF <- function(x, diversity = c("shannon", "simpson", "invsimpson")) {
+  md <- sample_data(x[[1]])
+  
+  div_df_list <- lapply(diversity, function(index) {
+    div_values <- vegan::diversity(t(repotu_df(x)), index = index)
+    if (!is.matrix(div_values)) {
+      div_values <- as.matrix(div_values, ncol = 1, dimnames = list(rownames(div_values), NULL))
+    }
+    colnames(div_values) <- paste0(index, "_", colnames(div_values))
+    return(data.frame(Unique_ID = rownames(div_values), div_values, stringsAsFactors = FALSE))
+  })
+  
+  final <- reduce(div_df_list, function(df1, df2) inner_join(df1, df2, by = "Unique_ID"))
+  final <- cbind(md, final)
+  
+  return(final)
+}
+
+alphadivDF(pseq_rrf5, diversity = c("shannon", "simpson", "invsimpson")) # Alpha diversity indices
+
+ggplot(alpha_df, aes(x = Species, y = simpson_, color = Species)) +
+  geom_jitter()+
+    geom_crossbar(stat = "summary",
+                fun = mean,
+                fun.max = mean,
+                fun.min = mean,
+                fatten = 1.5, width = 0.8) 
+  # geom_smooth(method = "lm", se = FALSE) +
+  # facet_wrap(~DiversityIndex, scales = "free_y") +
+  # theme_classic(base_size = 12) +
+  # theme(legend.title = element_text(face = "bold"),
+  #       panel.border = element_rect(linetype = "blank", fill = NA),
+  #       legend.text = element_markdown(size = 12), #Make legend text italic
+  #       axis.text.x = element_text(size = 14),
+  #       legend.position = "bottom") +
+  # labs(y = "Diversity Index", x = "Elevation (m.a.s.l.)") +
+  # scale_y_continuous(expand = c(0.07, 0.07)) +
+  # scale_color_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
+  #                   values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1)))
+
 # This function will resample an OTU table such that all samples have the same library size. Resampling will be performed multiple times.
 
 alpha_pseq <- phyloseq_mult_raref_div(pseq_rrf, # Estimating alpha diversity from rarefied datasets

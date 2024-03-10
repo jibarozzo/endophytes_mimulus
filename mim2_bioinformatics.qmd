@@ -1250,6 +1250,7 @@ library("microbiome") # Miscellaneous functions for microbiome analysis
 library("metagMisc") # Miscellaneous functions for microbiome analysis
 library("data.table")
 library("tidyverse")
+set.seed(123)
 out_dir <- file.path("../mim2_bioinformatics")
 taxa <- read.csv(file.path(out_dir, "clean_data/taxonomy/assign_tax_8450.csv"))
 
@@ -1260,7 +1261,7 @@ taxa <- taxa |>
   setDT(keep.rownames = "ASV_ID")
 
 # Save file
-saveRDS(taxa, file.path(out_dir, "clean_data/taxonomy/assign_tax_8450.rds"))
+#saveRDS(taxa, file.path(out_dir, "clean_data/taxonomy/assign_tax_8450.rds"))
 # Read file
 taxa <- readRDS(file.path(out_dir, "clean_data/taxonomy/assign_tax_8450.rds"))
 
@@ -1378,9 +1379,7 @@ dna_data <- read.csv(file.path(out_dir, "field_data/mim2_dna_pcr.csv"))
 
 dna_data <- dna_data |>
   dplyr::select(c(7, 15, 22)) |>
-  filter(!Unique_ID == "S1",
-         !Unique_ID == "S2", 
-         !Unique_ID == "#NAME?") |>
+  filter(!Unique_ID == c("S1", "S2", "#NAME?")) |>
   distinct() |>
   slice(-197) |> #Removes one sneaky sample.
   mutate(concentration = as.numeric(DNA_conc._ng.µl)) |>
@@ -1578,7 +1577,7 @@ for(r in row){
 
 # Remove controls from dataframe and makes a text file to paste into existing excel sheet
 decontaminated_p1 <- plate1[!rownames(plate1) %in% cont2, ]
-write.table(decontaminated_p1, file.path(out_dir,"ASV_tables/P1_Mim8450_negsblanks.tsv"), sep="\t") 
+#write.table(decontaminated_p1, file.path(out_dir,"clean_data/ASV_tables/P1_Mim8450_negsblanks.tsv"), sep="\t") 
 ```
 
 ```{r, Plate2}
@@ -1618,7 +1617,7 @@ for(r in row){
 
 # Remove controls from dataframe and makes a text file to paste into exisitng excel sheet
 decontaminated_p2 <- plate2[!rownames(plate2) %in% cont2, ]
-write.table(decontaminated_p2, file.path(out_dir,"ASV_tables/P2_Mim8450_negsblanks.tsv"), sep="\t")
+#write.table(decontaminated_p2, file.path(out_dir,"clean_data/ASV_tables/P2_Mim8450_negsblanks.tsv"), sep="\t")
 ```
 
 ### Removal ASV sequences that represent less than 0.1% of the read in samples.
@@ -1631,11 +1630,11 @@ write.table(decontaminated_p2, file.path(out_dir,"ASV_tables/P2_Mim8450_negsblan
 ##Saving decontaminated files as one.
 
 all_decontaminated <- bind_rows(decontaminated_p1, decontaminated_p2)
-write.csv(all_decontaminated,file.path(out_dir , "clean_data/ASV_tables/ASVs_8450_decont_blankandnegs.csv"))
+#write.csv(all_decontaminated,file.path(out_dir , "clean_data/ASV_tables/ASVs_8450_decont_blankandnegs.csv"))
 
 asv.decon <- t(all_decontaminated)
 asv.decon <- as.data.frame(asv.decon)
-write.csv(asv.decon, file.path(out_dir , "clean_data/ASV_tables/ASVs_8450_toFilt_10_percent.csv")) ## in the format to remove <10% OTUs -- see below
+#write.csv(asv.decon, file.path(out_dir , "clean_data/ASV_tables/ASVs_8450_toFilt_10_percent.csv")) ## in the format to remove <10% OTUs -- see below
 
 #### Script to remove < 0.10% abundance per sample #### From Shuzo Oita
 ####################################################
@@ -1657,6 +1656,7 @@ asv_10[ , i] <- apply(asv_10[ , i],2,
 
 #write.csv(asv_10, file.path(out_dir, "clean_data/ASV_tables/ASVs_8450_cleaned_10_percent.csv"))
 #saveRDS(asv_10, file.path(out_dir, "clean_data/ASV_tables/ASVs_8450_cleaned_10_percent.rds"))
+asv_10 <- readRDS(file.path(out_dir, "clean_data/ASV_tables/ASVs_8450_cleaned_10_percent.rds"))
 ```
 
 We end up with 688 ASVs in 176 samples after removing those that
@@ -1677,7 +1677,7 @@ asv_filter <- rownames(asv_10) #Using our cleaned ASV table to filter out the ta
 
 taxa <- taxa |>
   data.frame() |>
-  rownames_to_column(var = "ASV_ID") |>
+  #rownames_to_column(var = "ASV_ID") |>
   filter(ASV_ID %in% asv_filter) |>
   column_to_rownames(var = "ASV_ID") |>
   as.matrix()
@@ -1791,14 +1791,7 @@ phyloseq_prevalence_plot(
   point_alpha = 0.7,
   showplot = T
 )
-
 ```
-
-```{r, clean_summary}
-
-
-```
-
 
 The removal of singletons and samples with no reads of any taxa resulted
 in 231 ASVs in 160 samples. We have lost 14 samples in the process. It looks like good coverage for all/many of the samples.
@@ -1815,16 +1808,36 @@ downstream analyses.
 ```{r, phyloseq_to_df}
 # Phyloseq object to data frames 
 # Cleaned: no singletons
+# Saving phyloseq with not relative abundance calculated
+ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
+  rename(ASV = OTU)
+#write.csv(ps_clean_3_df,file.path(out_dir, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.csv"))
 
-rel_ps_clean_df <- phyloseq_to_df(rel_abund_ps_clean, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
+# Relative abundance calculated
+rel_ps_clean_df <- phyloseq_to_df(rel_abund_ps_clean, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
+  rename(ASV = OTU)
 
 #Replacing forced NaNs when turned into df
 rel_ps_clean_df  <- replace(rel_ps_clean_df , rel_ps_clean_df  == "NaN", 0) 
-write.csv(rel_ps_clean_df, file.path(out_dir, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.csv"))
+#write.csv(rel_ps_clean_df, file.path(out_dir, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.csv"))
 
-# Saving phyloseq with not relative abundance calculated
-ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
-#write.csv(ps_clean_3_df,file.path(out_dir, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.csv"))
+
+# Remove species B from the phyloseq object
+bicolor <- c("SDSB_B001", "SDSB_B002", "SDSB_B005")
+Sample <- rownames(sample_data(ps_clean_3@sam_data))
+
+ps_clean_3 <- subset_samples(ps_clean_3, !Sample %in% bicolor)
+rel_abund_ps_clean <- subset_samples(rel_abund_ps_clean, !Sample %in% bicolor)
+
+
+ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
+  rename(ASV = OTU)
+
+#saveRDS(ps_clean_3, file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.rds"))
+#write.csv(ps_clean_3_df, file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.csv"))
+
+#saveRDS(rel_abund_ps_clean, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
+#write.csv(rel_ps_clean_df, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
 ```
 
 Now we have the objects from `phyloseq` saved as R objects as well as
