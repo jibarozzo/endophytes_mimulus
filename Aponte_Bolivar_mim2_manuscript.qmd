@@ -114,32 +114,16 @@ path <- "../mim2_bioinformatics" # Change accordingly
 
 #### Load leaf traits master files ####
 traits <- read.csv(file.path(path, "field_data/mim2_leaf_traits_field_survey.csv")) #Raw file just in case
+
 leaf_traits <- readRDS(file.path(path, "clean_data/statistics/leaf_traits.rds"))
 
 plant_traits <- readRDS(file.path(path, "clean_data/statistics/plant_traits.rds"))
 
+plant_traits_rf <- readRDS(file.path(path, "clean_data/statistics/plant_traits_rf.rds")) #Substitues ps_melt df
+
 #Removing species B
 leaf_traits_noB <- leaf_traits |>
   filter(!Species == "B")
-
-# Samples with species to subset/filter matrices downstream
-# M. laciniatus
-lac_names <- plant_traits |>
-  slice(1:160) |> # Only selecting observations with ASV data 
-  filter(Species == "L") |>
-  pull(Unique_ID) 
-
-# M. guttatus
-gut_names <- plant_traits |> 
-  slice(1:160) |> # Only selecting observations with ASV data 
-  filter(Species == "G") |>
-  pull(Unique_ID)
-
-# M. nasutus
-nas_names <- plant_traits |> 
-  slice(1:160) |> # Only selecting observations with ASV data 
-  filter(Species == "N") |>
-  pull(Unique_ID)
 
 #### Phyloseq objects ####
 #Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data.
@@ -154,43 +138,52 @@ rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_rela
 rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.csv"))
 
 # Load ps_melt
-ps_melt <- readRDS(file.path(path, "clean_data/statistics/ps_melt.rds"))
+#ps_melt <- readRDS(file.path(path, "clean_data/statistics/ps_melt.rds"))
 
 #### Matrices ####
+# Initial matrices, before rarefaction
 # ASV abundance matrix
 asv_matrix <- ps_clean_3_df |>
-  select(!c(2:8, SDSB_B001, SDSB_B002, SDSB_B005)) |>#Removing samples from species "B"
-  column_to_rownames(var = "OTU") |>
+  select(!c(1,3:9))|>
+  #select(contains(c("ASV",names_rarefy))) |>
+  column_to_rownames(var = "ASV") |>
   as.matrix()
-# Results in 157 x 157 matrix
+# Results in 231 x 157 matrix
 
-# Names of the samples
-names_list <- colnames(asv_matrix)
-
-# Bray-Curtis dissimilarity matrix
-asv_vegdist <- vegdist(t(asv_matrix), method = "bray", binary = FALSE, upper = FALSE) |>
+#Bray-Curtis dissimilarity matrix rarefied to 1000 reads
+set.seed(433)
+asv_avgdist <- avgdist(t(asv_matrix), 
+                       sample = 750,
+                       dmethod = "bray",
+                       meanfun = mean,
+                       iterations = 100,
+                       diag =  FALSE, 
+                       upper = FALSE) |>
   as.matrix()
+
+# Rarefied data frame names
+names_rarefy <- colnames(asv_avgdist) # Rarefied data frame names from avgdist
 
 # Adding column and rownames
-rownames(asv_vegdist) <- names_list
-colnames(asv_vegdist) <- names_list
+rownames(asv_avgdist) <- names_rarefy
+colnames(asv_avgdist) <- names_rarefy
 
 # Geographical matrix
 #geo_matrix <- distm(plant_traits[,c("Longitude", "Latitude")], fun = distHaversine)
 geo_distm <- distm(plant_traits |>
-                      filter(Unique_ID %in% names_list) |>
+                      filter(Unique_ID %in% names_rarefy) |>
                      # column_to_rownames(var = "Unique_ID") |>
                       select(Longitude, Latitude), fun = distVincentyEllipsoid)
                       
 # Adding column and rownames
-rownames(geo_distm) <- names_list
-colnames(geo_distm) <- names_list
+rownames(geo_distm) <- names_rarefy
+colnames(geo_distm) <- names_rarefy
 # Converting to distance object
 #geo_dist <- as.dist(geo_matrix)
 
 # Subset data set for NMDS and dbRDA plot
 nmds_traits <- plant_traits |>
-  filter(Unique_ID %in% names_list)
+  filter(Unique_ID %in% names_rarefy)
 
 
 #### Summary stats about the data ####
@@ -1128,14 +1121,21 @@ p_m2dbrda
 #| label: mantel_plot
 #| fig-cap: "Dissimilarity of FEF communities associates with *Mimulus* as a function of geographic distance per site. Data represent pairwise Bray-Curtis dissimilarity among sites. A) Fefe community dissimilarity in considering all host species. B) FEf community dissimilarity by host species. Blue filled points correspond to *M. laciniatus*, green filled to *M. nasutus*, and yellow to *M. guttatus*."
 
+# remove_upper_triangle <- function(mat) {
+#   mat[upper.tri(mat)] <- NA
+#   return(mat)
+# }
+
 # Prepare the data for correlation plot
 # Longer format
-asv_long <- asv_vegdist |>
+asv_long <- asv_avgdist |>
   as_tibble(rownames = "A") |>
+  #remove_upper_triangle() |>
   pivot_longer(-A, names_to = "B", values_to = "bray_diss")
 
 geo_long <- geo_distm |>
   as_tibble(rownames = "A") |>
+  #remove_upper_triangle() |>
   pivot_longer(-A, names_to = "B", values_to = "geo_dist")
 
 # Merge the two dataframes
@@ -1146,19 +1146,28 @@ asv_geo_matrix_long <- inner_join(asv_long, geo_long, by = c("A", "B")) |>
 # Mantel test
 # All data points
 set.seed(859)
-abund_geo  <- mantel(asv_vegdist, geo_distm, method = "spearman", permutations = 999, na.rm = TRUE)
+abund_geo  <- mantel(asv_avgdist, geo_distm, method = "spearman", permutations = 999, na.rm = TRUE)
 #abund_geo
 
 # Mantel test by species
 # M. laciniatus
+
+# Samples with species to subset/filter matrices downstream
+# M. laciniatus
+lac_names_rfy <- plant_traits |>
+  slice(1:160) |> # Only selecting observations with ASV data 
+  filter(Unique_ID %in% names_rarefy,
+    Species == "L") |>
+  pull(Unique_ID) 
+
 # Subset the data
 lac_mantel  <- mantel(asv_long |> # Subset the data
-                       filter(A %in% lac_names, B %in% lac_names) |>
+                       filter(A %in% lac_names, B %in% lac_names_rfy) |>
                        pivot_wider(names_from = B, values_from = bray_diss) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
                      geo_long |> # Subset the data
-                       filter(A %in% lac_names, B %in% lac_names) |>
+                       filter(A %in% lac_names, B %in% lac_names_rfy) |>
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
@@ -1166,13 +1175,18 @@ lac_mantel  <- mantel(asv_long |> # Subset the data
 #lac_mantel
 
 # M. nasutus
+nas_names_rfy <- plant_traits |> 
+  slice(1:160) |> # Only selecting observations with ASV data 
+  filter(Unique_ID %in% names_rarefy,
+         Species == "N") |>
+  pull(Unique_ID)
 nas_mantel  <- mantel(asv_long |> # Subset the data
-                       filter(A %in% nas_names, B %in% nas_names) |>
+                       filter(A %in% nas_names, B %in% nas_names_rfy) |>
                        pivot_wider(names_from = B, values_from = bray_diss) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(), 
                       geo_long |> # Subset the data
-                       filter(A %in% nas_names, B %in% nas_names) |>
+                       filter(A %in% nas_names, B %in% nas_names_rfy) |>
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(), 
@@ -1180,14 +1194,19 @@ nas_mantel  <- mantel(asv_long |> # Subset the data
 #nas_mantel
 
 # M. guttatus
+gut_names_rfy <- plant_traits |> 
+  slice(1:160) |> # Only selecting observations with ASV data 
+  filter(Unique_ID %in% names_rarefy,
+         Species == "G") |>
+  pull(Unique_ID)
 # Subset the data
 gut_mantel  <- mantel(asv_long |> # Subset the data
-                       filter(A %in% gut_names, B %in% gut_names) |>
+                       filter(A %in% gut_names, B %in% gut_names_rfy) |>
                        pivot_wider(names_from = B, values_from = bray_diss) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
                      geo_long |> # Subset the data
-                       filter(A %in% gut_names, B %in% gut_names) |>
+                       filter(A %in% gut_names, B %in% gut_names_rfy) |>
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
@@ -1200,9 +1219,8 @@ labels_list <- c("M. laciniatus", "M. nasutus", "M. guttatus")
 names(labels_list) <- c("L", "N", "G")
 
 # Correlation ggplot
-mantel_test <- ggplot(asv_geo_matrix_long |>
-         filter(A < B, !Species == "B"), aes(y = bray_diss, x = geo_dist)) +
-  geom_jitter(aes(color = Species), alpha = 0.5, size = 3) +
+mantel_test <- ggplot(asv_geo_matrix_long, aes(y = bray_diss, x = geo_dist)) +
+  geom_point(aes(color = Species), alpha = 0.5, size = 3) +
   geom_smooth(method = "lm", se = TRUE, color = "black") +
   # stat_poly_eq(formula = y ~ x, 
   #              aes(label = paste("R2 =", abund_geo$statistic, 
@@ -1226,11 +1244,10 @@ mantel_test <- ggplot(asv_geo_matrix_long |>
         legend.text = element_markdown(size = 14), #Make legend text italic
         axis.text.x = element_text(size = 14))
 
-mantel_test
+#mantel_test
 
 # By species
-mantel_species <- ggplot(asv_geo_matrix_long |>
-         filter(A < B, !Species == "B"), aes(y = bray_diss, x = geo_dist)) +
+mantel_species <- ggplot(asv_geo_matrix_long, aes(y = bray_diss, x = geo_dist)) +
    geom_jitter(aes(color = Species), alpha = 0.5, size = 3) +
    geom_smooth(method = "lm", se = TRUE, color = "black") +
    # stat_regline_equation(label.y = 0.25, label.x = "right",
@@ -1244,9 +1261,9 @@ mantel_species <- ggplot(asv_geo_matrix_long |>
    #                 color = "black",
    #                 label.x = 'right',
    #                 label.y = 0.23, size = 4) +
-   scale_color_manual("Species", labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
-                      values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
-   labs(y = "Bray Curtis dissimilarity", x = "Geographic distance (m)", col = "") + 
+   scale_color_manual("Species", labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+                      values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
+   labs(y = "Bray Curtis dissimilarity", x = "Geographic distance (m)", col = "") +
    scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) +
    theme_classic(base_size = 16) +
    theme(legend.title = element_text(face = "bold"),
@@ -1255,7 +1272,7 @@ mantel_species <- ggplot(asv_geo_matrix_long |>
         legend.text = element_markdown(size = 14), #Make legend text italic
         axis.text.x = element_text(size = 12)) +
   facet_wrap(~ Species, labeller = labeller(Species = labels_list))
-
+#mantel_species
 
 # Joining plots
 mantel <- ggarrange(mantel_test, "", mantel_species, 

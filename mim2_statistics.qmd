@@ -66,6 +66,10 @@ This section cleans and shapes the raw data into two main data frames: `leaf_tra
 #| eval: true
 #| tidy: true
 
+################################
+########## RAW data sets #######
+################################
+
 traits <- read.csv(file.path(path, "field_data/mim2_leaf_traits_field_survey.csv")) # Main raw data set
 
 #Elevation_m categories (meters)
@@ -130,8 +134,10 @@ plant_traits <- plant_traits |>
          logLMA = log10(LMA))
 
 
-#### Phyloseq objects ####
 
+###################################
+#### Load Phyloseq objects ########
+###################################
 #Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data. These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
 
 # Load Phyloseq object cleaned of singletons (231 ASVs)
@@ -143,9 +149,10 @@ rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_rela
 rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
 
 
-#### Leaf traits with community data ####
 
+#### Leaf traits with community data ####
 # Calculating Hill orders on non-rarefied data
+# The estimate_richness() is meant to be used with untrimmed data. It is highly dependnet on singletons. My data is already trimmed and decontaminated. My singleton "removal" eliminates ASVs with all zeros or samples wil all zeros. Singletons do remain, so this is not a problem.
 plant_traits <- ps_clean_3 |> #Estimating community richness and shannon diversity from phyloseq object
   estimate_richness(split = TRUE, measures = c("Observed","Shannon", "Simpson")) |>
        #  Simpson = 1 / Simpson) |>
@@ -166,36 +173,36 @@ plant_traits <- ps_clean_3 |> #Estimating community richness and shannon diversi
 # Melt data  frame from ps_clean_3
 ps_melt <- ps_clean_3 |>
   psmelt() |>
-  filter(!sample_Species == "B") |> #Removing species B
   # group_by(Phylum, Elevation_cat) |>
   # mutate(mean_abundance = mean(Abundance), 
   #        se = sd(Abundance)/sqrt(length(Abundance)),
   #        sd = sd(Abundance),
   #        sample_Species = factor(sample_Species)) |>
   # ungroup() |>
-  rename(Unique_ID = Sample) |>
-  dplyr::select(!c(4, 6:15)) |>
-  left_join(plant_traits |>
-              dplyr::select(!Species), by = "Unique_ID") |>
-  relocate(Kingdom:Species, .after = hill_2) #Reordering columns 
+  rename(Unique_ID = Sample, ASV = OTU) |> #Renaming OTU column
+  dplyr::select(!c(4, 6:15))  #Reordering columns 
 #This data frame is useful for barplots and other visualizations.
 
 # Save file
 # Leaf traits
-#saveRDS(leaf_traits, file.path(path, "clean_data/statistics/leaf_traits.rds"))
-#write.csv(leaf_traits, file.path(path, "clean_data/statistics/leaf_traits.csv"))
+# saveRDS(leaf_traits, file.path(path, "clean_data/statistics/leaf_traits.rds"))
+# write.csv(leaf_traits, file.path(path, "clean_data/statistics/leaf_traits.csv"))
 
 # Plant traits with community data
-#saveRDS(plant_traits, file.path(path, "clean_data/statistics/plant_traits.rds"))
-#write.csv(plant_traits, file.path(path, "clean_data/statistics/plant_traits.csv"))
+# saveRDS(plant_traits, file.path(path, "clean_data/statistics/plant_traits.rds"))
+# write.csv(plant_traits, file.path(path, "clean_data/statistics/plant_traits.csv"))
 
 # Save ps_melt
 #saveRDS(ps_melt, file.path(path, "clean_data/statistics/ps_melt.rds"))
 #write.csv(ps_melt, file.path(path, "clean_data/statistics/ps_melt.csv"))
 
-#### Load master files ####
+#####################################################
+############### Load master files here ##############
+#####################################################
 leaf_traits <- readRDS(file.path(path, "clean_data/statistics/leaf_traits.rds")) # Post all the processing aboove, lod from here.
 plant_traits <- readRDS(file.path(path, "clean_data/statistics/plant_traits.rds"))
+
+ps_melt <- readRDS(file.path(path, "clean_data/statistics/ps_melt.rds"))
 
 # Samples with species to subset/filter matrices downstream
 # M. laciniatus
@@ -1219,7 +1226,7 @@ reads |>
 
 #Good's coverage
 cover_goods <- ps_melt |>
-  select(Unique_ID, sample_Species, OTU, Abundance) |>
+  select(Unique_ID, sample_Species, ASV, Abundance) |>
   group_by(Unique_ID) |>
   summarise(n_seqs = sum(Abundance),
             n_sing = sum(Abundance == 1),
@@ -1256,159 +1263,94 @@ accum_curve <- specaccum(t(asv_matrix),
                          method = "random", 
                          permutations = 1000, 
                          cex = 0.5)
+
 plot(accum_curve, col = "blue", ci = 1, pch = 16, main = "Species Accumulation Curve", xvar = "sites", xlab = "Number of Samples", ylab = "Number of ASVs")
 accum_curve
 
 
 # Phyloseq friendly packages
-data(example)
-# mirlyn package
-rarefy_whole_rep_ex <- rarefy_whole_rep(example, rep = 100)
-# Alpha diversity metrics (rarefied counts/abundance
+
 # mirlyn package 
-# 500 reads
-# pseq_rrf5 <- mirl(ps_clean_3,
-#                  libsize = 500,
-#                  rep = 1000,
-#                  set.seed = 433,
-#                  trimOTUs = FALSE,
-#                  replace = FALSE,
-#                  mc.cores = 4)
+#750 reads
+pseq_rrf1 <- mirl(ps_clean_3,
+                 libsize = 750,
+                 rep = 100,
+                 set.seed = 443,
+                 trimOTUs = FALSE,
+                 replace = FALSE,
+                 mc.cores = 4)
 # Functions `mirl` and `phyloseq_mult_raref`are practically the same. The difference is that `mirl` returns a list of phyloseq objects and `phyloseq_mult_raref` returns a single phyloseq object.
 
-
 # metagMisc package
-set.seed(443) # Important to set seed for reproducibility
-pseq_rrf <- phyloseq_mult_raref(ps_clean_3,
-                                SampSize = 1000,
-                                iter = 1000,
-                                replace = FALSE,
-                                multithread = TRUE)
-alpha_df <- alphadivDF(pseq_rrf5, diversity = c("shannon", "simpson", "invsimpson")) # Alpha diversity indices
-repotu_df(pseq_rrf5) # Report of the rarefaction process
-div_values <- vegan::diversity(t(repotu_df(pseq_rrf5)), index = "shannon")
-#Replicate OTU Table to Dataframe - Single Library Size
-repotu_df <- function(x) {
+# set.seed(443) # Important to set seed for reproducibility
+# pseq_rrf <- phyloseq_mult_raref(ps_clean_3,
+#                                 SampSize = 1000,
+#                                 iter = 1000,
+#                                 replace = FALSE,
+#                                 multithread = TRUE)
 
-  newdat <- lapply(x, otu_table)
+# This function will resample an ASV table such that all samples have the same library size. Resampling will be performed multiple times.
 
-  finaldat <- matrix(ncol = ncol(newdat[[1]]) * length(newdat), nrow = nrow(newdat[[1]]),
-    dimnames = list(rownames(newdat[[1]]),
-      paste0(rep(seq_len(length(newdat)), each = ncol(newdat[[1]])), "-",
-        rep(colnames(newdat[[1]]), times = length(newdat)))))
+# alpha_pseq <- phyloseq_mult_raref_div(pseq_rrf, # Estimating alpha diversity from rarefied datasets
+#                                       SampSize = 1000,
+#                                       iter = 1000,
+#                                       divindex = c("Observed", 
+#                                                    "Shannon", 
+#                                                    "Simpson", 
+#                                                    "InvSimpson"),
+#                                       parallel = TRUE,
+#                                       verbose = TRUE)
 
-  for (i in seq_along(newdat)) {
-    finaldat[, (1 + (i - 1) * ncol(newdat[[1]])):(i * ncol(newdat[[1]]))] <- newdat[[i]]
-  }
 
-  finaldat
 
-}
+###########################
+#### Custom functions #####
+###########################
+#After playing around with these functions I decided to change the `alphadivDF()` function to return a data frame with the alpha diversity indices, similar to how `estimate_richness()` calculates, from rarefied data sets. 
+# Data frame with alpha diversity indices calculated from rarefied data sets
+source("functions/alpha_rfy.R")
+plant_traits_rf <- alpha_rfy_DF(pseq_rrf1, diversity = c("shannon", "simpson", "invsimpson")) # Alpha diversity indices
 
-alphadivDF <- function(x, diversity="all", zeroes=TRUE){
-  md <- sample_data(x[[1]])
-  div <- microbiome::diversity(t(repotu_df(x)), index=diversity)
-  final <- suppressWarnings(cbind(md, DiversityIndex = div))
-  final
-}
+plant_traits_rf #Rarefied data frame
 
-alphadivDF <- function(x, diversity = c("shannon", "simpson", "invsimpson")) {
-  md <- sample_data(x[[1]])
-  
-  div_df_list <- lapply(diversity, function(index) {
-    div_values <- vegan::diversity(t(repotu_df(x)), index = index)
-    if (!is.matrix(div_values)) {
-      div_values <- as.matrix(div_values, ncol = 1, dimnames = list(rownames(div_values), NULL))
-    }
-    colnames(div_values) <- paste0(index, "_", colnames(div_values))
-    return(data.frame(Unique_ID = rownames(div_values), div_values, stringsAsFactors = FALSE))
-  })
-  
-  final <- reduce(div_df_list, function(df1, df2) inner_join(df1, df2, by = "Unique_ID"))
-  final <- cbind(md, final)
-  
-  return(final)
-}
-
-alphadivDF(pseq_rrf5, diversity = c("shannon", "simpson", "invsimpson")) # Alpha diversity indices
-
-ggplot(alpha_df, aes(x = Species, y = simpson_, color = Species)) +
-  geom_jitter()+
-    geom_crossbar(stat = "summary",
-                fun = mean,
-                fun.max = mean,
-                fun.min = mean,
-                fatten = 1.5, width = 0.8) 
-  # geom_smooth(method = "lm", se = FALSE) +
-  # facet_wrap(~DiversityIndex, scales = "free_y") +
-  # theme_classic(base_size = 12) +
-  # theme(legend.title = element_text(face = "bold"),
-  #       panel.border = element_rect(linetype = "blank", fill = NA),
-  #       legend.text = element_markdown(size = 12), #Make legend text italic
-  #       axis.text.x = element_text(size = 14),
-  #       legend.position = "bottom") +
-  # labs(y = "Diversity Index", x = "Elevation (m.a.s.l.)") +
-  # scale_y_continuous(expand = c(0.07, 0.07)) +
-  # scale_color_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-  #                   values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1)))
-
-# This function will resample an OTU table such that all samples have the same library size. Resampling will be performed multiple times.
-
-alpha_pseq <- phyloseq_mult_raref_div(pseq_rrf, # Estimating alpha diversity from rarefied datasets
-                                      SampSize = 1000,
-                                      iter = 1000,
-                                      divindex = c("Observed", 
-                                                   "Shannon", 
-                                                   "Simpson", 
-                                                   "InvSimpson"),
-                                      parallel = TRUE,
-                                      verbose = TRUE)
+# Preview
+ggplot(plant_traits_rf, aes(x = Elevation_cat, y = shannon_, color = Species)) +
+  geom_boxplot(alpha = 0.3, size = 0.5) +
+  facet_wrap(~Species) +
+  theme_classic(base_size = 12)
 ```
 
 It seems we sampled enough, based on the species accumulation curve. The rarefaction curve also shows that species richness is not necessarily increasing with greater sequencing depth. There seems to be a range of \~35 ASVs per \~50,000 reads. Other samples \>200,000 reads also have around 35 ASVs.
-With the rarefaction of the data set to a sequence depth of 5000 reads we are left with 86 samples. About have of our original sample number. At a 1000 reads we are left with 98 samples. Potentially, we will proceed with 1000 read rarefaction. I attempted to use the `mirlyn` package to calculate 1000 rarefied data sets per sequence depth parameter (e.g. 500, 1000, 3000) but the resulting phyloseq object is a list of phyloseq objects. I can select one and run analyses, but what I wanted was to average the all the data sets. The issue with averaging is that it returns doubles not integers. It then makes calculations of dissimilarity matrices and other analyses difficult. The final object from the chunk above calculates an estimate of alpha diversity from rarefied data sets. The `phyloseq_mult_raref_div` function returns a list of data frames with the alpha diversity indices. The plan is to wrangle this output to and join with `plant_traits` data to calculate correlations and other analyses.
+With the rarefaction of the data set to a sequence depth of 5000 reads we are left with 86 samples. About have of our original sample number. At a 750 reads we are left with 99 samples. Potentially, we will proceed with 750 read rarefaction. I attempted to use the `mirlyn` package to calculate 100 rarefied data sets per sequence depth parameter (e.g. 500, 1000, 3000) but the resulting phyloseq object is a list of phyloseq objects. I can select one and run analyses, but what I wanted was to average the all the data sets. The issue with averaging is that it returns doubles not integers. It then makes calculations of dissimilarity matrices and other analyses difficult. The final object from the chunk above calculates an estimate of alpha diversity from rarefied data sets. The `phyloseq_mult_raref_div` function returns a list of data frames with the alpha diversity indices. The plan is to wrangle this output to and join with `plant_traits` data to calculate correlations and other analyses.
+
+After some thought, I manipulated the `alphadiv_DF` to return a data frame with "shannon", "simpson", and "invsimpson" from the `vegan` package. The data frame has diversity measure calculated for each of the iterations of the rarefied data sets. It still contains the previous diversity measures calculated (non-rarefied) in the \[Cleaning and Shaping\] section. joined this data frame with the `plant_traits` data frame to calculate correlations and other analyses. The manipulation of the function was done in the `alpha_rfy.R` file. The function is called `alpha_rfy_DF`. I used ChatGPT to troubleshoot and write the function. It would have taken me a long time to figure out. 
+
+Now let's clean it up and start plotting.
+
 
 ##### Rarefied data frame
 
 ```{r, rarefaction_output}
-# Rarefied data frame names
-names_rarefy <- alpha_pseq |>
-  distinct(Sample) |>
-  column_to_rownames(var = "Sample")|>
-  rownames() |>
-  as.list()
-
-plant_traits_rf <- alpha_pseq |>
-  group_by(Sample) |>
-  pivot_wider(names_from = Index, values_from = Estimate) |>
-  select(-c(2:3)) |>
-  summarise_all(list(~ sum(., na.rm = TRUE))) |>
-  rename(Unique_ID = Sample) |>
-  inner_join(
-    plant_traits |>
-      filter(Unique_ID %in% names_rarefy), 
-    by = "Unique_ID"
-  ) |>
-  select(
-    -c(Observed.y, Shannon.y, hill_2, Simpson_1minusD)
-  ) |> # Columns from data not rarefied
-  mutate(hill_1 = exp(Shannon.x)) |> # Observed column is equivalent to hill_0
+plant_traits_rf <- plant_traits_rf |>
+  select(!c(11:12, 19:23)) |> # Removing variables calculated before rarefactions
+  relocate(Unique_ID, .before = Site) |># Moving Unique_ID to the front
+  mutate(Unique_ID =  str_remove(Unique_ID, "[0-9]\\-"),
+         hill_1 = exp(shannon_)) |> # Observed column is equivalent to hill_0
   # Simpson index is (1-D) and InvSimpson (1/D) which is equivalent to hill_2
-  relocate(
-    Observed.x, 
-    Shannon.x, 
-    Simpson, 
-    hill_1,
-    InvSimpson,
-    .after = logLMA
-  ) |>
   rename(
-    Observed = Observed.x, 
-    Shannon = Shannon.x,
-    Simpson_1minusD = Simpson,
-    hill_2 = InvSimpson
-  ) # Renaming columns
-# This is a long pipe because I am removing information from the initial `plant_traits` data frame and joining with the rarefied data frame.
+    Observed = observed, 
+    Shannon = shannon_,
+    Simpson_1minusD = simpson_,
+    hill_2 = invsimpson_
+  ) |>
+  relocate(Observed, .before = Shannon)# Renaming and relocating columns
+
+# Saving rarefied data frame
+#saveRDS(plant_traits_rf, file = "clean_data/statistics/plant_traits_rf.rds") # Saving rarefied data frame
+#write.csv(plant_traits_rf, file = "clean_data/statistics/plant_traits_rf.csv") # Saving rarefied data frame as csv
+
+#Loading rarefied data frame
+plant_traits_rf <- readRDS("clean_data/statistics/plant_traits_rf.rds") # Loading rarefied data frame
 ```
 
 I now have a data frame with 98 samples with rarefied alpha diversity indices and plant traits. I will use this for downstream analyses.
@@ -1423,37 +1365,48 @@ I now have a data frame with 98 samples with rarefied alpha diversity indices an
 # Initial matrices, before rarefaction
 # ASV abundance matrix
 asv_matrix <- ps_clean_3_df |>
-  select(!c(2:8)) |> 
-  filter(Unique_ID %in% names_rarefy) |> # Filtering samples to match rarefied data frame 
-  column_to_rownames(var = "OTU") |>
+  select(!c(1,3:9))|>
+  #select(contains(c("ASV",names_rarefy))) |>
+  column_to_rownames(var = "ASV") |>
   as.matrix()
-# Results in 157 x 157 matrix
+# Results in 231 x 157 matrix
 
 #Bray-Curtis dissimilarity matrix rarefied to 1000 reads
 set.seed(433)
-asv_vegdist <- avgdist(t(asv_matrix), 
-                       sample = 100,
+asv_avgdist <- avgdist(t(asv_matrix), 
+                       sample = 750,
                        dmethod = "bray",
                        meanfun = mean,
-                       iterations = 1000,
+                       iterations = 100,
                        diag =  FALSE, 
                        upper = FALSE) |>
   as.matrix()
 
+# Rarefied data frame names
+names_rarefy <- colnames(asv_avgdist) # Rarefied data frame names from avgdist
+
+test <- sample_data(pseq_rrf1[[1]]) |> # Rarefied phyloseq object
+  rownames() |>
+  as.character()
+
+# Check if the vectors are identical
+identical(test, names_rarefy)
+
+
 # Adding column and rownames
-rownames(asv_vegdist) <- names_list
-colnames(asv_vegdist) <- names_list
+rownames(asv_avgdist) <- names_rarefy
+colnames(asv_avgdist) <- names_rarefy
 
 # Geographical matrix
 #geo_matrix <- distm(plant_traits[,c("Longitude", "Latitude")], fun = distHaversine)
 geo_distm <- distm(plant_traits |>
-                      filter(Unique_ID %in% names_list) |>
+                      filter(Unique_ID %in% names_rarefy) |>
                      # column_to_rownames(var = "Unique_ID") |>
                       select(Longitude, Latitude), fun = distVincentyEllipsoid)
                       
 # Adding column and rownames
-rownames(geo_distm) <- names_list
-colnames(geo_distm) <- names_list
+rownames(geo_distm) <- names_rarefy
+colnames(geo_distm) <- names_rarefy
 ```
 
 
@@ -1493,7 +1446,7 @@ names(labels_list) <- c("L", "N", "G")
 # Hill number 1
 # Shannon diversity or hill number 1
 # Linear model summary
-summary(lm(Shannon ~ Elevation_m, data = plant_traits))
+summary(lm(Shannon ~ Elevation_m, data = plant_traits_rf))
 elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
 
 # Plot plant_traits$Species[plant_traits$Species != "B"]
@@ -1695,8 +1648,7 @@ labels_list <- c("M. laciniatus", "M. nasutus", "M. guttatus")
 names(labels_list) <- c("L", "N", "G")
 
 # Plot
-hill0_species <- ggplot(data = plant_traits  |>
-  filter(!Species == "B"), 
+hill0_species <- ggplot(data = plant_traits_rf, 
   aes(x = Species, y = Observed)) +
   geom_violin(aes(fill = Species)) +
   geom_crossbar(stat="summary",
@@ -1733,8 +1685,7 @@ hill0_species
 # Hill number 1
 # Shannon diversity or hill number 1
 # Plot
-hill1_species <- ggplot(data = plant_traits  |>
-  filter(!Species == "B"), 
+hill1_species <- ggplot(data = plant_traits_rf, 
   aes(x = Species, y = hill_1)) +
   geom_violin(aes(fill = Species)) +
   geom_crossbar(stat="summary",
@@ -1769,8 +1720,7 @@ hill1_species
 
 # Hill number 2
 # Inverse Simpson diversity or hill number 2
-hill2_species <- ggplot(data = plant_traits  |>
-  filter(!Species == "B"), 
+hill2_species <- ggplot(data = plant_traits_rf, 
   aes(x = Species, y = hill_2)) +
   geom_violin(aes(fill = Species)) +
   geom_crossbar(stat="summary",
@@ -1830,8 +1780,8 @@ hill0_beta <-  ggplot(plant_traits_rf, aes(x = Elevation_cat, y = Observed)) +
                 width = 0.5, 
                 color="black") +
   geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
-  scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
-  scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
+   scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
+  scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_shape_manual(values=c(15:18),labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
   theme_classic(base_size = 14) +
   theme(strip.text.x = element_text(colour = "black", face = "bold"),
@@ -1852,8 +1802,7 @@ hill0_beta
 
 # Hill number 1
 # Shannon diversity or hill number 1
-hill1_beta <- ggplot(plant_traits |>
-                filter(!Species == "B"), aes(x = Elevation_cat, y = hill_1)) +
+hill1_beta <- ggplot(plant_traits_rf, aes(x = Elevation_cat, y = hill_1)) +
   
   geom_violin(aes(fill = Elevation_cat)) +
   geom_crossbar(stat="summary", 
@@ -1864,8 +1813,8 @@ hill1_beta <- ggplot(plant_traits |>
                 width = 0.5, 
                 color="black") +
   geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
-  scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
-  scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
+   scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
+  scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_shape_manual(values=c(15:18),labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
   theme_classic(base_size = 14) +
   theme(strip.text.x = element_text(colour = "black", face = "bold"),
@@ -1886,8 +1835,7 @@ hill1_beta
 # Hill number 2
 # Inverse Simpson diversity or hill number 2
 
-hill2_beta <- ggplot(plant_traits |>
-                filter(!Species == "B"), aes(x = Elevation_cat, y = hill_2)) +
+hill2_beta <- ggplot(plant_traits_rf, aes(x = Elevation_cat, y = hill_2)) +
   
   geom_violin(aes(fill = Elevation_cat)) +
   geom_crossbar(stat="summary", 
@@ -1898,9 +1846,8 @@ hill2_beta <- ggplot(plant_traits |>
                 width = 0.5, 
                 color="black") +
   geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
-  scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
-  scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Lakota", n = 3, type = "discrete")) +
-  scale_shape_manual(values=c(15:18),labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
+   scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
+  scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   theme_classic(base_size = 14) +
   theme(strip.text.x = element_text(colour = "black", face = "bold"),
         legend.title = element_text(face = "bold"),
@@ -1918,14 +1865,28 @@ hill2_beta
 
 
 # Joining plots
-hill_beta <- ggarrange(hill0_beta, hill1_beta, hill2_beta, 
+hill_beta <- ggarrange(hill0_beta, hill1_beta, hill2_beta,
           nrow = 1, ncol = 3,
           common.legend = TRUE,
           legend = "bottom",
-          labels = c("A", "B", "C"))
+          labels = c("D", "E", "F"))
+# hill_beta
 
-hill_beta
-#ggsave(file.path(path, "figures/figure3.png"), plot = hill_beta, dpi=300, units=c("mm"), width=300, height=100)
+#### Alpha and Beta diversity ####
+# Joined plots
+# A joined plot of joined plots
+
+
+alpha_beta_diversity <- ggarrange(hill_numbers_species, "", hill_beta,
+                          nrow = 3, ncol = 1,
+                          common.legend = FALSE,
+                          widths = c(1, 0.2, 1),
+                          heights = c(1, 0.2, 1),
+                          legend = "bottom")
+
+alpha_beta_diversity
+
+#ggsave(filename = file.path(path, "figures/figure3.png"), plot = alpha_beta_diversity, dpi=300, units=c("mm"), width=300, height=275)
 ```
 
 #### Mantel tests and correlations
@@ -1936,7 +1897,7 @@ hill_beta
 #| tidy: true
 # Prepare the data for correlation plot
 # Longer format
-asv_long <- asv_vegdist |>
+asv_long <- asv_avgdist |>
   as_tibble(rownames = "A") |>
   pivot_longer(-A, names_to = "B", values_to = "bray_diss")
 
@@ -1955,8 +1916,7 @@ labels_list <- c("M. laciniatus", "M. nasutus", "M. guttatus")
 names(labels_list) <- c("L", "N", "G")
 
 # Correlation ggplot
-mantel_test <- ggplot(asv_geo_matrix_long |>
-         filter(A < B, !Species == "B"), aes(y = bray_diss, x = geo_dist)) +
+mantel_test <- ggplot(asv_geo_matrix_long, aes(y = bray_diss, x = geo_dist)) +
   geom_jitter(aes(color = Species), alpha = 0.7, size = 3) +
   geom_smooth(method = "lm", se = TRUE, color = "black") +
    #stat_regline_equation(label.y = 0.5, label.x = 1900, 
@@ -1985,19 +1945,28 @@ mantel_test
 # Mantel test
 # All data points
 set.seed(859)
-abund_geo  <- mantel(asv_vegdist, geo_distm, method = "spearman", permutations = 999, na.rm = TRUE)
+abund_geo  <- mantel(asv_avgdist, geo_distm, method = "spearman", permutations = 999, na.rm = TRUE)
 #abund_geo
 
 # Mantel test by species
 # M. laciniatus
+
+# Samples with species to subset/filter matrices downstream
+# M. laciniatus
+lac_names_rfy <- plant_traits |>
+  slice(1:160) |> # Only selecting observations with ASV data 
+  filter(Unique_ID %in% names_rarefy,
+    Species == "L") |>
+  pull(Unique_ID) 
+
 # Subset the data
 lac_mantel  <- mantel(asv_long |> # Subset the data
-                       filter(A %in% lac_names, B %in% lac_names) |>
+                       filter(A %in% lac_names, B %in% lac_names_rfy) |>
                        pivot_wider(names_from = B, values_from = bray_diss) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
                      geo_long |> # Subset the data
-                       filter(A %in% lac_names, B %in% lac_names) |>
+                       filter(A %in% lac_names, B %in% lac_names_rfy) |>
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
@@ -2005,13 +1974,18 @@ lac_mantel  <- mantel(asv_long |> # Subset the data
 lac_mantel
 
 # M. nasutus
+nas_names_rfy <- plant_traits |> 
+  slice(1:160) |> # Only selecting observations with ASV data 
+  filter(Unique_ID %in% names_rarefy,
+         Species == "N") |>
+  pull(Unique_ID)
 nas_mantel  <- mantel(asv_long |> # Subset the data
-                       filter(A %in% nas_names, B %in% nas_names) |>
+                       filter(A %in% nas_names, B %in% nas_names_rfy) |>
                        pivot_wider(names_from = B, values_from = bray_diss) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(), 
                       geo_long |> # Subset the data
-                       filter(A %in% nas_names, B %in% nas_names) |>
+                       filter(A %in% nas_names, B %in% nas_names_rfy) |>
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(), 
@@ -2019,14 +1993,19 @@ nas_mantel  <- mantel(asv_long |> # Subset the data
 nas_mantel
 
 # M. guttatus
+gut_names_rfy <- plant_traits |> 
+  slice(1:160) |> # Only selecting observations with ASV data 
+  filter(Unique_ID %in% names_rarefy,
+         Species == "G") |>
+  pull(Unique_ID)
 # Subset the data
 gut_mantel  <- mantel(asv_long |> # Subset the data
-                       filter(A %in% gut_names, B %in% gut_names) |>
+                       filter(A %in% gut_names, B %in% gut_names_rfy) |>
                        pivot_wider(names_from = B, values_from = bray_diss) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
                      geo_long |> # Subset the data
-                       filter(A %in% gut_names, B %in% gut_names) |>
+                       filter(A %in% gut_names, B %in% gut_names_rfy) |>
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
@@ -2385,7 +2364,7 @@ p2
 #| 
 set.seed(123)
 #Ordination - NMDS with bray-curtis #########
-x <- as.matrix(asv_vegdist)
+x <- as.matrix(asv_avgdist)
 #x <- replace(x, x == "NaN", 0)
 x <- na.omit(x) #apparently there are some NAs in the matrix fro "Bray-Curtis"
 # Choosing the number of dimensions
@@ -2445,14 +2424,14 @@ NMDS
 
 ```{r}
 # Model with intercept only ####
-m0 <- dbrda(asv_vegdist ~ 1, data = nmds_traits) #Model with intercept only.
+m0 <- dbrda(asv_avgdist ~ 1, data = nmds_traits) #Model with intercept only.
 m0
 m0 <- na.omit(m0)
-m1 <- dbrda(asv_vegdist ~ ., data = nmds_traits, na.action = na.omit) # Model with all explanatory variables.
+m1 <- dbrda(asv_avgdist ~ ., data = nmds_traits, na.action = na.omit) # Model with all explanatory variables.
 m1 <- 
 
 # Model with species, site, leaf traits and elevation. ####
-m2 <- dbrda(asv_vegdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_cat + Site + Species,  data = nmds_traits, na.action = na.omit)
+m2 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_cat + Site + Species,  data = nmds_traits, na.action = na.omit)
 m2
 m2 <- na.omit(m2)
 Anova(m2)
@@ -2489,7 +2468,7 @@ m3.forsel <- ordistep(m0, scope = formula(m3), Pin = 0.5, Pout = 0.1, trace = T,
 ##### Plot dbRDA
 
 ```{r, m2dbRDA}
-m2dbRDA <- dbrda(asv_vegdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m, distance = "bray", data = nmds_traits, na.action = na.omit)
+m2dbRDA <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m, distance = "bray", data = nmds_traits, na.action = na.omit)
 
 summary(m2dbRDA)
 plot(m2dbRDA)
@@ -2587,7 +2566,7 @@ p_m2dbrda
 
 ```{r, adonis2}
 set.seed(123)
-perma <- adonis2(asv_vegdist ~ logACI + 
+perma <- adonis2(asv_avgdist ~ logACI + 
                    logLT + 
                    logLPS + 
                    logLMA + 
@@ -2609,7 +2588,7 @@ Analysis of multivariate homogeneity of group dispersions.
 ```{r, PERMDISP}
 set.seed(123)
 # By Species
-beta <- betadisper(as.dist(asv_vegdist), nmds_traits$Species, type = "centroid", sqrt.dist = FALSE)
+beta <- betadisper(as.dist(asv_avgdist), nmds_traits$Species, type = "centroid", sqrt.dist = FALSE)
 beta
 anova(beta)
 permutest(beta, permutations = 9999)
@@ -2621,7 +2600,7 @@ boxplot(beta, xlab = "", las = 2, cex.axis = 0.8)
 # No significant differences in the dispersion of the fungal community across species.
 
 # By Elevation
-beta2 <- betadisper(as.dist(asv_vegdist), nmds_traits$Elevation_cat, type = "centroid", sqrt.dist = FALSE)
+beta2 <- betadisper(as.dist(asv_avgdist), nmds_traits$Elevation_cat, type = "centroid", sqrt.dist = FALSE)
 anova(beta2)
 TukeyHSD(beta2)
 boxplot(beta2, xlab = "", las = 2, cex.axis = 0.8)
@@ -2634,7 +2613,7 @@ plot(beta2, hull=FALSE, ellipse=TRUE)
 Who contributes more to differneces in the community composition?
 
 ```{r, SIMPER}
-(sim <- with(nmds_traits, simper(asv_vegdist, Elevation_cat, permutations = 999)))
+(sim <- with(nmds_traits, simper(asv_avgdist, Elevation_cat, permutations = 999)))
 summary(sim)
 ```
 
@@ -2719,8 +2698,3 @@ colnames(multipatt_analysis_sign)[1]  <- "ASV"
 No ASVs significantly correlated with Mimulus species. When we test for correlations in elevation categories and adjust the p value for multiple comparison we are left with only 0 ASVs.
 
 NO evidence of a core ASV community associated with Mimulus or elevation types.
-
-```{r}
-
-
-```
