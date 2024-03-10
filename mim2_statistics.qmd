@@ -22,19 +22,26 @@ library("broom")
 library("MetBrewer")
 library("rstatix")
 
+# Models
 library("car")
 library("nlme")
 
+# Diversity
 library("vegan")
 library("hillR")
-library("phyloseq")
-library("metagMisc")
-library("microbiome")
-library("iNEXT")
 library("geosphere")
 library("indicspecies")
 
+# Phyloseq friendly
+library("phyloseq")
+library("metagMisc") # Miscellaneous functions
+library("microbiome") # Expands phyloseq 
+library("iNEXT")
+library("mirlyn")
+
+
 library("conflicted")
+conflict_prefer("select", "dplyr")
 conflict_prefer("filter", "dplyr")
 conflict_prefer("alpha", "ggplot2")
 ```
@@ -52,7 +59,7 @@ path <- "../mim2_bioinformatics" # Change accordingly
 
 ## Cleaning and Shaping
 
-This section cleans and shapes the raw data into two main data frames: `leaf_traits` and `plant_traits`. The first has all data point for leaf trait measurements at the leaf level (raw) and the second one represents the average per plant while incorporating FEF community data. The FEF community data is only available for 160/320 samples. For the downstream analyses, we eliminated *M. bicolor* or species "B" in the data set. The removal of this is due to a small sample size for leaf trait measurements and even smaller for FEF community data (*n* = 3). The removal is not explicit in `plant_traits` it is only explicit in the subset `leaf_traits_noB` and latter on in the `asv_matrix` that gives way for community analyses in [Community Diversity]. We include a custom function for p-value formatting.
+This section cleans and shapes the raw data into two main data frames: `leaf_traits` and `plant_traits`. The first has all data point for leaf trait measurements at the leaf level (raw) and the second one represents the average per plant while incorporating FEF community data. The FEF community data is only available for 160/320 samples. For the downstream analyses, we eliminated *M. bicolor* or species "B" from the leaf trait data set and the phyloseq object. The removal of this is due to a small sample size for leaf trait measurements and even smaller for FEF community data (*n* = 3). The removal is not explicit in `plant_traits` it is only explicit in the subset `leaf_traits_noB` and and phyloseq objects. This is important for the rarefaction of sequence dept and later on in the `asv_matrix` that gives way for community analyses in [Community Diversity]. I include a custom function for p-value formatting.
 
 ```{r, cleaning_chaping_data}
 #| echo: false
@@ -99,7 +106,7 @@ plant_traits <- leaf_traits |>
 
 #### Log transformation ####
 
-# All variables are non-normal. We proceed with a log transformation of the data.
+# All variables are non-normal. I proceed with a log transformation of the data.
 # See Descriptive Statistics section for reference on this decision. Leaf_trait_transformation block.
 # Leaft traits transformed
 leaf_traits <- leaf_traits |>
@@ -110,6 +117,7 @@ leaf_traits <- leaf_traits |>
          logLMA = log10(LMA))
 
 #Removing species B
+# I have 3 samples for species B to remove from the data set.
 leaf_traits_noB <- leaf_traits |>
   filter(!Species == "B")
 
@@ -126,19 +134,32 @@ plant_traits <- plant_traits |>
 
 #Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data. These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
 
-
 # Load Phyloseq object cleaned of singletons (231 ASVs)
-ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.rds"))
-ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.csv"))
+ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.rds"))
+ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.csv"))
+ps_clean_3_df <- ps_clean_3_df[, -1]
 
 # Load Relative abundance phyloseq
-rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.rds"))
-rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.csv"))
+rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
+rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
+
+# Remove species B from the phyloseq object
+# bicolor <- c("SDSB_B001", "SDSB_B002", "SDSB_B005")
+# Sample <- rownames(sample_data(ps_clean_3@sam_data)) 
+# 
+# ps_clean_3 <- subset_samples(ps_clean_3, !Sample %in% bicolor)
+# rel_abund_ps_clean <- subset_samples(rel_abund_ps_clean, !Sample %in% bicolor)
+
+# saveRDS(ps_clean_3, file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.rds"))
+# ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
+#write.csv(ps_clean_3_df, file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.csv"))
+# saveRDS(rel_abund_ps_clean, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
+# write.csv(rel_ps_clean_df, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
 
 
 #### Leaf traits with community data ####
 
-# Calculating Hill orders
+# Calculating Hill orders on non-rarefied data
 plant_traits <- ps_clean_3 |> #Estimating community richness and shannon diversity from phyloseq object
   estimate_richness(split = TRUE, measures = c("Observed","Shannon", "Simpson")) |>
        #  Simpson = 1 / Simpson) |>
@@ -307,7 +328,7 @@ shapiro.test(leaf_traits$Elevation_m) #Since p-value is less than 0.05 this mean
 fligner.test(Elevation_m ~ Site, data = leaf_traits) #Homogeneity of variances test. p-value < 0.05, variances are not equal.
 ```
 
-All leaf traits and elevation are not normally distributed. This requires transformation for further analysis. We will proceed with a log transformation of the data.
+All leaf traits and elevation are not normally distributed. This requires transformation for further analysis. I will proceed with a log transformation of the data.
 
 ```{r, Leaf_traits_transformation}
 
@@ -332,7 +353,7 @@ All leaf traits and elevation are not normally distributed. This requires transf
 #          logLMA = log10(LMA))
 ```
 
-We are not omiting samples with NAs because some have the complete data for some leaf traits and not for others. We will omit samples with NAs for the Fungal analyses.
+I will not omiting samples with NAs because some have the complete data for some leaf traits and not for others. I will omit samples with NAs for the Fungal analyses.
 
 ## Post data transformations
 
@@ -372,7 +393,7 @@ qqPlot(leaf_traits$logACI)
 shapiro.test(leaf_traits$logACI) #Another transformation that does not meet normality assumptions.
 ```
 
-The log transformations improve the normality of the data, but it does not meet the assumptions for normality. We will proceed with the analyses using the log transformed data. We will use non-parametric tests for the analyses.
+The log transformations improve the normality of the data, but it does not meet the assumptions for normality. I will proceed with the analyses using the log transformed data. I will use non-parametric tests for the analyses.
 
 ## Non-parametric tests
 
@@ -1039,7 +1060,7 @@ ant_arranged_with_caption
 # PCA using covariates to explain species richness/abundance ####
 data.pca <- leaf_traits_noB |>
   na.omit() |>
-  select(c(19:23)) #Selecting only the log-transformed leaf trait columns. We use the log transformed data due to our findings of non-normality in the data. See this post for a hot take: https://stats.stackexchange.com/questions/164381/why-log-transforming-the-data-before-performing-principal-component-analysis
+  select(c(19:23)) #Selecting only the log-transformed leaf trait columns. I use the log transformed data due to our findings of non-normality in the data. See this post for a hot take: https://stats.stackexchange.com/questions/164381/why-log-transforming-the-data-before-performing-principal-component-analysis
 
 leaf_traits.pca <- na.omit(leaf_traits_noB) 
 
@@ -1093,25 +1114,276 @@ pca_auto
 
 # Community Diversity
 
-Here we are going to explore the relationship between elevation and FEF community composition through richness and species diversity. We have already calculated Hill numbers in [Cleaning and Shaping data]. He we create a dissimilarity matrix and calculate the distance between samples. We remove *M. bicolor* (species "B") from the analysis (see [Cleaning and Shaping data] for more details). 
+Here we are going to explore the relationship between elevation and FEF community composition through richness and species diversity. I have already calculated Hill numbers in \[Cleaning and Shaping data\]. He we create a dissimilarity matrix and calculate the distance between samples. I remove *M. bicolor* (species "B") from the analysis (see \[Cleaning and Shaping data\] for more details). Here we used a classic data frame that stems from `ps_clean_3` object. The matrix calculations can also be achieved using the phyloseq friendly packages: `microbiome`, `metagMisc` and `mirlyn`. First let's look as summary information from our phyloseq object (see also `mim2_bioinformatics.qmd`).
+
+```{r, summary_info}
+# How many ASVs per Phyla and reads per sample are there after decontamination?
+readcount(ps_clean_3) #Read count
+phyloseq_summary(ps_clean_3, more_stats = F, long = F) # metagMisc overall summary
+summarize_phyloseq(ps_clean_3) #Microbiome package summary
+
+# How many samples with ASVs per phyla are there AFTER decontamination?
+percent_phyla_clean <- phyloseq_ntaxa_by_tax(
+  ps_clean_3,
+  TaxRank = "Phylum",
+  relative = F,
+  add_meta_data = F
+) |>
+  as.data.frame() |>
+  mutate(sum = sum(N.OTU)) |>
+  group_by(Phylum) |>
+  summarise(occurance_in_samples = n())# Count the number of ASV per phylum
+
+
+# Coverage
+cover_chao <- phyloseq_coverage(ps_clean_3, correct_singletons = T) #Coverage: Good-Turing frequency estimation (Chiu, Chao 2016)
+
+
+# Prevalence plot
+phyloseq_prevalence_plot(
+  ps_clean_3,
+  prev.trh = 0.5,
+  taxcolor = "Phylum",
+  facet = TRUE,
+  point_alpha = 0.7,
+  showplot = T
+)
+
+# Average relative ASVs per host species
+ps_average <- phyloseq_average(
+  ps_clean_3,
+  avg_type = "arithmetic",
+  acomp_zero_impute = NULL,
+  aldex_samples = 128,
+  aldex_denom = "all",
+  group = "Species",
+  drop_group_zero = FALSE,
+  verbose = TRUE,
+  progress = "text",
+)
+
+# Core ASV abundance
+core_abundance(
+  ps_clean_3,
+  detection = 0.1/100,
+  prevalence = 50/100,
+  include.lowest = FALSE
+)
+
+# Rare ASVs
+rare_abundance(
+  ps_clean_3,
+  detection = 0.1/100,
+  prevalence = 50/100,
+  include.lowest = FALSE
+)
+
+# Core taxa
+core_tax <- core_members(ps_clean_3, detection = 0.1/100, prevalence = 50/100, include.lowest = FALSE)
+
+# Rare taxa
+rare_tax <- rare_members(ps_clean_3, detection = 0.1/100, prevalence = 50/100, include.lowest = FALSE)
+```
+The core taxa members are *Vishniacozyma victoriae* (ASV_1), *Cladosporium herbanum* (ASV_2) and *Cladosporium* spp. (ASV_7). The rest of the ASVs (228) are rare. Now that we have a better idea of what is present in samples we can move on to the next steps.
+
+
+
+## How to decide sampling depth for rarefaction?
+
+Visual assesment of samplint depth.
+
+```{r, sampling_depth}
+
+# Reads per sample
+names_list <- colnames(ps_clean_3@otu_table) #List of samples
+reads <- readcount(ps_clean_3) |>  
+  as.data.frame() |>
+  rownames_to_column(var = "Unique_ID") |>
+  rename(n_seqs = "readcount(ps_clean_3)") |>
+  right_join(plant_traits, by = "Unique_ID") |>
+  select(Unique_ID, Site, Species, n_seqs)
+
+# Sum of reads per site
+reads_sum <- reads |>
+  group_by(Site) |>
+  filter(Unique_ID %in% names_list) |>
+  summarise(n_seqs = sum(n_seqs)) 
+
+# Visualizing the distribution of reads
+ggplot(reads, aes(x = n_seqs)) +
+  geom_histogram(binwidth = 10000, fill = "grey", color = "black") +
+  coord_cartesian(xlim = c(0, 100000)) # Cut-off
+
+ggplot(reads, aes(x = 1, y = n_seqs)) +
+  geom_jitter() +
+  scale_y_log10()
+
+test <- reads |>
+         arrange(n_seqs) |>
+  filter(Unique_ID %in% names_list)
+ggplot(test, aes(x = 1:nrow(test), y = n_seqs)) +
+  geom_line() +
+  coord_cartesian(ylim = c(0, 100000)) # Cut-off
+
+
+# Arrange the samples to see where the big breaks in counts are. 
+reads |>
+         arrange(n_seqs) |>
+  filter(Unique_ID %in% names_list)
+
+#Good's coverage
+cover_goods <- ps_melt |>
+  select(Unique_ID, sample_Species, OTU, Abundance) |>
+  group_by(Unique_ID) |>
+  summarise(n_seqs = sum(Abundance),
+            n_sing = sum(Abundance == 1),
+            goods = 1 - (n_sing/n_seqs)) 
+
+cover_goods|>
+  filter(n_seqs > 5000) |> #Filtering samples with more than f000 reads
+  ggplot(aes(x= n_seqs,y = goods)) +
+  geom_point() # Similar to `phyloseq_coverage` results above but here we know how it is calculated.
+          
+cover_goods |>
+  arrange(goods)
+```
+ From the summaries above and graphical evaluation we see that 1) the median read count is 9619 and 2) all the way to \~5000 reads the difference in jumps is \~250, the jump to 5000 is \ 500 counts. Good's coverage shows that we have only 5 samples that are below ~0.99 cover threshold. I believe that establishing a sampling depth of 5000 reads is a good compromise between the number of samples and the number of reads. I will use this depth for the rarefaction curves.
+ 
+#### Rarefaction and species accumulation curves
+
+I are calculating some curves to see if we have enough sampling effort.
+
+::: callout-note
+Rarefaction is subject to debate, see [@mcmurdie2014] and [@cameron2021] for a discussion.
+:::
+
+```{r, rarefaction}
+# Alpha diversity metrics
+set.seed(123)
+
+# Vegan
+# Rarefaction curve
+vegan::rarecurve(t(asv_matrix), step=50, cex=0.5, xlab = "Sample Size", ylab = "Species", label = TRUE, tidy = FALSE) # rrarefy generates one randomly rarefied community data frame or vector of given sample size. 
+
+# Species accumulation curve
+accum_curve <- specaccum(t(asv_matrix), 
+                         method = "random", 
+                         permutations = 1000, 
+                         cex = 0.5)
+plot(accum_curve, col = "blue", ci = 1, pch = 16, main = "Species Accumulation Curve", xvar = "sites", xlab = "Number of Samples", ylab = "Number of ASVs")
+accum_curve
+
+
+# Phyloseq friendly packages
+data(example)
+# mirlyn package
+rarefy_whole_rep_ex <- rarefy_whole_rep(example, rep = 100)
+# Alpha diversity metrics (rarefied counts/abundance
+# mirlyn package 
+# 500 reads
+# pseq_rrf5 <- mirl(ps_clean_3,
+#                  libsize = 500,
+#                  rep = 1000,
+#                  set.seed = 433,
+#                  trimOTUs = FALSE,
+#                  replace = FALSE,
+#                  mc.cores = 4)
+# Functions `mirl` and `phyloseq_mult_raref`are practically the same. The difference is that `mirl` returns a list of phyloseq objects and `phyloseq_mult_raref` returns a single phyloseq object.
+
+
+# metagMisc package
+set.seed(443) # Important to set seed for reproducibility
+pseq_rrf <- phyloseq_mult_raref(ps_clean_3,
+                                SampSize = 1000,
+                                iter = 1000,
+                                replace = FALSE,
+                                multithread = TRUE)
+# This function will resample an OTU table such that all samples have the same library size. Resampling will be performed multiple times.
+
+alpha_pseq <- phyloseq_mult_raref_div(pseq_rrf, # Estimating alpha diversity from rarefied datasets
+                                      SampSize = 1000,
+                                      iter = 1000,
+                                      divindex = c("Observed", 
+                                                   "Shannon", 
+                                                   "Simpson", 
+                                                   "InvSimpson"),
+                                      parallel = TRUE,
+                                      verbose = TRUE)
+```
+
+It seems we sampled enough, based on the species accumulation curve. The rarefaction curve also shows that species richness is not necessarily increasing with greater sequencing depth. There seems to be a range of \~35 ASVs per \~50,000 reads. Other samples \>200,000 reads also have around 35 ASVs.
+With the rarefaction of the data set to a sequence depth of 5000 reads we are left with 86 samples. About have of our original sample number. At a 1000 reads we are left with 98 samples. Potentially, we will proceed with 1000 read rarefaction. I attempted to use the `mirlyn` package to calculate 1000 rarefied data sets per sequence depth parameter (e.g. 500, 1000, 3000) but the resulting phyloseq object is a list of phyloseq objects. I can select one and run analyses, but what I wanted was to average the all the data sets. The issue with averaging is that it returns doubles not integers. It then makes calculations of dissimilarity matrices and other analyses difficult. The final object from the chunk above calculates an estimate of alpha diversity from rarefied data sets. The `phyloseq_mult_raref_div` function returns a list of data frames with the alpha diversity indices. The plan is to wrangle this output to and join with `plant_traits` data to calculate correlations and other analyses.
+
+##### Rarefied data frame
+
+```{r, rarefaction_output}
+# Rarefied data frame names
+names_rarefy <- alpha_pseq |>
+  distinct(Sample) |>
+  column_to_rownames(var = "Sample")|>
+  rownames() |>
+  as.list()
+
+plant_traits_rf <- alpha_pseq |>
+  group_by(Sample) |>
+  pivot_wider(names_from = Index, values_from = Estimate) |>
+  select(-c(2:3)) |>
+  summarise_all(list(~ sum(., na.rm = TRUE))) |>
+  rename(Unique_ID = Sample) |>
+  inner_join(
+    plant_traits |>
+      filter(Unique_ID %in% names_rarefy), 
+    by = "Unique_ID"
+  ) |>
+  select(
+    -c(Observed.y, Shannon.y, hill_2, Simpson_1minusD)
+  ) |> # Columns from data not rarefied
+  mutate(hill_1 = exp(Shannon.x)) |> # Observed column is equivalent to hill_0
+  # Simpson index is (1-D) and InvSimpson (1/D) which is equivalent to hill_2
+  relocate(
+    Observed.x, 
+    Shannon.x, 
+    Simpson, 
+    hill_1,
+    InvSimpson,
+    .after = logLMA
+  ) |>
+  rename(
+    Observed = Observed.x, 
+    Shannon = Shannon.x,
+    Simpson_1minusD = Simpson,
+    hill_2 = InvSimpson
+  ) # Renaming columns
+# This is a long pipe because I am removing information from the initial `plant_traits` data frame and joining with the rarefied data frame.
+```
+
+I now have a data frame with 98 samples with rarefied alpha diversity indices and plant traits. I will use this for downstream analyses.
+
+#### Dissimilarity and geographic distance matrices
 
 ```{r, dist_matrix}
 #| echo: false
 #| eval: true
 #| tidy: true
 
+# Initial matrices, before rarefaction
 # ASV abundance matrix
 asv_matrix <- ps_clean_3_df |>
-  select(!c(2:8, SDSB_B001, SDSB_B002, SDSB_B005)) |> #Removing samples from species "B"
+  select(!c(2:8)) |> 
+  filter(Unique_ID %in% names_rarefy) |> # Filtering samples to match rarefied data frame 
   column_to_rownames(var = "OTU") |>
   as.matrix()
 # Results in 157 x 157 matrix
 
-# Names of the samples
-names_list <- colnames(asv_matrix)
-
-#Bray-Curtis dissimilarity matrix
-asv_vegdist <- vegdist(t(asv_matrix), method = "bray", binary = FALSE, upper = FALSE) |>
+#Bray-Curtis dissimilarity matrix rarefied to 1000 reads
+set.seed(433)
+asv_vegdist <- avgdist(t(asv_matrix), 
+                       sample = 100,
+                       dmethod = "bray",
+                       meanfun = mean,
+                       iterations = 1000,
+                       diag =  FALSE, 
+                       upper = FALSE) |>
   as.matrix()
 
 # Adding column and rownames
@@ -1130,24 +1402,10 @@ rownames(geo_distm) <- names_list
 colnames(geo_distm) <- names_list
 ```
 
-#### Rarefaction and species accumulation curves
-We are calculating some curves to see if we have enough sampling effort. 
-```{r, rarefaction}
-set.seed(123)
-summarize_phyloseq(ps_clean_3)
-# Rarefaction curve
-rarecurve(asv_matrix, step=50, cex=0.5, xlab = "Sample Size", ylab = "Species", label = TRUE, tidy = FALSE)
-
-# Species accumulation curve
-accum_curve <- specaccum(asv_matrix, method = "random", permutations = 1000, cex = 0.5)
-plot(accum_curve, col = "blue", ci = 1, pch = 16, main = "Species Accumulation Curve", xvar = "sites", xlab = "Number of Samples", ylab = "Number of Species")
-
-```
-
-It seems we sampled enough, based on the species accumulation curve. The rarefaction curve also shows that species richness is not increasing with greater sequencing depth. Only ASV_1 exceeds 500,000 rarefied sequences. 
 
 
-#### Hill numbers
+
+#### Hill number plots
 
 ```{r, hill_numbers}
 # Shannon Diversity or hill number 1
@@ -1184,181 +1442,194 @@ names(labels_list) <- c("L", "N", "G")
 summary(lm(Shannon ~ Elevation_m, data = plant_traits))
 elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
 
+# Plot plant_traits$Species[plant_traits$Species != "B"]
 # Plot
-hill1_diversity <- ggplot(data = plant_traits  |>
-  filter(!Species == "B"), 
-  aes(x = Elevation_m, y = hill_1, color = Species)) +
-   geom_jitter(aes(color = plant_traits$Species[plant_traits$Species != "B"]), size = 3, alpha = 0.7) + 
-   geom_smooth(method = lm, se = F) + 
-   # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
-   geom_smooth(method = lm, se = T, level = 0.95, na.rm = F, color = "black") + 
-   stat_regline_equation(label.y = 25, label.x = 1000,
-                         aes(label = paste(..eq.label.., #sprintf("italic('p')~'%s'", elev_div_p), 
-                                          sep = "~~~~")), size = rel(4), color = "black") +
-   stat_regline_equation(label.y = 22, label.x = 1000,
-                          aes(label = ..adj.rr.label.., ), size = rel(4), color = "black") + 
-   #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
-                     #values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
-   scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
-                     values = met.brewer("Isfahan2", n = 4, type = "discrete", 
-                                          direction = c(-1))) + 
-  labs(y = "\U1D492 = 1", x = "Elevation (m.a.s.l.)", col = "") +
-  #labs(y = expression("*q* = 1"), x = "Elevation (m.a.s.l.)", col = "") + 
-   theme_classic(base_size = 12) +
-   theme(legend.title = element_text(face = "bold"),
-         #strip.text = element_text(face = "italic", size = 14),
-         strip.background = element_blank(),
-         strip.text = element_blank(),
-         panel.border = element_rect(linetype = "blank", fill = NA),
-         legend.text = element_markdown(size = 12), #Make legend text italic
-         axis.text.x = element_text(size = 12),
-         #axis.title.x = element_text(size = 14),
-         axis.title.x = element_blank()) +
-  #facet_wrap(~ Species, labeller = labeller(Species = labels_list)) +
-  facet_wrap(~ Species) +
-  guides(color = "none")        #To turn off color legend
-
-hill1_diversity
-
-#ggsave(filename = file.path(path, "figures/shannon_elevation.png"), plot = hill1_diversity, dpi=300, units=c("mm"), width=250, height=150)
-
-# Linear models per species
-# Linear model summary
-# M. laciniatus
-summary(lm(hill_1 ~ Elevation_m, data = plant_traits[plant_traits$Species == "L",]))
-#Not significant
-
-# M. nasutus
-summary(lm(hill_1 ~ Elevation_m, data = plant_traits[plant_traits$Species == "N",]))
-#Not significant
-
-# M. guttatus
-summary(lm(hill_1 ~ Elevation_m, data = plant_traits[plant_traits$Species == "G",]))
-#Not significant
-
-
-# Hill number 0 
-# Species richness or hill number 0
-
-#Linear model summary
-summary(lm(Observed ~ Elevation_m, data = plant_traits))
-richness_p <- format.p(cor.test(plant_traits$Observed, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
-# Species labels
-labels_list <- c("M. laciniatus", "M. nasutus", "M. guttatus")
-names(labels_list) <- c("L", "N", "G")
-
-# Plot
-hill0_diversity <- ggplot(data = plant_traits  |>
-  filter(!Species == "B"), 
-  aes(x = Elevation_m, y = Observed, color = Species)) +
-   geom_jitter(aes(color = plant_traits$Species[plant_traits$Species != "B"]), size = 3, alpha = 0.7) + 
-   geom_smooth(method = lm, se = F) + 
+hill0_diversity <-ggplot(data = plant_traits_rf, 
+                         aes(x = Elevation_m, y = Observed, color = Species)) +
+  geom_jitter(aes(color = Species), size = 3, alpha = 0.7) + 
+   geom_smooth(method = lm, se = F) +
    # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
    geom_smooth(method = lm, se = T, level = 0.95, na.rm = F, color = "black") + 
    stat_regline_equation(label.y = 57, label.x = 1000, 
-                         aes(label = paste(..eq.label.., #sprintf("italic('p')~'%s'", richness_p), 
-                                          sep = "~~~~")), size = rel(4), color = "black") +
-  stat_regline_equation(label.y = 52, label.x = 1000, 
-                          aes(label = ..adj.rr.label..), size = rel(4), color = "black") + 
+                          aes(label = ..adj.rr.label..), size = rel(5), color = "black") + 
+   stat_fit_glance(method = 'lm',
+                   method.args = list(formula = y ~ x),
+                   geom = 'text',
+                   aes(label = paste("p = ",
+                                     signif(..p.value.., digits = 4), 
+                                     sep = "")),
+                   color = "black",
+                   label.x = 'center', 
+                   label.y = 50, size = rel(4)) +
    scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                       values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
-   labs(y =  "\U1D492 = 0", x = "Elevation (m.a.s.l.)", col = "") + 
-   theme_classic(base_size = 12) +
+   labs(y =  "\U1D492 = 0", x = "", col = "") + 
+   scale_y_continuous(expand = c(0.05, 0.05)) +
+   theme_classic(base_size = 16) +
    theme(legend.title = element_text(face = "bold"),
-         strip.text = element_text(face = "italic", size = 14),
+         strip.text = element_text(face = "bold.italic", size = 14),
          panel.border = element_rect(linetype = "blank", fill = NA),
-         legend.text = element_markdown(size = 12), #Make legend text italic
-         axis.text.x = element_text(size = 12),
-         #axis.title.x = element_text(size = 14), 
-         axis.title.x = element_blank()) +
+         legend.text = element_markdown(size = 14), #Make legend text italic
+         axis.text.x = element_text(size = 14)) +
+  scale_x_continuous(expand = c(0.05, 0.05)) +
   facet_wrap(~ Species, labeller = labeller(Species = labels_list)) +
   guides(color = "none")        #To turn off color legend
   # annotate(geom = "text", x = 2100, y = 2.5, label = "p = 0.03", color = "black")
 #annotate(geom="text", x=2100, y=50, label="p = 0.06", color = "black")
 
-hill0_diversity
+#hill0_diversity
 
 #ggsave(filename = file.path(path, "figures/richness_elevation.png"), plot = hill0_diversity, dpi=300, units=c("mm"), width=250, height=150)
 
 # Linear models per species
 # Linear model summary
 # M. laciniatus
-summary(lm(Observed ~ Elevation_m, data = plant_traits[plant_traits$Species == "L",]))
+#summary(lm(Observed ~ Elevation_m, data = plant_traits[plant_traits$Species == "L",]))
 #Not significant
 
 # M. nasutus
-summary(lm(Observed ~ Elevation_m, data = plant_traits[plant_traits$Species == "N",]))
+#summary(lm(Observed ~ Elevation_m, data = plant_traits[plant_traits$Species == "N",]))
 #Not significant
 
 # M. guttatus
-summary(lm(Observed~ Elevation_m, data = plant_traits[plant_traits$Species == "G",]))
+#summary(lm(Observed~ Elevation_m, data = plant_traits[plant_traits$Species == "G",]))
 #Not significant
 
+# Hill number 1
+# Shannon diversity or hill number 1
+# Linear model summary
+#summary(lm(Shannon ~ Elevation_m, data = plant_traits))
+#elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
+
+# Plot
+hill1_diversity <- ggplot(data = plant_traits_rf, 
+                          aes(x = Elevation_m, y = hill_1, color = Species)) +
+   geom_jitter(aes(color = Species), size = 3, alpha = 0.7) + 
+   geom_smooth(method = lm, se = F) +
+   # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
+   geom_smooth(method = lm, se = T, level = 0.95, na.rm = F, color = "black") + 
+   stat_regline_equation(label.y = 22, label.x = 1000,
+                          aes(label = ..adj.rr.label.., ), size = rel(5), color = "black") + 
+   stat_fit_glance(method = 'lm',
+                   method.args = list(formula = y ~ x),
+                   geom = 'text',
+                   aes(label = paste("p = ",
+                                     signif(..p.value.., digits = 4), 
+                                     sep = "")),
+                   color = "black",
+                   label.x = 'center', 
+                   label.y = 18, size = rel(4)) +
+   #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
+                     #values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
+   scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
+                     values = met.brewer("Isfahan2", n = 4, type = "discrete", 
+                                          direction = c(-1))) + 
+  labs(y = "\U1D492 = 1", x = "", col = "") +
+  scale_y_continuous(expand = c(0.05, 0.05)) +
+  #labs(y = expression("*q* = 1"), x = "Elevation (m.a.s.l.)", col = "") + 
+   theme_classic(base_size = 16) +
+   theme(legend.title = element_text(face = "bold"),
+         #strip.text = element_text(face = "italic", size = 14),
+         strip.background = element_blank(),
+         strip.text = element_blank(),
+         panel.border = element_rect(linetype = "blank", fill = NA),
+         legend.text = element_markdown(size = 14), #Make legend text italic
+         axis.text.x = element_text(size = 14)) +
+  #facet_wrap(~ Species, labeller = labeller(Species = labels_list)) +
+  facet_wrap(~ Species) +
+  guides(color = "none")        #To turn off color legend
+
+#hill1_diversity
+
+#ggsave(filename = file.path(path, "figures/shannon_elevation.png"), plot = hill1_diversity, dpi=300, units=c("mm"), width=250, height=150)
+
+# Linear models per species
+# Linear model summary
+# M. laciniatus
+#summary(lm(hill_1 ~ Elevation_m, data = plant_traits[plant_traits$Species == "L",]))
+#Not significant
+
+# M. nasutus
+#summary(lm(hill_1 ~ Elevation_m, data = plant_traits[plant_traits$Species == "N",]))
+#Not significant
+
+# M. guttatus
+#summary(lm(hill_1 ~ Elevation_m, data = plant_traits[plant_traits$Species == "G",]))
+#Not significant
 
 # Hill number 2
 # Inverse Simpson diversity or hill number 2
 # Linear model summary
-summary(lm(hill_2 ~ Elevation_m, data = plant_traits))
-elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
+#summary(lm(hill_2 ~ Elevation_m, data = plant_traits))
+#elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
 
 # Plot
-hill2_diversity <- ggplot(data = plant_traits  |>
-  filter(!Species == "B"), 
-  aes(x = Elevation_m, y = hill_2, color = Species)) +
-   geom_jitter(aes(color = plant_traits$Species[plant_traits$Species != "B"]), size = 3, alpha = 0.7) + 
-   geom_smooth(method = lm, se = F) + 
+hill2_diversity <-ggplot(data = plant_traits_rf,
+                         aes(x = Elevation_m, y = hill_2, color = Species)) +
+   geom_jitter(aes(color = Species), size = 3, alpha = 0.7) + 
+   geom_smooth(method = lm, se = F) +
    # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
    geom_smooth(method = lm, se = T, level = 0.95, na.rm = F, color = "black") + 
-   stat_regline_equation(label.y = 17, label.x = 1000,
-                         aes(label = paste(..eq.label.., #sprintf("italic('p')~'%s'", elev_div_p), 
-                                          sep = "~~~~")), size = rel(4), color = "black") +
-   stat_regline_equation(label.y = 15, label.x = 1000,
-                          aes(label = ..adj.rr.label.., ), size = rel(4), color = "black") + 
+   stat_regline_equation(label.y.npc = "top",
+                         label.y = 13,
+                         label.x = 1000,
+                          aes(label = ..adj.rr.label.., ), size = rel(5), color = "black") +
+   stat_fit_glance(method = 'lm',
+                   method.args = list(formula = y ~ x),
+                   geom = 'text',
+                   aes(label = paste("p = ",
+                                     signif(..p.value.., digits = 4), 
+                                     sep = "")),
+                   color = "black",
+                   label.x = 'center', 
+                   label.y = 11, size = rel(4)) +
    #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
                      #values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", 
                                           direction = c(-1))) + 
   labs(y = "\U1D492 = 2", x = "Elevation (m.a.s.l.)", col = "") +
+  #scale_y_continuous(breaks = c(0, 15, 2)) +
   #labs(y = expression("*q* = 1"), x = "Elevation (m.a.s.l.)", col = "") + 
-   theme_classic(base_size = 12) +
+   theme_classic(base_size = 16) +
    theme(legend.title = element_text(face = "bold"),
          #strip.text = element_text(face = "italic", size = 14),
          strip.background = element_blank(),
          strip.text = element_blank(),
          panel.border = element_rect(linetype = "blank", fill = NA),
-         legend.text = element_markdown(size = 12), #Make legend text italic
-         axis.text.x = element_text(size = 12),
-         axis.title.x = element_text(size = 14)) +
+         legend.text = element_markdown(size = 14), #Make legend text italic
+         axis.text.x = element_text(size = 14)) +
   #facet_wrap(~ Species, labeller = labeller(Species = labels_list)) +
   facet_wrap(~ Species) +
   guides(color = "none")        #To turn off color legend
 
-hill2_diversity
+#hill2_diversity
 
 #ggsave(filename = file.path(path, "figures/invsimpson_elevation.png"), plot = hill2_diversity, dpi=300, units=c("mm"), width=250, height=150)
 
 # Linear models per species
 # Linear model summary
 # M. laciniatus
-summary(lm(hill_2 ~ Elevation_m, data = plant_traits[plant_traits$Species == "L",]))
+#summary(lm(hill_2 ~ Elevation_m, data = plant_traits[plant_traits$Species == "L",]))
 #Not significant
 
 # M. nasutus
-summary(lm(hill_2 ~ Elevation_m, data = plant_traits[plant_traits$Species == "N",]))
+#summary(lm(hill_2 ~ Elevation_m, data = plant_traits[plant_traits$Species == "N",]))
 #Not significant
 
 # M. guttatus
-summary(lm(hill_2 ~ Elevation_m, data = plant_traits[plant_traits$Species == "G",]))
+#summary(lm(hill_2 ~ Elevation_m, data = plant_traits[plant_traits$Species == "G",]))
 #Not significant
 
 
 ###### Joined plots ######
-hill_numbers <- ggarrange(hill0_diversity, hill1_diversity, hill2_diversity, 
-          nrow = 3, ncol = 1)
+hill_numbers <- ggarrange(hill0_diversity, hill1_diversity, hill2_diversity,
+                          labels = c("A", "B", "C"),
+                          nrow = 3, ncol = 1)
 
+hill_numbers
 #ggsave(filename = file.path(path, "figures/hill_numbers_elevation.png"), plot = hill_numbers, dpi=600, units=c("mm"), width=300, height=275)
 
 ############################################
@@ -1494,8 +1765,7 @@ hill_numbers_species
 
 # Observed richness
 # Hill number 0
-hill0_beta <-  ggplot(plant_traits |>
-                filter(!Species == "B"), aes(x = Elevation_cat, y = Observed)) +
+hill0_beta <-  ggplot(plant_traits_rf, aes(x = Elevation_cat, y = Observed)) +
   
   geom_violin(aes(fill = Elevation_cat)) +
   geom_crossbar(stat="summary", 
@@ -2052,9 +2322,6 @@ p2
 # head(dput(p2))
 ```
 
-
-
-
 ### NMDS
 
 ```{r, NMDS}
@@ -2282,6 +2549,7 @@ fwrite(dfperma, file.path(path, "Plots", "/permanova.csv"))
 ```
 
 ### PERMDISP
+
 Analysis of multivariate homogeneity of group dispersions.
 
 ```{r, PERMDISP}
@@ -2305,7 +2573,7 @@ TukeyHSD(beta2)
 boxplot(beta2, xlab = "", las = 2, cex.axis = 0.8)
 plot(beta2, hull=FALSE, ellipse=TRUE)
 
-# We see significant differences in the dispersion of the fungal community across elevation categories. 
+# I see significant differences in the dispersion of the fungal community across elevation categories. 
 
 ```
 
@@ -2319,7 +2587,6 @@ summary(sim)
 # Indicator species analysis
 
 This analysis allows us to determine what endophytes are associated with particular groups (e.g. tree species). According to this vgnette from Cáceres ([2022](https://cran.r-project.org/web/packages/indicspecies/vignettes/IndicatorSpeciesAnalysis.html)) `multipatt` function can provides us with Indicators Value Index and correlation index. Both are similar, but the differences lies in the question they help answer. Indicator value index "\[...\]are used for assessing the predictive values of species as indicators of the conditions prevailing in site groups, e.g. for field determination of community types or ecological monitoring." While the correlation index can be used for "\[...\] determining the ecological preferences of species among a set of alternative site groups or site group combinations."
-
 
 ```{r, indicspp}
 
@@ -2336,7 +2603,6 @@ asv_indicspp <- left_join(asv_matrix_df, nmds_traits, by = "Unique_ID") |># Join
     select(!c(237:255)) |>
   relocate(Species, Site, Elevation_cat, Elevation_m, .after = Unique_ID)
 ```
-
 
 ```{r indicspp}
 #Making vector of groups for analysis
@@ -2396,13 +2662,11 @@ multipatt_analysis_elev_sign <- multipatt_analysis_elev_sign[p.adj <= 0.06,]
 colnames(multipatt_analysis_sign)[1]  <- "ASV" 
 ```
 
-No ASVs significantly correlated with Mimulus species. When we test for correlations in elevation categories and adjust the p value for multiple comparison we are left with only 0 ASVs. 
+No ASVs significantly correlated with Mimulus species. When we test for correlations in elevation categories and adjust the p value for multiple comparison we are left with only 0 ASVs.
 
-NO evidence of a core ASV community associated with Mimulus or elevation types. 
-
+NO evidence of a core ASV community associated with Mimulus or elevation types.
 
 ```{r}
 
 
 ```
-

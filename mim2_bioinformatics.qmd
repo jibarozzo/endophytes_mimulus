@@ -1246,7 +1246,8 @@ contaminants and remove them.
 ```{r, ASV_TAXA_tables}
 library("phyloseq")
 library("decontam")
-library("microbiome")
+library("microbiome") # Miscellaneous functions for microbiome analysis
+library("metagMisc") # Miscellaneous functions for microbiome analysis
 library("data.table")
 library("tidyverse")
 out_dir <- file.path("../mim2_bioinformatics")
@@ -1742,11 +1743,17 @@ ps_clean_3 <- readRDS(file.path(out_dir, "clean_data/taxonomy/ASV_8450_assigned_
 ```
 
 #### Phyloseq CLEANED summary statistics
+
 ```{r, Phyloseq_clean_summary}
-# How mansy ASVs per Phyla are there after decontamination? Represent by percentage
+# How many ASVs per Phyla are there after decontamination? Represent by percentage
+# metagMisc summary
 phyloseq_summary(ps_clean_3, more_stats = F, long = F) #Overall summary
 
-## This summary does not include the relative abundance of phyla represented in the total reads. We will calculate this below. ###
+# Microbiome package summary
+summarize_phyloseq(ps_clean_3) #Microbiome package summary
+
+
+## This summary does not include the relative abundance (compositional) of phyla represented in the total reads. We will calculate this below. ###
 
 # Relative abundance of Phyla based on the total reads
 clean_relabundance_phyla <- tax_glom(ps_clean_3, 
@@ -1771,12 +1778,30 @@ percent_phyla_clean <- phyloseq_ntaxa_by_tax(
   group_by(Phylum) |>
   summarise(occurance_in_samples = n())# Count the number of ASV per phylum
 
-# Micorobiome packge summary
-summarize_phyloseq(ps_clean_3) #Microbiome package summary
+
+# Coverage
+phyloseq_coverage(ps_clean_3, correct_singletons = F) #Coverage
+
+# Prevalence plot
+phyloseq_prevalence_plot(
+  ps_clean_3,
+  prev.trh = 0.5,
+  taxcolor = "Phylum",
+  facet = TRUE,
+  point_alpha = 0.7,
+  showplot = T
+)
+
 ```
 
+```{r, clean_summary}
+
+
+```
+
+
 The removal of singletons and samples with no reads of any taxa resulted
-in 231 ASVs in 160 samples. We have lost 14 samples in the process.
+in 231 ASVs in 160 samples. We have lost 14 samples in the process. It looks like good coverage for all/many of the samples.
 
 We see that Ascomycota is present in 147 samples, Basidiomycota in 155 samples. The rest of the phyla are present in less than 6 samples.
 
@@ -1790,7 +1815,6 @@ downstream analyses.
 ```{r, phyloseq_to_df}
 # Phyloseq object to data frames 
 # Cleaned: no singletons
-library("metagMisc")
 
 rel_ps_clean_df <- phyloseq_to_df(rel_abund_ps_clean, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
 
@@ -1799,7 +1823,7 @@ rel_ps_clean_df  <- replace(rel_ps_clean_df , rel_ps_clean_df  == "NaN", 0)
 write.csv(rel_ps_clean_df, file.path(out_dir, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.csv"))
 
 # Saving phyloseq with not relative abundance calculated
-ps_clean_3_df <- phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
+ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance")
 #write.csv(ps_clean_3_df,file.path(out_dir, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.csv"))
 ```
 
