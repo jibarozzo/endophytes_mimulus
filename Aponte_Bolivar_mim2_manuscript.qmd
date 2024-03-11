@@ -83,22 +83,36 @@ library("data.table")
 library("ggpubr")
 library("ggfortify")
 library("ggtext")
+library("ggh4x")
 library("ggpmisc")
 library("broom")
 library("MetBrewer")
 library("rstatix")
 
+# Models
 library("car")
 library("nlme")
 
+# Diversity
 library("vegan")
-library("phyloseq")
 library("hillR")
-library("metagMisc")
-library("microbiome")
 library("iNEXT")
 library("geosphere")
 library("indicspecies")
+
+# Phyloseq friendly
+#Some of these are redundant and have conflicts, but have functions that I like better than others or compliment each other.
+library("phyloseq")
+library("microeco") # New package for microbial analyses
+library("file2meco") # File to microeco (phyloseq friendly)
+library("metagMisc") # Miscellaneous functions
+library("microbiome") # Expands phyloseq 
+library("mirlyn")
+
+library("conflicted")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("alpha", "ggplot2")
 
 # File path
 
@@ -130,12 +144,12 @@ leaf_traits_noB <- leaf_traits |>
 #These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
 
 #Load Phyloseq object cleaned of singletons (231 ASVs)
-ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.rds"))
-ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.csv"))
+ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.rds"))
+ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.csv"))
 
 #Load Relative abundance phyloseq
-rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.rds"))
-rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.csv"))
+rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
+rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
 
 # Load ps_melt
 #ps_melt <- readRDS(file.path(path, "clean_data/statistics/ps_melt.rds"))
@@ -409,36 +423,38 @@ names(labels_list) <- c("L", "N", "G")
 # Species richness or hill number 0
 
 #Linear model summary
-#summary(lm(Observed ~ Elevation_m, data = plant_traits))
+#summary(lm(Observed ~ Elevation_m, data = plant_traits_rf))
 #richness_p <- format.p(cor.test(plant_traits$Observed, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
 # Species labels
 labels_list <- c("M. laciniatus", "M. nasutus", "M. guttatus")
 names(labels_list) <- c("L", "N", "G")
 
 # Plot
-hill0_diversity <- ggplot(data = plant_traits  |>
-                            filter(!Species == "B"), 
+hill0_diversity <- ggplot(data = plant_traits_rf, 
                           aes(x = Elevation_m, y = Observed, color = Species)) +
-   geom_jitter(aes(color = plant_traits$Species[plant_traits$Species != "B"]), size = 3, alpha = 0.7) + 
-   geom_smooth(method = lm, se = F) + 
-   # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
-   geom_smooth(method = lm, se = T, level = 0.95, na.rm = F, color = "black") + 
-   stat_regline_equation(label.y = 57, label.x = 1000, 
-                          aes(label = ..adj.rr.label..), size = rel(5), color = "black") + 
-   stat_fit_glance(method = 'lm',
-                   method.args = list(formula = y ~ x),
-                   geom = 'text',
-                   aes(label = paste("p = ",
-                                     signif(..p.value.., digits = 4), 
-                                     sep = "")),
-                   color = "black",
-                   label.x = 'center', 
-                   label.y = 50, size = rel(4)) +
+   geom_jitter(aes(color = Species), 
+               #stat = "summary",
+               #fun = mean,
+               size = 3, alpha = 0.3) + 
+   #geom_smooth(method = lm, se = F) +
+  geom_smooth(method = lm, se = T, level = 0.95, na.rm = F, color = "black") +
+  stat_poly_eq(formula = y ~ x, color = "black",
+               aes(label = paste(#..eq.label.., 
+                 ..adj.rr.label.., #"~italic(p) ==",
+                 ..p.value.label.., 
+                 #signif(..p.value.., digits = 4),
+                 sep = "*`,`~~")), 
+               rr.digits = 2,
+               p.digits = 3 ,
+               parse = TRUE,
+               label.x = "left",
+               label.y= "top",
+               vstep = 0.08) +
    scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                       values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
-   labs(y =  "\U1D492 = 0", x = "Elevation (m.a.s.l.)", col = "") + 
+   labs(y =  "\U1D492 = 0", x = "", col = "") + 
    scale_y_continuous(expand = c(0.05, 0.05)) +
    theme_classic(base_size = 16) +
    theme(legend.title = element_text(face = "bold"),
@@ -477,30 +493,33 @@ hill0_diversity <- ggplot(data = plant_traits  |>
 #elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
 
 # Plot
-hill1_diversity <- ggplot(data = plant_traits  |>
-  filter(!Species == "B"), 
-  aes(x = Elevation_m, y = hill_1, color = Species)) +
-   geom_jitter(aes(color = plant_traits$Species[plant_traits$Species != "B"]), size = 3, alpha = 0.7) + 
+hill1_diversity <- ggplot(data = plant_traits_rf,
+                          aes(x = Elevation_m, y = hill_1, color = Species)) +
+   geom_jitter(aes(color = Species), 
+               #stat = "summary",
+               #fun = mean,
+               size = 3, alpha = 0.3) + 
    geom_smooth(method = lm, se = F) + 
    # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
    geom_smooth(method = lm, se = T, level = 0.95, na.rm = F, color = "black") + 
-   stat_regline_equation(label.y = 22, label.x = 1000,
-                          aes(label = ..adj.rr.label.., ), size = rel(5), color = "black") + 
-   stat_fit_glance(method = 'lm',
-                   method.args = list(formula = y ~ x),
-                   geom = 'text',
-                   aes(label = paste("p = ",
-                                     signif(..p.value.., digits = 4), 
-                                     sep = "")),
-                   color = "black",
-                   label.x = 'center', 
-                   label.y = 18, size = rel(4)) +
+  stat_poly_eq(formula = y ~ x, color = "black",
+               aes(label = paste(#..eq.label.., 
+                 ..adj.rr.label.., #"~italic(p) ==",
+                 ..p.value.label.., 
+                 #signif(..p.value.., digits = 4),
+                 sep = "*`,`~~")), 
+               rr.digits = 2,
+               p.digits = 3 ,
+               parse = TRUE,
+               label.x = "left",
+               label.y = "top",
+               vstep = 0.08) +
    #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
                      #values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", 
                                           direction = c(-1))) + 
-  labs(y = "\U1D492 = 1", x = "Elevation (m.a.s.l.)", col = "") +
+  labs(y = "\U1D492 = 1", x = "", col = "") +
   scale_y_continuous(expand = c(0.05, 0.05)) +
   #labs(y = expression("*q* = 1"), x = "Elevation (m.a.s.l.)", col = "") + 
    theme_classic(base_size = 16) +
@@ -515,7 +534,7 @@ hill1_diversity <- ggplot(data = plant_traits  |>
   facet_wrap(~ Species) +
   guides(color = "none")        #To turn off color legend
 
-#hill1_diversity
+hill1_diversity
 
 #ggsave(filename = file.path(path, "figures/shannon_elevation.png"), plot = hill1_diversity, dpi=300, units=c("mm"), width=250, height=150)
 
@@ -540,26 +559,27 @@ hill1_diversity <- ggplot(data = plant_traits  |>
 #elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
 
 # Plot
-hill2_diversity <- ggplot(data = plant_traits  |>
-  filter(!Species == "B"), 
+hill2_diversity <- ggplot(data = plant_traits_rf, 
   aes(x = Elevation_m, y = hill_2, color = Species)) +
-   geom_jitter(aes(color = plant_traits$Species[plant_traits$Species != "B"]), size = 3, alpha = 0.7) + 
+   geom_jitter(aes(color = Species), 
+               #stat = "summary",
+               #fun = mean,
+               size = 3, alpha = 0.3) + 
    geom_smooth(method = lm, se = F) + 
    # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
    geom_smooth(method = lm, se = T, level = 0.95, na.rm = F, color = "black") + 
-   stat_regline_equation(label.y.npc = "top",
-                         label.y = 13,
-                         label.x = 1000,
-                          aes(label = ..adj.rr.label.., ), size = rel(5), color = "black") +
-   stat_fit_glance(method = 'lm',
-                   method.args = list(formula = y ~ x),
-                   geom = 'text',
-                   aes(label = paste("p = ",
-                                     signif(..p.value.., digits = 4), 
-                                     sep = "")),
-                   color = "black",
-                   label.x = 'center', 
-                   label.y = 11, size = rel(4)) +
+  stat_poly_eq(formula = y ~ x, color = "black",
+               aes(label = paste(#..eq.label.., 
+                 ..adj.rr.label.., #"~italic(p) ==",
+                 ..p.value.label.., 
+                 #signif(..p.value.., digits = 4),
+                 sep = "*`,`~~")), 
+               rr.digits = 2,
+               p.digits = 3 ,
+               parse = TRUE,
+               label.x = "left",
+               label.y = "top",
+               vstep = 0.08) +
    #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
                      #values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
@@ -629,18 +649,17 @@ labels_list <- c("M. laciniatus", "M. nasutus", "M. guttatus")
 names(labels_list) <- c("L", "N", "G")
 
 # Plot
-hill0_species <- ggplot(data = plant_traits  |>
-  filter(!Species == "B"), 
+hill0_species <- ggplot(data = plant_traits_rf, 
   aes(x = Species, y = Observed)) +
-  geom_violin(aes(fill = Species)) +
-  geom_crossbar(stat="summary",
-                fun = mean,
-                fun.max = mean,
-                fun.min = mean,
-                fatten = 1.5, width = 0.8) +
-  geom_point(color="black", alpha = 0.2,
-             size=1.7, 
-             position = position_jitter(w = 0.05))  +
+  geom_boxplot(aes(fill = Species)) +
+  # geom_crossbar(stat="summary",
+  #               fun = mean,
+  #               fun.max = mean,
+  #               fun.min = mean,
+  #               fatten = 1.5, width = 0.8) +
+  # geom_point(color="black", alpha = 0.2,
+  #            size=1.7, 
+  #            position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
@@ -666,18 +685,18 @@ hill0_species <- ggplot(data = plant_traits  |>
 # Hill number 1
 # Shannon diversity or hill number 1
 # Plot
-hill1_species <- ggplot(data = plant_traits  |>
-  filter(!Species == "B"), 
+hill1_species <- ggplot(data = plant_traits_rf, 
   aes(x = Species, y = hill_1)) +
-  geom_violin(aes(fill = Species)) +
-  geom_crossbar(stat="summary",
-                fun = mean,
-                fun.max = mean,
-                fun.min = mean,
-                fatten = 1.5, width = 0.8) +
-  geom_point(color="black", alpha = 0.2,
-             size=1.7, 
-             position = position_jitter(w = 0.05))  +
+  geom_boxplot(aes(fill = Species)) +
+  # geom_crossbar(stat="summary",
+  #               
+  #               fun = mean,
+  #               fun.max = mean,
+  #               fun.min = mean,
+  #               fatten = 1.5, width = 0.8) +
+  # geom_point(color="black", alpha = 0.2,
+  #            size=1.7, 
+  #            position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
@@ -701,18 +720,17 @@ hill1_species <- ggplot(data = plant_traits  |>
 
 # Hill number 2
 # Inverse Simpson diversity or hill number 2
-hill2_species <- ggplot(data = plant_traits  |>
-  filter(!Species == "B"), 
-  aes(x = Species, y = hill_2)) +
-  geom_violin(aes(fill = Species)) +
-  geom_crossbar(stat="summary",
-                fun = mean,
-                fun.max = mean,
-                fun.min = mean,
-                fatten = 1.5, width = 0.8) +
-  geom_point(color="black", alpha = 0.2,
-             size=1.7, 
-             position = position_jitter(w = 0.05))  +
+hill2_species <- ggplot(data = plant_traits_rf, 
+                        aes(x = Species, y = hill_2)) +
+  geom_boxplot(aes(fill = Species)) +
+  # geom_crossbar(stat="summary",
+  #               fun = mean,
+  #               fun.max = mean,
+  #               fun.min = mean,
+  #               fatten = 1.5, width = 0.8) +
+  # geom_point(color="black", alpha = 0.2,
+  #            size=1.7, 
+  #            position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
@@ -749,18 +767,17 @@ hill2_species <- ggplot(data = plant_traits  |>
 
 # Observed richness
 # Hill number 0
-hill0_beta <-  ggplot(plant_traits |>
-                filter(!Species == "B"), aes(x = Elevation_cat, y = Observed)) +
+hill0_beta <-  ggplot(plant_traits_rf, aes(x = Elevation_cat, y = Observed)) +
   
-  geom_violin(aes(fill = Elevation_cat)) +
-  geom_crossbar(stat="summary", 
-                fun = mean, 
-                fun.max = mean, 
-                fun.min = mean,  
-                fatten = 2, 
-                width = 0.5, 
-                color="black") +
-  geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
+  geom_boxplot(aes(fill = Elevation_cat)) +
+  # geom_crossbar(stat="summary", 
+  #               fun = mean, 
+  #               fun.max = mean, 
+  #               fun.min = mean,  
+  #               fatten = 2, 
+  #               width = 0.5, 
+  #               color="black") +
+  # geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
   scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_shape_manual(values=c(15:18),labels = c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
@@ -783,18 +800,17 @@ hill0_beta <-  ggplot(plant_traits |>
 
 # Hill number 1
 # Shannon diversity or hill number 1
-hill1_beta <- ggplot(plant_traits |>
-                filter(!Species == "B"), aes(x = Elevation_cat, y = hill_1)) +
+hill1_beta <- ggplot(plant_traits_rf, aes(x = Elevation_cat, y = hill_1)) +
   
-  geom_violin(aes(fill = Elevation_cat)) +
-  geom_crossbar(stat="summary", 
-                fun = mean, 
-                fun.max = mean, 
-                fun.min = mean,  
-                fatten = 2, 
-                width = 0.5, 
-                color="black") +
-  geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
+  geom_boxplot(aes(fill = Elevation_cat)) +
+  # geom_crossbar(stat="summary", 
+  #               fun = mean, 
+  #               fun.max = mean, 
+  #               fun.min = mean,  
+  #               fatten = 2, 
+  #               width = 0.5, 
+  #               color="black") +
+   geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
   scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_shape_manual(values=c(15:18),labels = c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
@@ -817,18 +833,17 @@ hill1_beta <- ggplot(plant_traits |>
 # Hill number 2
 # Inverse Simpson diversity or hill number 2
 
-hill2_beta <- ggplot(plant_traits |>
-                filter(!Species == "B"), aes(x = Elevation_cat, y = hill_2)) +
+hill2_beta <- ggplot(plant_traits_rf, aes(x = Elevation_cat, y = hill_2)) +
   
-  geom_violin(aes(fill = Elevation_cat)) +
-  geom_crossbar(stat="summary", 
-                fun = mean, 
-                fun.max = mean, 
-                fun.min = mean,  
-                fatten = 2, 
-                width = 0.5, 
-                color="black") +
-  geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
+  geom_boxplot(aes(fill = Elevation_cat)) +
+  # geom_crossbar(stat="summary", 
+  #               fun = mean, 
+  #               fun.max = mean, 
+  #               fun.min = mean,  
+  #               fatten = 2, 
+  #               width = 0.5, 
+  #               color="black") +
+  # geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
   scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_shape_manual(values=c(15:18),labels = c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
@@ -886,30 +901,36 @@ alpha_beta_diversity
 #| label: rabun_barplot
 #| fig-cap: "Bar plot of relative abundance of fungal phyla by species and elevation category."
 
-ps_melt <- psmelt(ps_clean_3) # Melting data to create accurate relative abunddance plot
-p1 <- ggplot(ps_melt |>
-  filter(!sample_Species == "B"), aes(x = sample_Species, y = Abundance)) +
-  geom_bar(aes(fill = Phylum, color = Phylum), stat="identity", position = "fill") +
-  scale_fill_manual(labels=c('Ascomycota', 'Basidiomycota', 'Chytridiomycota', 'Fungi_ord_Incertae_sedis', 'Mortierellomycota', 'Olpidiomycota'),values= met.brewer("Lakota", n = 6 , type = "discrete", override.order = TRUE)) +
-  scale_color_manual(labels=c('Ascomycota', 'Basidiomycota', 'Chytridiomycota', 'Fungi_ord_Incertae_sedis', 'Mortierellomycota', 'Olpidiomycota'), values = met.brewer("Lakota", n = 6, type = "discrete", override.order = TRUE)) +
-  theme_classic(base_size = 16) +
-  theme(strip.background = element_rect(fill = "white"),
-        strip.text = element_text(colour = "black", face = "bold"),
-        legend.title = element_text(face = "bold"),
-        legend.text = element_text(size = 14),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(face="italic", 
-                                    size = 12,  
-                                    hjust = 1,
-                                    angle = 30)) +
-  scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
-  labs(y = "Relative Abundance", x = "") +
-  facet_grid(~Elevation_cat)
-
-  
-p1 
+# ps_melt <- psmelt(ps_clean_3) # Melting data to create accurate relative abunddance plot
+# p1 <- ggplot(ps_melt |>
+#   filter(!sample_Species == "B"), aes(x = sample_Species, y = Abundance)) +
+#   geom_bar(aes(fill = Phylum, color = Phylum), stat="identity", position = "fill") +
+#   scale_fill_manual(labels=c('Ascomycota', 'Basidiomycota', 'Chytridiomycota', 'Fungi_ord_Incertae_sedis', 'Mortierellomycota', 'Olpidiomycota'),values= met.brewer("Lakota", n = 6 , type = "discrete", override.order = TRUE)) +
+#   scale_color_manual(labels=c('Ascomycota', 'Basidiomycota', 'Chytridiomycota', 'Fungi_ord_Incertae_sedis', 'Mortierellomycota', 'Olpidiomycota'), values = met.brewer("Lakota", n = 6, type = "discrete", override.order = TRUE)) +
+#   theme_classic(base_size = 16) +
+#   theme(strip.background = element_rect(fill = "white"),
+#         strip.text = element_text(colour = "black", face = "bold"),
+#         legend.title = element_text(face = "bold"),
+#         legend.text = element_text(size = 14),
+#         panel.border = element_rect(linetype = "blank", fill = NA),
+#         axis.text.y = element_text(size = 12),
+#         axis.text.x = element_text(face="italic", 
+#                                     size = 12,  
+#                                     hjust = 1,
+#                                     angle = 30)) +
+#   scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
+#   labs(y = "Relative Abundance", x = "") +
+#   facet_grid(~Elevation_cat)
+# p1 
+# return a ggplot2 object
 #ggsave(file.path(path, "figures/figure4.png") , plot = p1, dpi=300, units=c("mm"), width=200, height=250)
+
+#Barplots with microeco
+micro_psclean <- phyloseq2meco(ps_clean_3) # First convert phyloseq to meco
+t1 <- trans_abund$new(dataset = micro_psclean, taxrank = "Phylum", ntaxa = 8)
+t1gg <- t1$plot_bar(others_color = "grey70", facet = c("Species", "Elevation_cat"), xtext_keep = FALSE, legend_text_italic = FALSE)
+t1gg 
+#ggsave(file.path(path, "figures/figure4.png") , plot = t1gg, dpi=300, units=c("mm"), width=200, height=250)
 ```
 
 ## Figure 5
@@ -924,8 +945,15 @@ p1
 #| fig-cap: "FEF community composition association with leaf functional traits and elevation per host species. Distance-based Redundancy Analysis (dbRDA) plot of FEF community and leaf functional traits by species. A) Each point represents a FEF community sample from one host species; blue filled squares correspond to *M. laciniatus*, green circles to *M. nasutus*, and yellow triangles to *M. guttatus*. B) Purple filled shapes correspond to LOW elevation, pink chapes to MID elevation and light maroon shapes to HIGH elevation. Point shapes correspond to host species. Solid arrow lines represent significant associations (*p* <0.01), while dashed lines represent non-significant associations. The length and direction of the arrows indicate the strength and direction of the association between the traits and the FEF community composition. The labels on the arrows correspond to the leaf functional traits. Ellipses represent 95% confidence intervals. The plot is based on the Bray-Curtis dissimilarity matrix."
 
 # dbRDA using Elevation as continuous variable
-m2dbRDA <- dbrda(asv_vegdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m + Site + Species, distance = "bray", data = nmds_traits, na.action = na.omit)
+model <- asv_avgdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m + Site + Species
 
+set.seed(123)
+m2dbRDA <- dbrda(model, distance = "bray", data = nmds_traits, na.action = na.omit)
+
+# PERMANOVA = dbRDA
+adonis2(model, nmds_traits, distance = "bray", permutations = 999, by = "margin", add = FALSE, parallel = 2, na.action = na.omit, strata = NULL)
+
+# Results from dbRDA and adonis2 should be very similar. 
 #summary(m2dbRDA)
 #plot(m2dbRDA)
 #anova(m2dbRDA, by = "margin")
@@ -982,12 +1010,12 @@ p_m2dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +
   geom_segment(arrow_map, size = rel(.8), data = A.4[c(2,4:6),], color = "black", arrow = arrowhead, linetype = "dashed") +
   geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") + # plot vertical line
   geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") + # plot horizontal line
-  geom_text(label_map, size = rel(4), data = A4.sub1, fontface = "bold", show.legend = FALSE, label = c("Elv."), nudge_x = -0.3) +
-  geom_text(label_map, size = rel(3), data = A4.sub2, fontface = "bold", show.legend = FALSE, label = c("logACI"), nudge_y = -0.05, nudge_x = 0.4) +
-  geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI"), nudge_y = -0.2) +
-  geom_text(label_map, size = rel(3), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA"), nudge_y = -0.1, nudge_x = -0.3) +
-  geom_text(label_map, size = rel(3), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS"), nudge_y = -0.15, nudge_x = 0.2) +
-  geom_text(label_map, size = rel(3), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT"), nudge_y = 0.1, nudge_x = 0.4) +
+  geom_text(label_map, size = rel(4), data = A4.sub1, fontface = "bold", show.legend = FALSE, label = c("Elv.")) +
+  geom_text(label_map, size = rel(3), data = A4.sub2, fontface = "bold", show.legend = FALSE, label = c("logACI")) +
+  geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI")) +
+  geom_text(label_map, size = rel(3), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA")) +
+  geom_text(label_map, size = rel(3), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS")) +
+  geom_text(label_map, size = rel(3), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT")) +
   xlab(label = paste("dbRDA1 (", round(B$concont$importance[2,1]*100, digits = 1), "%)", sep="")) +
   ylab(label = paste("dbRDA2 (", round(B$concont$importance[2,2]*100, digits = 1), "%)", sep="")) + 
   scale_color_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
@@ -1027,12 +1055,12 @@ elev_cat_dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +
   geom_segment(arrow_map, size = rel(.8), data = A.4[c(2,4:6),], color = "black", arrow = arrowhead, linetype = "dashed") +
   geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") + # plot vertical line
   geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") + # plot horizontal line
-  geom_text(label_map, size = rel(4), data = A4.sub1, fontface = "bold", show.legend = FALSE, label = c("Elv."), nudge_x = -0.3) +
-  geom_text(label_map, size = rel(3), data = A4.sub2, fontface = "bold", show.legend = FALSE, label = c("logACI"), nudge_y = -0.05, nudge_x = 0.4) +
-  geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI"), nudge_y = -0.2) +
-  geom_text(label_map, size = rel(3), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA"), nudge_y = -0.1, nudge_x = -0.3) +
-  geom_text(label_map, size = rel(3), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS"), nudge_y = -0.15, nudge_x = 0.2) +
-  geom_text(label_map, size = rel(3), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT"), nudge_y = 0.1, nudge_x = 0.4) +
+  geom_text(label_map, size = rel(4), data = A4.sub1, fontface = "bold", show.legend = FALSE, label = c("Elv.")) +
+  geom_text(label_map, size = rel(3), data = A4.sub2, fontface = "bold", show.legend = FALSE, label = c("logACI")) +
+  geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI")) +
+  geom_text(label_map, size = rel(3), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA")) +
+  geom_text(label_map, size = rel(3), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS")) +
+  geom_text(label_map, size = rel(3), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT")) +
   xlab(label = paste("dbRDA1 (", round(B$concont$importance[2,1]*100, digits = 1), "%)", sep="")) +
   ylab(label = paste("dbRDA2 (", round(B$concont$importance[2,2]*100, digits = 1), "%)", sep="")) + 
   scale_color_manual(name = "Elevation", labels=c('LOW', 'MID', 'HIGH'),
