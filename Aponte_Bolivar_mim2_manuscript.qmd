@@ -164,16 +164,16 @@ asv_matrix <- ps_clean_3_df |>
   as.matrix()
 # Results in 231 x 157 matrix
 
-#Bray-Curtis dissimilarity matrix rarefied to 1000 reads
-set.seed(433)
-asv_avgdist <- avgdist(t(asv_matrix), 
-                       sample = 750,
-                       dmethod = "bray",
-                       meanfun = mean,
-                       iterations = 100,
-                       diag =  FALSE, 
-                       upper = FALSE) |>
-  as.matrix()
+#Bray-Curtis dissimilarity matrix rarefied to 750 reads
+# set.seed(433)
+# asv_avgdist <- avgdist(t(asv_matrix), 
+#                        sample = 750,
+#                        dmethod = "bray",
+#                        meanfun = mean,
+#                        iterations = 50,
+#                        diag =  FALSE, 
+#                        upper = FALSE) |>
+#   as.matrix()
 
 # Rarefied data frame names
 names_rarefy <- colnames(asv_avgdist) # Rarefied data frame names from avgdist
@@ -945,7 +945,8 @@ t1gg
 #| fig-cap: "FEF community composition association with leaf functional traits and elevation per host species. Distance-based Redundancy Analysis (dbRDA) plot of FEF community and leaf functional traits by species. A) Each point represents a FEF community sample from one host species; blue filled squares correspond to *M. laciniatus*, green circles to *M. nasutus*, and yellow triangles to *M. guttatus*. B) Purple filled shapes correspond to LOW elevation, pink chapes to MID elevation and light maroon shapes to HIGH elevation. Point shapes correspond to host species. Solid arrow lines represent significant associations (*p* <0.01), while dashed lines represent non-significant associations. The length and direction of the arrows indicate the strength and direction of the association between the traits and the FEF community composition. The labels on the arrows correspond to the leaf functional traits. Ellipses represent 95% confidence intervals. The plot is based on the Bray-Curtis dissimilarity matrix."
 
 # dbRDA using Elevation as continuous variable
-model <- asv_avgdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m + Site + Species
+#logACI + logLT + logLPS + logLMA +
+model <- asv_avgdist ~ logLBI + Elevation_m + Site + Species
 
 set.seed(123)
 m2dbRDA <- dbrda(model, distance = "bray", data = nmds_traits, na.action = na.omit)
@@ -1175,7 +1176,7 @@ asv_geo_matrix_long <- inner_join(asv_long, geo_long, by = c("A", "B")) |>
 # All data points
 set.seed(859)
 abund_geo  <- mantel(asv_avgdist, geo_distm, method = "spearman", permutations = 999, na.rm = TRUE)
-#abund_geo
+abund_geo
 
 # Mantel test by species
 # M. laciniatus
@@ -1190,17 +1191,17 @@ lac_names_rfy <- plant_traits |>
 
 # Subset the data
 lac_mantel  <- mantel(asv_long |> # Subset the data
-                       filter(A %in% lac_names, B %in% lac_names_rfy) |>
+                       filter(A %in% lac_names_rfy, B %in% lac_names_rfy) |>
                        pivot_wider(names_from = B, values_from = bray_diss) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
                      geo_long |> # Subset the data
-                       filter(A %in% lac_names, B %in% lac_names_rfy) |>
+                       filter(A %in% lac_names_rfy, B %in% lac_names_rfy) |>
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
                       method = "spearman", permutations = 999, na.rm = TRUE)
-#lac_mantel
+lac_mantel
 
 # M. nasutus
 nas_names_rfy <- plant_traits |> 
@@ -1209,17 +1210,17 @@ nas_names_rfy <- plant_traits |>
          Species == "N") |>
   pull(Unique_ID)
 nas_mantel  <- mantel(asv_long |> # Subset the data
-                       filter(A %in% nas_names, B %in% nas_names_rfy) |>
+                       filter(A %in% nas_names_rfy, B %in% nas_names_rfy) |>
                        pivot_wider(names_from = B, values_from = bray_diss) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(), 
                       geo_long |> # Subset the data
-                       filter(A %in% nas_names, B %in% nas_names_rfy) |>
+                       filter(A %in% nas_names_rfy, B %in% nas_names_rfy) |>
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(), 
                      method = "spearman", permutations = 999, na.rm = TRUE)
-#nas_mantel
+nas_mantel
 
 # M. guttatus
 gut_names_rfy <- plant_traits |> 
@@ -1229,12 +1230,12 @@ gut_names_rfy <- plant_traits |>
   pull(Unique_ID)
 # Subset the data
 gut_mantel  <- mantel(asv_long |> # Subset the data
-                       filter(A %in% gut_names, B %in% gut_names_rfy) |>
+                       filter(A %in% gut_names_rfy, B %in% gut_names_rfy) |>
                        pivot_wider(names_from = B, values_from = bray_diss) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
                      geo_long |> # Subset the data
-                       filter(A %in% gut_names, B %in% gut_names_rfy) |>
+                       filter(A %in% gut_names_rfy, B %in% gut_names_rfy) |>
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),

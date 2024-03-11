@@ -17,7 +17,6 @@ library("data.table")
 library("ggpubr")
 library("ggfortify")
 library("ggtext")
-library("ggh4x")
 library("ggpmisc")
 library("broom")
 library("MetBrewer")
@@ -30,17 +29,14 @@ library("nlme")
 # Diversity
 library("vegan")
 library("hillR")
-library("iNEXT")
 library("geosphere")
 library("indicspecies")
 
 # Phyloseq friendly
-#Some of these are redundant and have conflicts, but have functions that I like better than others or compliment each other.
 library("phyloseq")
-library("microeco") # New package for microbial analyses
-library("file2meco") # File to microeco
 library("metagMisc") # Miscellaneous functions
 library("microbiome") # Expands phyloseq 
+library("iNEXT")
 library("mirlyn")
 
 
@@ -184,7 +180,7 @@ ps_melt <- ps_clean_3 |>
   #        sample_Species = factor(sample_Species)) |>
   # ungroup() |>
   rename(Unique_ID = Sample, ASV = OTU) |> #Renaming OTU column
-  dplyr::select(!c(14:15))  #Reordering columns 
+  dplyr::select(!c(4, 6:15))  #Reordering columns 
 #This data frame is useful for barplots and other visualizations.
 
 # Save file
@@ -1270,7 +1266,14 @@ accum_curve <- specaccum(t(asv_matrix),
 
 plot(accum_curve, col = "blue", ci = 1, pch = 16, main = "Species Accumulation Curve", xvar = "sites", xlab = "Number of Samples", ylab = "Number of ASVs")
 accum_curve
+```
 
+
+I am going to take two approaches to selecting rarefied datasets for this study. First, rarefy the sequences and then randomize the resulting samples to select a smaller subset (~90 samples). Second approach is to randomize the samples first and then rarefy the sequences from those samples. I will compare and select the method that has the greatest sequencing breadth. The selection of samples will be done using a vector of samples names, this is most important for the second method. The names are selected from the `ps_clean_3` phyloseq object and/or the `ps_clean_3_df` data frame. 
+
+
+##### Rafaction of sequences > samples
+```{r, rarefaction_sequence}
 
 # Phyloseq friendly packages
 
@@ -1278,18 +1281,36 @@ accum_curve
 #750 reads
 pseq_rrf1 <- mirl(ps_clean_3,
                  libsize = 750,
-                 rep = 50,
+                 rep = 100,
                  set.seed = 443,
                  trimOTUs = FALSE,
                  replace = FALSE,
                  mc.cores = 4)
+
+# Select sample names
+seq_sample_names <- sample_names(pseq_rrf1[[1]]) # Sample names
+
+# Randomize sample names
+rand_matrix <- matrix(NA_character_, nrow = 95, ncol = 95)
+for (i in 1:95) {
+  set.seed(443)
+  rand_matrix[i, ] <- sample(seq_sample_names, 95, replace = FALSE)
+}
+
+# Select a random vector of names
+rand_vector <-  vector(length = 1)
+for (i in 1:95) {
+  set.seed(443)
+  rand_vector[i] <- sample(rand_matrix[i, ], 1)
+}
+
 # Functions `mirl` and `phyloseq_mult_raref`are practically the same. The difference is that `mirl` returns a list of phyloseq objects and `phyloseq_mult_raref` returns a single phyloseq object.
 
 # metagMisc package
 # set.seed(443) # Important to set seed for reproducibility
 # pseq_rrf <- phyloseq_mult_raref(ps_clean_3,
-#                                 SampSize = 750,
-#                                 iter = 100,
+#                                 SampSize = 1000,
+#                                 iter = 1000,
 #                                 replace = FALSE,
 #                                 multithread = TRUE)
 
@@ -1361,7 +1382,7 @@ I now have a data frame with 98 samples with rarefied alpha diversity indices an
 
 #### Dissimilarity and geographic distance matrices
 
-```{r, dist_matrix}
+```{r, diss_matrix}
 #| echo: false
 #| eval: true
 #| tidy: true
@@ -1387,7 +1408,7 @@ asv_avgdist <- avgdist(t(asv_matrix),
   as.matrix()
 
 # Rarefied data frame names
-names_rarefy <- colnames(asv_avgdist) # Rarefied data frame names from avgdist
+#names_rarefy <- colnames(asv_avgdist) # Rarefied data frame names from avgdist
 
 test <- sample_data(pseq_rrf1[[1]]) |> # Rarefied phyloseq object
   rownames() |>
@@ -1583,32 +1604,19 @@ hill2_diversity <-ggplot(data = plant_traits_rf,
    geom_smooth(method = lm, se = F) +
    # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
    geom_smooth(method = lm, se = T, level = 0.95, na.rm = F, color = "black") + 
-   # stat_regline_equation(label.y.npc = "top",
-   #                       label.y = 13,
-   #                       label.x = 1000,
-   #                        aes(label = ..adj.rr.label.., ), size = rel(5), color = "black") +
-   # stat_fit_glance(method = 'lm',
-   #                 method.args = list(formula = y ~ x),
-   #                 geom = 'text',
-   #                 aes(label = paste("p = ",
-   #                                   signif(..p.value.., digits = 4), 
-   #                                   sep = "")),
-   #                 color = "black",
-   #                 label.x = 'center', 
-   #                 label.y = 11, size = rel(4)) +
-  stat_poly_eq(formula = y ~ x, 
-               aes(color = Species,
-                   label = paste(#..eq.label.., 
-                                 ..adj.rr.label.., 
-                                 #"~italic(p) ==",
-                                 ..p.value.label.., 
-                                 #signif(..p.value.., digits = 4),
-                                 sep = "*`,`~~")), 
-               rr.digits = 2,
-               p.digits = 3 ,
-               parse = TRUE,
-               label.x.npc = "left",
-               vstep = 0.08) +
+   stat_regline_equation(label.y.npc = "top",
+                         label.y = 13,
+                         label.x = 1000,
+                          aes(label = ..adj.rr.label.., ), size = rel(5), color = "black") +
+   stat_fit_glance(method = 'lm',
+                   method.args = list(formula = y ~ x),
+                   geom = 'text',
+                   aes(label = paste("p = ",
+                                     signif(..p.value.., digits = 4), 
+                                     sep = "")),
+                   color = "black",
+                   label.x = 'center', 
+                   label.y = 11, size = rel(4)) +
    #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
                      #values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
    scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
@@ -1629,7 +1637,7 @@ hill2_diversity <-ggplot(data = plant_traits_rf,
   facet_wrap(~ Species) +
   guides(color = "none")        #To turn off color legend
 
-hill2_diversity
+#hill2_diversity
 
 #ggsave(filename = file.path(path, "figures/invsimpson_elevation.png"), plot = hill2_diversity, dpi=300, units=c("mm"), width=250, height=150)
 
@@ -1907,7 +1915,6 @@ alpha_beta_diversity
 ```
 
 #### Mantel tests and correlations
-##### Elevation
 
 ```{r, mantel}
 #| echo: false
@@ -2032,9 +2039,6 @@ gut_mantel
 ```
 
 The correlation plot for Bray-Curtis dissimilarity and geographical distance shows a positive correlation. The more distant two sites are, the more dissimilar their FEF communities are (bray = 1). The Mantel test shows a significant correlation between the two matrices (r = 0.054, p \< 0.02).
-
-##### Leaf traits correlogram
-
 
 ### Communitty simple linear models
 
@@ -2243,7 +2247,7 @@ ant_arranged_with_caption
 
 ```{r, asv_barplot}
 
-# Phylum level per elevation category and species
+# Phylum level per elevation catergory and species
 p1 <- ggplot(ps_melt |>
   filter(!sample_Species == "B"), aes(x = sample_Species, y = Abundance)) +
   geom_bar(aes(fill = Phylum, color = Phylum), stat="identity", position = "fill") +
@@ -2289,20 +2293,7 @@ p2 <- plot_bar(microbiome::transform(ps_clean_3, "compositional")) +
   facet_wrap(~ sample_Species)
 p2
 
-# Barplots with microeco
 
-micro_psclean <- phyloseq2meco(ps_clean_3) # First convert phyloseq to meco
-t1 <- trans_abund$new(dataset = micro_psclean, taxrank = "Phylum", ntaxa = 8)
-t1gg <- t1$plot_bar(others_color = "grey70", facet = c("Species", "Elevation_cat"), xtext_keep = FALSE, legend_text_italic = FALSE)
-t1gg 
-#   scale_fill_manual(values= met.brewer("Tsimshian", type = "discrete", direction = 1, override.order = TRUE)) +
-#   scale_color_manual(values = met.brewer("Tsimshian", type = "discrete", direction = 1, override.order = TRUE)) +
-#   theme_classic(base_size = 14) +
-#   theme(strip.background = element_rect(fill = "white"),
-#         strip.text.x = element_text(colour = "black", face = "bold.italic"),
-#         legend.text = element_text(size = 12),
-#         panel.border = element_rect(linetype = "blank", fill = NA),
-#         axis.text.x = element_blank())
 
 # # Load libraries
 # library("multcomp")
@@ -2732,3 +2723,8 @@ colnames(multipatt_analysis_sign)[1]  <- "ASV"
 No ASVs significantly correlated with Mimulus species. When we test for correlations in elevation categories and adjust the p value for multiple comparison we are left with only 0 ASVs.
 
 NO evidence of a core ASV community associated with Mimulus or elevation types.
+
+```{r}
+
+
+```
