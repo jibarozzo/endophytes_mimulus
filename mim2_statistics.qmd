@@ -1292,17 +1292,18 @@ seq_sample_names <- sample_names(pseq_rrf1[[1]]) # Sample names
 
 # Randomize sample names
 rand_matrix <- matrix(NA_character_, nrow = 95, ncol = 95)
+set.seed(443)
 for (i in 1:95) {
-  set.seed(443)
   rand_matrix[i, ] <- sample(seq_sample_names, 95, replace = FALSE)
 }
 
 # Select a random vector of names
-rand_vector <-  vector(length = 1)
+rand_mat <-  matrix(NA_character_ , nrow = 95, ncol = 1)
+set.seed(443)
 for (i in 1:95) {
-  set.seed(443)
-  rand_vector[i] <- sample(rand_matrix[i, ], 1)
+  rand_mat[,i] <- sample(rand_matrix[,i], 1, replace = FALSE)
 }
+
 
 # Functions `mirl` and `phyloseq_mult_raref`are practically the same. The difference is that `mirl` returns a list of phyloseq objects and `phyloseq_mult_raref` returns a single phyloseq object.
 
