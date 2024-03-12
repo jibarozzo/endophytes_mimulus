@@ -1135,7 +1135,7 @@ The core taxa members are *Vishniacozyma victoriae* (ASV_1), *Cladosporium herba
 
 ## How to decide sampling depth for rarefaction?
 
-Visual assesment of samplint depth.
+Visual assessment of sampling depth.
 
 ```{r, sampling_depth}
 
@@ -1146,11 +1146,12 @@ reads <- readcount(ps_clean_3) |>
   rownames_to_column(var = "Unique_ID") |>
   rename(n_seqs = "readcount(ps_clean_3)") |>
   right_join(plant_traits, by = "Unique_ID") |>
+  filter(Unique_ID %in% names_list) |>
   select(Unique_ID, Site, Species, n_seqs)
 
-# Sum of reads per site
+# Sum of reads per site per species
 reads_sum <- reads |>
-  group_by(Site) |>
+  group_by(Site, Species) |>
   filter(Unique_ID %in% names_list) |>
   summarise(n_seqs = sum(n_seqs)) 
 
@@ -1164,8 +1165,9 @@ ggplot(reads, aes(x = 1, y = n_seqs)) +
   scale_y_log10()
 
 test <- reads |>
-         arrange(n_seqs) |>
+  arrange(n_seqs) |>
   filter(Unique_ID %in% names_list)
+
 ggplot(test, aes(x = 1:nrow(test), y = n_seqs)) +
   geom_line() +
   coord_cartesian(ylim = c(0, 100000)) # Cut-off
@@ -1183,7 +1185,6 @@ cover_goods <- ps_melt |>
   summarise(n_seqs = sum(Abundance),
             n_sing = sum(Abundance == 1),
             goods = 1 - (n_sing/n_seqs)) 
-
 cover_goods|>
   filter(n_seqs > 5000) |> #Filtering samples with more than f000 reads
   ggplot(aes(x= n_seqs,y = goods)) +
@@ -1205,10 +1206,18 @@ Rarefaction is subject to debate, see [@mcmurdie2014] and [@cameron2021] for a d
 ```{r, rarefaction}
 # Alpha diversity metrics
 set.seed(123)
+# Initial matrices, before rarefaction
+# ASV abundance matrix
+asv_matrix <- ps_clean_3_df |>
+  select(!c(1,3:9))|>
+  #select(contains(c("ASV",names_rarefy))) |>
+  column_to_rownames(var = "ASV") |>
+  as.matrix()
+# Results in 231 x 157 matrix
 
 # Vegan
 # Rarefaction curve
-vegan::rarecurve(t(asv_matrix), step=50, cex=0.5, xlab = "Sample Size", ylab = "Species", label = TRUE, tidy = FALSE) # rrarefy generates one randomly rarefied community data frame or vector of given sample size. 
+vegan::rarecurve(t(asv_matrix), step=50, cex=0.5, xlab = "Sample Size", ylab = "Species", label = FALSE, tidy = FALSE) # rrarefy generates one randomly rarefied community data frame or vector of given sample size. 
 
 # Species accumulation curve
 accum_curve <- specaccum(t(asv_matrix), 
@@ -1231,40 +1240,58 @@ After some trying a couple of things and thought, I manipulated the `alphadiv_DF
 
 I decided I am going to take two approaches to selecting rarefied datasets for this study. First, rarefy the sequences and then randomize the resulting samples to select a smaller subset (~90 samples). Second approach is to randomize the samples first and then rarefy the sequences from those samples. I will compare and select the method that has the greatest sequencing breadth. The selection of samples will be done using a vector of samples names, this is most important for the second method. The names are selected from the `ps_clean_3` phyloseq object and/or the `ps_clean_3_df` data frame. 
 
+Let me evaluate how many samples per site we have:
+
+```{r, samples_per_site}  
+samples_per_site <- reads |>
+  group_by(Site) |>
+  summarise(n_samples = n()) |>
+  arrange(desc(n_samples))
+```
+
+We have around 7-10 samples per site per species. Some site are lower because they were removed in previous filtering stages. 
 
 
+##### Rafaction of sequences > samples (Method A)
 
-##### Rafaction of sequences > samples
+
 ```{r, rarefaction_sequence}
-
 # Phyloseq friendly packages
 
 # mirlyn package 
 #750 reads
-pseq_rrf1 <- mirl(ps_clean_3,
-                 libsize = 750,
-                 rep = 100,
-                 set.seed = 443,
-                 trimOTUs = FALSE,
-                 replace = FALSE,
-                 mc.cores = 4)
+# pseq_rrf1 <- mirl(ps_clean_3,
+#                  libsize = 750,
+#                  rep = 50,
+#                  set.seed = 443,
+#                  trimOTUs = FALSE,
+#                  replace = FALSE,
+#                  mc.cores = 4)
+
+#saveRDS(pseq_rrfa, file = "clean_data/statistics/pseq_rrf1.rds") # Saving rarefied phyloseq object
+pseq_rrfa <- readRDS("clean_data/statistics/pseq_rrf1.rds") # Loading rarefied phyloseq object
 
 # Select sample names
-seq_sample_names <- sample_names(pseq_rrf1[[1]]) # Sample names
+seq_sample_names <- sample_names(pseq_rrfa[[1]]) # Sample names
 
 # Randomize sample names
 rand_matrix <- matrix(NA_character_, nrow = 95, ncol = 95)
+
 set.seed(443)
 for (i in 1:95) {
   rand_matrix[i, ] <- sample(seq_sample_names, 95, replace = FALSE)
 }
 
-# Select a random vector of names
-rand_mat <-  matrix(NA_character_ , nrow = 95, ncol = 1)
-set.seed(443)
-for (i in 1:95) {
-  rand_mat[,i] <- sample(rand_matrix[,i], 1, replace = FALSE)
+rand_select <- function(mat) {
+    j <- sample(seq_len(ncol(mat)), size=1)
+    rand_matrix[, j, drop=TRUE]    ## (Use `drop=FALSE` to say "don't convert 1-column matrices to vectors")
 }
+# Select random sample column
+set.seed(443)
+random_samples <- rand_select(rand_matrix)
+
+# This list will be used to select samples from the long pseq_rrfy1 object
+
 
 
 # Functions `mirl` and `phyloseq_mult_raref`are practically the same. The difference is that `mirl` returns a list of phyloseq objects and `phyloseq_mult_raref` returns a single phyloseq object.
@@ -1297,10 +1324,10 @@ for (i in 1:95) {
 #After playing around with these functions I decided to change the `alphadivDF()` function to return a data frame with the alpha diversity indices, similar to how `estimate_richness()` calculates, from rarefied data sets. 
 # Data frame with alpha diversity indices calculated from rarefied data sets
 source("functions/alpha_rfy.R")
-plant_traits_rf <- alpha_rfy_DF(pseq_rrf1, diversity = c("shannon", "simpson", "invsimpson")) # Alpha diversity indices
+plant_traits_rf <- alpha_rfy_DF(pseq_rrfa, diversity = c("shannon", "simpson", "invsimpson")) # Alpha diversity indices
 
-plant_traits_rf #Rarefied data frame
-# Preview
+
+# RAW Preview
 ggplot(plant_traits_rf, aes(x = Elevation_cat, y = shannon_, color = Species)) +
   geom_boxplot(alpha = 0.3, size = 0.5) +
   facet_wrap(~Species) +
@@ -1309,18 +1336,19 @@ ggplot(plant_traits_rf, aes(x = Elevation_cat, y = shannon_, color = Species)) +
 
 
 
-Now let's clean it up and start plotting.
+Now let's clean it up, select the randomized subsamples, and start plotting.
 
 
-##### Rarefied data frame
+##### Rarefied data frame Method A
 
 ```{r, rarefaction_output}
-plant_traits_rf <- plant_traits_rf |>
+plant_traits_MA <- plant_traits_rf |>
   select(!c(11:12, 19:23)) |> # Removing variables calculated before rarefactions
   relocate(Unique_ID, .before = Site) |># Moving Unique_ID to the front
   mutate(Unique_ID =  str_remove(Unique_ID, "[0-9]\\-"),
          hill_1 = exp(shannon_)) |> # Observed column is equivalent to hill_0
   # Simpson index is (1-D) and InvSimpson (1/D) which is equivalent to hill_2
+  filter(Unique_ID %in% random_samples) |># Selecting samples from randomization
   rename(
     Observed = observed, 
     Shannon = shannon_,
@@ -1337,7 +1365,47 @@ plant_traits_rf <- plant_traits_rf |>
 #plant_traits_rf <- readRDS("clean_data/statistics/plant_traits_rf.rds") # Loading rarefied data frame
 ```
 
-I now have a data frame with 98 samples with rarefied alpha diversity indices and plant traits. I will use this for downstream analyses.
+I now have a data frame with 95 samples with rarefied alpha diversity indices and plant traits. I will use this for downstream analyses.
+
+
+##### Rarefaction of samples > sequences (Method B)
+
+```{r, rarefaction_samples}
+# Select random samples from 157 pool
+# Reduce each site by 1. The is a total of 21 sites.
+
+# Random selection
+set.seed(443)
+methodB_samples <- sample(names_list, 136, replace = FALSE)
+
+# Rarefy selected samples
+
+rownames_to_column(ps_clean_3@sam_data@row.names, var = "Unique_ID")
+
+SAMP <- sample_data(plant_traits)
+
+# Phyloseq object with cleaned ASV table
+ps_clean <- phyloseq(ASV, TAX, SAMP)
+methodb_pseq <- ps_clean_3_df |>
+  filter(Unique_ID %in% methodB_samples) |>
+  column_to_rownames(var = "Unique_ID") |>
+  row.names()# Rarefied phyloseq object)
+
+
+pseq_rrfb <-  mirl(subset_samples(ps_clean_3, sample = methodB_samples),
+                  libsize = 750,
+                  rep = 50,
+                  set.seed = 443,
+                  trimOTUs = FALSE,
+                  replace = FALSE,
+                  mc.cores = 4)
+
+
+ps_clean_3 %>%
+  sample_data()
+
+```
+
 
 #### Dissimilarity and geographic distance matrices
 
@@ -1346,16 +1414,10 @@ I now have a data frame with 98 samples with rarefied alpha diversity indices an
 #| eval: true
 #| tidy: true
 
-# Initial matrices, before rarefaction
-# ASV abundance matrix
-asv_matrix <- ps_clean_3_df |>
-  select(!c(1,3:9))|>
-  #select(contains(c("ASV",names_rarefy))) |>
-  column_to_rownames(var = "ASV") |>
-  as.matrix()
-# Results in 231 x 157 matrix
 
-#Bray-Curtis dissimilarity matrix rarefied to 1000 reads
+# Select randomized samples for beta diversity rarefaction
+
+#Bray-Curtis dissimilarity matrix rarefied to 750 reads
 set.seed(433)
 asv_avgdist <- avgdist(t(asv_matrix), 
                        sample = 750,

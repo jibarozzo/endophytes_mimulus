@@ -329,6 +329,46 @@ The authors declare no competing interests.
 # Figures
 
 ## Figure 1
+```{r, themes}
+#| echo: false
+#| eval: true
+#| tidy: true
+
+#ggplot themes
+# Theme for leaf trait and diversity plots: discrete
+theme_lfspp_discrete <-      theme_classic(base_size = 16) +
+  theme(legend.title = element_text(face = "bold"),
+        strip.text = element_text(face = "bold"),
+        panel.border = element_rect(linetype = "blank", fill = NA),
+        legend.text = element_markdown(size = 12), #Make legend text italic
+        axis.text.x = element_blank())
+
+# Theme for leaf trait plots: continuous
+theme_lfspp_continuous <- theme_classic(base_size = 16) +
+  theme(legend.title = element_text(face = "bold"),
+        panel.border = element_rect(linetype = "blank", fill = NA),
+        legend.text = element_markdown(size = 12), #Make legend text italic
+        axis.text.x = element_text(size = 14),
+        legend.position = "bottom")
+
+# Theme for species by diversity  plots: discrete
+theme_sppdiv_discrete <-    theme_classic(base_size = 16) +
+   theme(legend.title = element_text(face = "bold"),
+         strip.text = element_text(face = "italic", size = 14),
+         panel.border = element_rect(linetype = "blank", fill = NA),
+         legend.text = element_markdown(size = 12), #Make legend text italic
+         axis.text.x.bottom = element_blank(),
+         axis.title.x = element_blank())
+
+# Theme for leaf trait and diversity  plots: continuous
+theme_lfdiv_continuous <- theme_classic(base_size = 16) +
+   theme(legend.title = element_text(face = "bold"),
+         strip.text = element_text(face = "bold.italic", size = 14),
+         panel.border = element_rect(linetype = "blank", fill = NA),
+         legend.text = element_markdown(size = 14), #Make legend text italic
+         axis.text.x = element_text(size = 14))
+```
+
 
 ```{r, figure1}
 #| echo: false
@@ -652,32 +692,17 @@ names(labels_list) <- c("L", "N", "G")
 hill0_species <- ggplot(data = plant_traits_rf, 
   aes(x = Species, y = Observed)) +
   geom_boxplot(aes(fill = Species)) +
-  # geom_crossbar(stat="summary",
-  #               fun = mean,
-  #               fun.max = mean,
-  #               fun.min = mean,
-  #               fatten = 1.5, width = 0.8) +
-  # geom_point(color="black", alpha = 0.2,
-  #            size=1.7, 
-  #            position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
-   labs(y =  "\U1D492 = 0", x = "", col = "") + 
-   theme_classic(base_size = 16) +
-   theme(legend.title = element_text(face = "bold"),
-         #strip.text = element_text(face = "bold.italic", size = 14),
-         panel.border = element_rect(linetype = "blank", fill = NA),
-         legend.text = element_markdown(size = 14), #Make legend text italic
-         axis.text.x = element_text(size = 14),
-         axis.text.x.bottom = element_blank()) +
-  scale_y_continuous(expand = c(0.05, 0.05)) +
-    stat_compare_means(comparisons = my_comparisons,
+  theme_sppdiv_discrete +
+  labs(y =  "\U1D492 = 0", x = "", col = "") + 
+  stat_compare_means(comparisons = my_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif") 
   #guides(color = "none")        #To turn off color legend
   
-#hill0_species
+hill0_species
 # annotate(geom = "text", x = 2100, y = 2.5, label = "p = 0.03", color = "black")
 #annotate(geom="text", x=2100, y=50, label="p = 0.06", color = "black")
 
@@ -688,26 +713,11 @@ hill0_species <- ggplot(data = plant_traits_rf,
 hill1_species <- ggplot(data = plant_traits_rf, 
   aes(x = Species, y = hill_1)) +
   geom_boxplot(aes(fill = Species)) +
-  # geom_crossbar(stat="summary",
-  #               
-  #               fun = mean,
-  #               fun.max = mean,
-  #               fun.min = mean,
-  #               fatten = 1.5, width = 0.8) +
-  # geom_point(color="black", alpha = 0.2,
-  #            size=1.7, 
-  #            position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
-   labs(y =  "\U1D492 = 1", x = "", col = "") + 
-   theme_classic(base_size = 16) +
-   theme(legend.title = element_text(face = "bold"),
-        #strip.text = element_text(face = "bold.italic", size = 14),
-         panel.border = element_rect(linetype = "blank", fill = NA),
-         legend.text = element_markdown(size = 14), #Make legend text italic
-         axis.text.x = element_text(size = 14),
-         axis.text.x.bottom = element_blank()) +
+  theme_sppdiv_discrete +
+  labs(y =  "\U1D492 = 1", x = "", col = "") + 
   scale_y_continuous(expand = c(0.05, 0.05)) +
   stat_compare_means(comparisons = my_comparisons,
                      method = "wilcox.test", 
@@ -723,25 +733,11 @@ hill1_species <- ggplot(data = plant_traits_rf,
 hill2_species <- ggplot(data = plant_traits_rf, 
                         aes(x = Species, y = hill_2)) +
   geom_boxplot(aes(fill = Species)) +
-  # geom_crossbar(stat="summary",
-  #               fun = mean,
-  #               fun.max = mean,
-  #               fun.min = mean,
-  #               fatten = 1.5, width = 0.8) +
-  # geom_point(color="black", alpha = 0.2,
-  #            size=1.7, 
-  #            position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
-   labs(y =  "\U1D492 = 2", x = "", col = "") + 
-   theme_classic(base_size = 16) +
-   theme(legend.title = element_text(face = "bold"),
-         #strip.text = element_text(face = "bold.italic", size = 14),
-         panel.border = element_rect(linetype = "blank", fill = NA),
-         legend.text = element_markdown(size = 14), #Make legend text italic
-         axis.text.x.bottom = element_blank()) +
-  scale_y_continuous(expand = c(0.05, 0.05)) +
+  theme_sppdiv_discrete +
+  labs(y =  "\U1D492 = 2", x = "", col = "") + 
   stat_compare_means(comparisons = my_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif") 
@@ -770,23 +766,10 @@ hill2_species <- ggplot(data = plant_traits_rf,
 hill0_beta <-  ggplot(plant_traits_rf, aes(x = Elevation_cat, y = Observed)) +
   
   geom_boxplot(aes(fill = Elevation_cat)) +
-  # geom_crossbar(stat="summary", 
-  #               fun = mean, 
-  #               fun.max = mean, 
-  #               fun.min = mean,  
-  #               fatten = 2, 
-  #               width = 0.5, 
-  #               color="black") +
-  # geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
   scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_shape_manual(values=c(15:18),labels = c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14),
-        axis.text.x.bottom = element_blank()) +
-        #axis.text.x = element_text(face="italic", size = 14)) +
+  theme_sppdiv_discrete +
   scale_y_continuous(expand = c(0.05, 0.05)) +
   stat_compare_means(comparisons = my_comparisons3,
                      method = "wilcox.test", 
@@ -803,23 +786,11 @@ hill0_beta <-  ggplot(plant_traits_rf, aes(x = Elevation_cat, y = Observed)) +
 hill1_beta <- ggplot(plant_traits_rf, aes(x = Elevation_cat, y = hill_1)) +
   
   geom_boxplot(aes(fill = Elevation_cat)) +
-  # geom_crossbar(stat="summary", 
-  #               fun = mean, 
-  #               fun.max = mean, 
-  #               fun.min = mean,  
-  #               fatten = 2, 
-  #               width = 0.5, 
-  #               color="black") +
-   geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
+  geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
   scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_shape_manual(values=c(15:18),labels = c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14),
-        axis.text.x.bottom = element_blank()) +
-        #axis.text.x = element_text(face="italic", size = 14)) +
+  theme_sppdiv_discrete +
   scale_y_continuous(expand = c(0.05, 0.05)) +
   stat_compare_means(comparisons = my_comparisons3,
                      method = "wilcox.test", 
@@ -836,23 +807,10 @@ hill1_beta <- ggplot(plant_traits_rf, aes(x = Elevation_cat, y = hill_1)) +
 hill2_beta <- ggplot(plant_traits_rf, aes(x = Elevation_cat, y = hill_2)) +
   
   geom_boxplot(aes(fill = Elevation_cat)) +
-  # geom_crossbar(stat="summary", 
-  #               fun = mean, 
-  #               fun.max = mean, 
-  #               fun.min = mean,  
-  #               fatten = 2, 
-  #               width = 0.5, 
-  #               color="black") +
-  # geom_point(aes(shape = Species),color="black", alpha = 0.4,size= 2.5, position = position_jitter(w=0.05)) +
   scale_color_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   scale_shape_manual(values=c(15:18),labels = c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14),
-        axis.text.x.bottom = element_blank()) +
-        #axis.text.x = element_text(face="italic", size = 14)) +
+  theme_sppdiv_discrete +
   scale_y_continuous(expand = c(0.05, 0.05)) +
   stat_compare_means(comparisons = my_comparisons3,
                      method = "wilcox.test", 
@@ -1262,16 +1220,11 @@ mantel_test <- ggplot(asv_geo_matrix_long, aes(y = bray_diss, x = geo_dist)) +
                           #aes(label = ..eq.label..), size = rel(4), color = "black") +
   #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
                      #values = met.brewer("Archambault", n = 4, type = "discrete", direction = c(1))) + 
-   scale_color_manual("Species", labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
+  scale_color_manual("Species", labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
                       values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
-   labs(y = "Bray Curtis dissimilarity", x = "Geographic distance (m)", col = "") + 
-   scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) +
-   theme_classic(base_size = 16) +
-   theme(legend.title = element_text(face = "bold"),
-        strip.text = element_text(face = "bold.italic", size = 14),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14), #Make legend text italic
-        axis.text.x = element_text(size = 14))
+  labs(y = "Bray Curtis dissimilarity", x = "Geographic distance (m)", col = "") + 
+  scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) +
+  theme_lfspp_continuous +
 
 #mantel_test
 
@@ -1292,14 +1245,9 @@ mantel_species <- ggplot(asv_geo_matrix_long, aes(y = bray_diss, x = geo_dist)) 
    #                 label.y = 0.23, size = 4) +
    scale_color_manual("Species", labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
                       values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
-   labs(y = "Bray Curtis dissimilarity", x = "Geographic distance (m)", col = "") +
-   scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) +
-   theme_classic(base_size = 16) +
-   theme(legend.title = element_text(face = "bold"),
-        strip.text = element_text(face = "bold.italic", size = 14),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14), #Make legend text italic
-        axis.text.x = element_text(size = 12)) +
+  labs(y = "Bray Curtis dissimilarity", x = "Geographic distance (m)", col = "") +
+  scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) +
+  theme_lfspp_continuous +
   facet_wrap(~ Species, labeller = labeller(Species = labels_list))
 #mantel_species
 
