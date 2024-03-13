@@ -1701,7 +1701,7 @@ lost <- setdiff(sample_names(ASV), sample_names(SAMP)) #This is the difference b
 print(lost) #These are the samples that are lost. They are duplicate samples from the same plant. We proceed without them. 
 
 # Save phyloseq object
-#saveRDS(ps_clean, file.path(out_dir, "taxonomy/phyloseq_clean_8450.rds"))
+#saveRDS(ps_clean, file.path(out_dir, "clean_data/taxonomy/phyloseq_clean_8450.rds"))
 ```
 
 Our `ps_clean` object now has 688 ASVs and 174 samples.
@@ -1735,11 +1735,11 @@ rel_abund_ps_clean <- prune_samples(sample_sums(rel_abund_ps_clean ) > 0, rel_ab
 # Result: 231 taxa in 160 samples.
 
 # Save file
-#saveRDS(ps_clean_3, file.path(out_dir, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.rds"))
+#saveRDS(ps_clean_3, file.path(out_dir, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons.rds"))
 #saveRDS(rel_abund_ps_clean, file.path(out_dir, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.rds"))
 
 # Load file
-ps_clean_3 <- readRDS(file.path(out_dir, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.rds"))
+ps_clean_3 <- readRDS(file.path(out_dir, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons.rds"))
 ```
 
 #### Phyloseq CLEANED summary statistics
@@ -1811,10 +1811,10 @@ downstream analyses.
 # Saving phyloseq with not relative abundance calculated
 ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
   rename(ASV = OTU)
-#write.csv(ps_clean_3_df,file.path(out_dir, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons.csv"))
+#write.csv(ps_clean_3_df,file.path(out_dir, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons.csv"))
 
 # Relative abundance calculated
-rel_ps_clean_df <- phyloseq_to_df(rel_abund_ps_clean, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
+rel_ps_clean_df <- metagMisc::phyloseq_to_df(rel_abund_ps_clean, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
   rename(ASV = OTU)
 
 #Replacing forced NaNs when turned into df
@@ -1833,9 +1833,9 @@ rel_abund_ps_clean <- subset_samples(rel_abund_ps_clean, !Sample %in% bicolor)
 ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
   rename(ASV = OTU)
 
-#saveRDS(ps_clean_3, file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.rds"))
-#write.csv(ps_clean_3_df, file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.csv"))
-
+#saveRDS(ps_clean_3, file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.rds"))
+#write.csv(ps_clean_3_df, file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.csv"))
+# 
 #saveRDS(rel_abund_ps_clean, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
 #write.csv(rel_ps_clean_df, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
 ```

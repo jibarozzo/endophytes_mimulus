@@ -33,12 +33,13 @@ library("geosphere")
 library("indicspecies")
 
 # Phyloseq friendly
+#Some of these are redundant and have conflicts, but have functions that I like better than others or compliment each other.
 library("phyloseq")
+library("microeco") # New package for microbial analyses
+library("file2meco") # File to microeco (phyloseq friendly)
 library("metagMisc") # Miscellaneous functions
 library("microbiome") # Expands phyloseq 
-library("iNEXT")
 library("mirlyn")
-
 
 library("conflicted")
 conflict_prefer("select", "dplyr")
@@ -134,19 +135,18 @@ plant_traits <- plant_traits |>
          logLMA = log10(LMA))
 
 
-
 ###################################
 #### Load Phyloseq objects ########
 ###################################
 #Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data. These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
 
 # Load Phyloseq object cleaned of singletons (231 ASVs)
-ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.rds"))
-ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_assigned_nonsingletons_noB.csv"))
+ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.rds"))
+ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.csv"))
 
 # Load Relative abundance phyloseq
-rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
-rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
+# rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
+# rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
 
 
 
@@ -187,14 +187,14 @@ ps_melt <- ps_clean_3 |>
 # Leaf traits
 # saveRDS(leaf_traits, file.path(path, "clean_data/statistics/leaf_traits.rds"))
 # write.csv(leaf_traits, file.path(path, "clean_data/statistics/leaf_traits.csv"))
-
-# Plant traits with community data
+# 
+# # Plant traits with community data
 # saveRDS(plant_traits, file.path(path, "clean_data/statistics/plant_traits.rds"))
 # write.csv(plant_traits, file.path(path, "clean_data/statistics/plant_traits.csv"))
-
-# Save ps_melt
-#saveRDS(ps_melt, file.path(path, "clean_data/statistics/ps_melt.rds"))
-#write.csv(ps_melt, file.path(path, "clean_data/statistics/ps_melt.csv"))
+# 
+# # Save ps_melt
+# saveRDS(ps_melt, file.path(path, "clean_data/statistics/ps_melt.rds"))
+# write.csv(ps_melt, file.path(path, "clean_data/statistics/ps_melt.csv"))
 
 #####################################################
 ############### Load master files here ##############
@@ -223,21 +223,11 @@ nas_names <- plant_traits |>
   filter(Species == "N") |>
   pull(Unique_ID)
 
-#####################################################
-# Formatting formula for p value
-format.p <- function(p, precision = .001) {
-  digits <- -log(precision, base = 10)
-  p <- formatC(p, format = 'f', digits = digits)
-  if (p < .001) {
-    p = paste0('< ', precision)}
-  if (p >= .001) {
-    p = paste0('= ', p)    }
-  sub("", "", p)
-}
-######################################################
+# Functions
+source(file.path(path, "functions/pval_format.R"))
 
 # Comparisons
-my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
+my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
 my_comparisons3 <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
 ```
 
@@ -1260,7 +1250,7 @@ We have around 7-10 samples per site per species. Some site are lower because th
 
 # mirlyn package 
 #750 reads
-# pseq_rrf1 <- mirl(ps_clean_3,
+# pseq_rrfa <- mirl(ps_clean_3,
 #                  libsize = 750,
 #                  rep = 50,
 #                  set.seed = 443,
@@ -1268,8 +1258,8 @@ We have around 7-10 samples per site per species. Some site are lower because th
 #                  replace = FALSE,
 #                  mc.cores = 4)
 
-#saveRDS(pseq_rrfa, file = "clean_data/statistics/pseq_rrf1.rds") # Saving rarefied phyloseq object
-pseq_rrfa <- readRDS("clean_data/statistics/pseq_rrf1.rds") # Loading rarefied phyloseq object
+#saveRDS(pseq_rrfa, file = "clean_data/statistics/pseq_rrfa.rds") # Saving rarefied phyloseq object
+pseq_rrfa <- readRDS("clean_data/statistics/pseq_rrfa.rds") # Loading rarefied phyloseq object
 
 # Select sample names
 seq_sample_names <- sample_names(pseq_rrfa[[1]]) # Sample names
@@ -1342,8 +1332,9 @@ Now let's clean it up, select the randomized subsamples, and start plotting.
 ##### Rarefied data frame Method A
 
 ```{r, rarefaction_output}
+# Method A output
 plant_traits_MA <- plant_traits_rf |>
-  select(!c(11:12, 19:23)) |> # Removing variables calculated before rarefactions
+  select(!c(11:12)) |> # Removing variables calculated before rarefactions
   relocate(Unique_ID, .before = Site) |># Moving Unique_ID to the front
   mutate(Unique_ID =  str_remove(Unique_ID, "[0-9]\\-"),
          hill_1 = exp(shannon_)) |> # Observed column is equivalent to hill_0
@@ -1358,11 +1349,11 @@ plant_traits_MA <- plant_traits_rf |>
   relocate(Observed, .before = Shannon)# Renaming and relocating columns
 
 # Saving rarefied data frame
-#saveRDS(plant_traits_rf, file = "clean_data/statistics/plant_traits_rf.rds") # Saving rarefied data frame
-#write.csv(plant_traits_rf, file = "clean_data/statistics/plant_traits_rf.csv") # Saving rarefied data frame as csv
+#saveRDS(plant_traits_MA, file = "clean_data/statistics/plant_traits_MA.rds") # Saving rarefied data frame
+#write.csv(plant_traits_MA, file = "clean_data/statistics/plant_traits_MA.csv") # Saving rarefied data frame as csv
 
 #Loading rarefied data frame
-#plant_traits_rf <- readRDS("clean_data/statistics/plant_traits_rf.rds") # Loading rarefied data frame
+plant_traits_MA <- readRDS("clean_data/statistics/plant_traits_MA.rds") # Loading rarefied data frame
 ```
 
 I now have a data frame with 95 samples with rarefied alpha diversity indices and plant traits. I will use this for downstream analyses.
@@ -1380,9 +1371,13 @@ methodB_samples <- sample(names_list, 136, replace = FALSE)
 
 # Rarefy selected samples
 
-rownames_to_column(ps_clean_3@sam_data@row.names, var = "Unique_ID")
+rownames_to_column(ps_clean_3@sam_data, var = "Unique_ID")
 
 SAMP <- sample_data(plant_traits)
+SAMP <- sample_data(plant_traits)
+
+# Phyloseq object with cleaned ASV table
+ps_clean_3 <- merge_phyloseq(ps_clean_3, SAMP)
 
 # Phyloseq object with cleaned ASV table
 ps_clean <- phyloseq(ASV, TAX, SAMP)
@@ -1402,8 +1397,9 @@ pseq_rrfb <-  mirl(subset_samples(ps_clean_3, sample = methodB_samples),
 
 
 ps_clean_3 %>%
-  sample_data()
-
+  sample_names() %>%
+  filter(ps_clean_3 %in% methodB_samples) 
+prune_samples(sample_names(ps_clean_3) %in% methodB_samples, ps_clean_3)
 ```
 
 
