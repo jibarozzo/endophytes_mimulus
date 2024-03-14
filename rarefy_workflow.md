@@ -1,6 +1,6 @@
 
 ```mermaid
-flowchart TB;
+flowchart TB
     
  A([Sample pool n= 157])--> B[/Rarefy seqs
      @750x50/]   

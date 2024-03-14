@@ -56,6 +56,10 @@ conflict_prefer("alpha", "ggplot2")
 path <- "../mim2_bioinformatics" # Change accordingly
 ```
 
+# Objective of the notebook
+
+The goal of this notebook is to explore the relationship between leaf endophytes of *Mimulus* spp. with elevation and host leaf traits. I attempt to analyze in every possible way by firs performing descriptive statistics and then the adequate analyses for each question. The notebook is meant to serves as a draft for the analyses I include in the manuscript. Because of this there will be some differences between the documents. The code here can be at times messy and not well organized. The manuscript document has all the refined code for plots and analyses. I try to keep both documents as similar as possible, but the manuscript document is the final product. Here you may find violin plots and the manuscript boxplots, things like that.
+
 # Data sets
 
 ## Cleaning and Shaping
@@ -124,7 +128,7 @@ leaf_traits <- leaf_traits |>
 #Removing species B
 # I have 3 samples for species B to remove from the data set.
 leaf_traits_noB <- leaf_traits |>
-  filter(!Species == "B")
+  filter(!Species == "M. bicolor")
 
 # Plant traits transformed
 plant_traits <- plant_traits |>
@@ -201,7 +205,7 @@ ps_melt <- ps_clean_3 |>
 #####################################################
 leaf_traits <- readRDS(file.path(path, "clean_data/statistics/leaf_traits.rds")) # Post all the processing aboove, lod from here.
 plant_traits <- readRDS(file.path(path, "clean_data/statistics/plant_traits.rds"))
-plant_traits_rf <- readRDS(file.path(path, "clean_data/statistics/plant_traits_rf.rds"))
+plant_traits_MB <- readRDS(file.path(path, "clean_data/statistics/plant_traits_MB.rds"))
 ps_melt <- readRDS(file.path(path, "clean_data/statistics/ps_melt.rds"))
 
 # Samples with species to subset/filter matrices downstream
@@ -231,7 +235,7 @@ my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. gut
 my_comparisons3 <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
 ```
 
-##Descriptive stats
+## Descriptive stats
 
 ```{r, Leaf_traits_basics}
 #| echo: false
@@ -447,6 +451,7 @@ pairwise.wilcox.test(imagej1$logLBI, g = imagej1$Genotype)
 # Figures
 
 ### Leaf traits
+
 ```{r, themes}
 #ggplot themes
 # Theme for leaf trait and diversity plots: discrete
@@ -471,7 +476,6 @@ theme_sppdiv_discrete <-    theme_classic(base_size = 16) +
          strip.text = element_text(face = "italic", size = 14),
          panel.border = element_rect(linetype = "blank", fill = NA),
          legend.text = element_text(face = "italic", size = 12), #Make legend text italic
-         legend.text = element_markdown(size = 12), #Make legend text italic
          axis.text.x.bottom = element_blank(),
          axis.title.x = element_blank())
 
@@ -491,7 +495,6 @@ theme_lfdiv_continuous <- theme_classic(base_size = 16) +
          legend.text = element_markdown(size = 14), #Make legend text italic
          axis.text.x = element_text(size = 14))
 ```
-
 
 #### LMA
 
@@ -1128,11 +1131,12 @@ core_tax <- core_members(ps_clean_3, detection = 0.1/100, prevalence = 50/100, i
 # Rare taxa
 rare_tax <- rare_members(ps_clean_3, detection = 0.1/100, prevalence = 50/100, include.lowest = FALSE)
 ```
+
 The core taxa members are *Vishniacozyma victoriae* (ASV_1), *Cladosporium herbanum* (ASV_2) and *Cladosporium* spp. (ASV_7). The rest of the ASVs (228) are rare. Now that we have a better idea of what is present in samples we can move on to the next steps.
 
+# Sampling depth and effort
 
-
-## How to decide sampling depth for rarefaction?
+How to decide sampling depth for rarefaction?
 
 Visual assessment of sampling depth.
 
@@ -1192,11 +1196,12 @@ cover_goods|>
 cover_goods |>
   arrange(goods)
 ```
- From the summaries above and graphical evaluation we see that 1) the median read count is 9619 and 2) all the way to \~5000 reads the difference in jumps is \~250, the jump to 5000 is \ 500 counts. Good's coverage shows that we have only 5 samples that are below ~0.99 cover threshold. I believe that establishing a sampling depth of 5000 reads is a good compromise between the number of samples and the number of reads. I will use this depth for the rarefaction curves.
- 
-#### Rarefaction and species accumulation curves
 
-I are calculating some curves to see if we have enough sampling effort.
+From the summaries above and graphical evaluation we see that 1) the median read count is 9619 and 2) all the way to \~5000 reads the difference in jumps is \~250, the jump to 5000 is  500 counts. Good's coverage shows that we have only 5 samples that are below \~0.99 cover threshold. I believe that establishing a sampling depth of 5000 reads is a good compromise between the number of samples and the number of reads. I will use this depth for the rarefaction curves.
+
+### Rarefaction and species accumulation curves
+
+I am calculating some curves to see if we have enough sampling effort.
 
 ::: callout-note
 Rarefaction is subject to debate, see [@mcmurdie2014] and [@cameron2021] for a discussion.
@@ -1228,31 +1233,43 @@ plot(accum_curve, col = "blue", ci = 1, pch = 16, main = "Species Accumulation C
 accum_curve
 ```
 
-It seems we sampled enough, based on the species accumulation curve. The rarefaction curve also shows that species richness is not necessarily increasing with greater sequencing depth. There seems to be a range of \~35 ASVs per \~50,000 reads. Other samples \>200,000 reads also have around 35 ASVs.
-With the rarefaction of the data set to a sequence depth of 5000 reads we are left with 86 samples. About have of our original sample number. 
+It seems we sampled enough, based on the species accumulation curve. The rarefaction curve also shows that species richness is not necessarily increasing with greater sequencing depth. There seems to be a range of \~35 ASVs per \~50,000 reads. Other samples \>200,000 reads also have around 35 ASVs. With the rarefaction of the data set to a sequence depth of 5000 reads we are left with 86 samples. About have of our original sample number.
 
-##### Rarefaction strategy
+### Rarefaction strategy
 
 Initially, I played around with rarefying at a 750 reads and was left with 99 samples. This is a decent balance between sequence depth and breadth. I attempted to use the `mirlyn` package to calculate 100 rarefied data sets per sequence depth parameter (e.g. 500, 1000, 3000) but the resulting phyloseq object is a list of phyloseq objects. I can select one and run analyses, but what I wanted was to average the all the data sets. The issue with averaging is that it returns doubles not integers. It then makes calculations of dissimilarity matrices and other analyses difficult. The final object from the chunk above calculates an estimate of alpha diversity from rarefied data sets. The `phyloseq_mult_raref_div` function returns a list of data frames with the alpha diversity indices. The plan is to wrangle this output to and join with `plant_traits` data to calculate correlations and other analyses.
 
-After some trying a couple of things and thought, I manipulated the `alphadiv_DF` to return a data frame with "shannon", "simpson", and "invsimpson" from the `vegan` package. The data frame has diversity measure calculated for each of the iterations of the rarefied data sets. It still contains the previous diversity measures calculated (non-rarefied) in the \[Cleaning and Shaping\] section. joined this data frame with the `plant_traits` data frame to calculate correlations and other analyses. The manipulation of the function was done in the `alpha_rfy.R` file. The function is called `alpha_rfy_DF`. I used ChatGPT to troubleshoot and write the function. It would have taken me a long time to figure out. 
+After some trying a couple of things and thought, I manipulated the `alphadiv_DF` to return a data frame with "shannon", "simpson", and "invsimpson" from the `vegan` package. The data frame has diversity measure calculated for each of the iterations of the rarefied data sets. It still contains the previous diversity measures calculated (non-rarefied) in the \[Cleaning and Shaping\] section. joined this data frame with the `plant_traits` data frame to calculate correlations and other analyses. The manipulation of the function was done in the `alpha_rfy.R` file. The function is called `alpha_rfy_DF`. I used ChatGPT to troubleshoot and write the function. It would have taken me a long time to figure out.
 
-I decided I am going to take two approaches to selecting rarefied datasets for this study. First, rarefy the sequences and then randomize the resulting samples to select a smaller subset (~90 samples). Second approach is to randomize the samples first and then rarefy the sequences from those samples. I will compare and select the method that has the greatest sequencing breadth. The selection of samples will be done using a vector of samples names, this is most important for the second method. The names are selected from the `ps_clean_3` phyloseq object and/or the `ps_clean_3_df` data frame. 
+I decided I am going to take two approaches to selecting rarefied datasets for this study. First, rarefy the sequences and then randomize the resulting samples to select a smaller subset (\~90 samples). Second approach is to randomize the samples first and then rarefy the sequences from those samples. I will compare and select the method that has the greatest sequencing breadth. The selection of samples will be done using a vector of samples names, this is most important for the second method. The names are selected from the `ps_clean_3` phyloseq object and/or the `ps_clean_3_df` data frame.
+
+```{mermaid}
+%%| label: fig-model
+%%| fig-cap: "Models for rarefaction strategy."
+%%| file: "rarefy_workflow.mmd"
+
+```
+
+```{mermaid}
+flowchart LR
+  A[Hard edge] --> B(Round edge)
+  B --> C{Decision}
+  C --> D[Result one]
+  C --> E[Result two]
+```
 
 Let me evaluate how many samples per site we have:
 
-```{r, samples_per_site}  
+```{r, samples_per_site}
 samples_per_site <- reads |>
   group_by(Site) |>
   summarise(n_samples = n()) |>
   arrange(desc(n_samples))
 ```
 
-We have around 7-10 samples per site per species. Some site are lower because they were removed in previous filtering stages. 
+We have around 7-10 samples per site per species. Some site are lower because they were removed in previous filtering stages.
 
-
-##### Rafaction of sequences > samples (Method A)
-
+#### Method A: Rarefaction of sequences \> samples
 
 ```{r, rarefaction_sequence}
 # Phyloseq friendly packages
@@ -1333,10 +1350,7 @@ ggplot(plant_traits_MA, aes(x = Elevation_cat, y = shannon_, color = Species)) +
   theme_classic(base_size = 12)
 ```
 
-
-
 Now let's clean it up, select the randomized subsamples, and start plotting.
-
 
 ##### Rarefied data frame Method A
 
@@ -1367,8 +1381,7 @@ plant_traits_MA <- plant_traits_MA |>
 
 I now have a data frame with 95 samples with rarefied alpha diversity indices and plant traits. I will use this for downstream analyses.
 
-
-##### Rarefaction of samples > sequences (Method B)
+#### Method B: Rarefaction of samples \> sequences
 
 ```{r, rarefaction_samples}
 # Select random samples from 157 pool
@@ -1397,7 +1410,6 @@ pseq_rrfb <-  mirl(methodB_ps,
 
 # A total of 84 samples result from method B
 ```
-
 
 ##### Rarefied data frame Method B
 
@@ -1464,10 +1476,15 @@ ggplot() +
 
 ```
 
-Conclusions:
-For method A have a total of ~ 18-22 incdividual plants per elevation category, and 24 individual of *M. laciniatus*, 9 for *M. nasutus* and 28 for *M. guttatus*. for guttatus across all 50 rarefied datasets. Method B has 32 *M. laciniatus*, 15 *M. nasutus*, and 37 *M. guttatus*. Method B has 25-30 indivdual plants per elevation category a more balanced distribution of individuals per species. Density plots for observed richness show that the distribution of richness is similar between the two methods. Method B does capture better *M. nasutus*' richness better. Method B has  better balanced between the species represented. Yes, it is less samples, but it has a better distribution of represent host species, due to maintaining more *M. nasutus* samples. Qualitatively they don't differ much. T-tests suggest no differences in observed richness, but significant differences in Shannon and Simpson diversity. **I will use method B for downstream analyses due to better balance of host species representation.** 
+#### Sampling depth and effort conclusions:
 
-#### Dissimilarity and geographic distance matrices
+For method A have a total of \~ 18-22 incdividual plants per elevation category, and 24 individual of *M. laciniatus*, 9 for *M. nasutus* and 28 for *M. guttatus*. for guttatus across all 50 rarefied datasets. Method B has 32 *M. laciniatus*, 15 *M. nasutus*, and 37 *M. guttatus*. Method B has 25-30 indivdual plants per elevation category a more balanced distribution of individuals per species. Density plots for observed richness show that the distribution of richness is similar between the two methods. Method B does capture better *M. nasutus*' richness better. Method B has better balanced between the species represented. Yes, it is less samples, but it has a better distribution of represent host species, due to maintaining more *M. nasutus* samples. Qualitatively they don't differ much. T-tests suggest no differences in observed richness, but significant differences in Shannon and Simpson diversity. **I will use method B for downstream analyses due to better balance of host species representation.**
+
+::: callout-note
+All analyses for alpha and beta diversity below are completed with `plant_traits_MB` data frame.
+:::
+
+### Dissimilarity and geographic distance matrices
 
 ```{r, diss_matrix}
 #| echo: false
@@ -1481,15 +1498,15 @@ asv_matrix <- ps_clean_3_df |>
   as.matrix()
 
 #Bray-Curtis dissimilarity matrix rarefied to 750 reads
-set.seed(433)
-asv_avgdist <- avgdist(t(asv_matrix), 
-                       sample = 750,
-                       dmethod = "bray",
-                       meanfun = mean,
-                       iterations = 50,
-                       diag =  FALSE, 
-                       upper = FALSE) |>
-  as.matrix()
+# set.seed(433)
+# asv_avgdist <- avgdist(t(asv_matrix), 
+#                        sample = 750,
+#                        dmethod = "bray",
+#                        meanfun = mean,
+#                        iterations = 50,
+#                        diag =  FALSE, 
+#                        upper = FALSE) |>
+#   as.matrix()
 
 # Save
 saveRDS(asv_avgdist, file = "clean_data/statistics/asv_avgdist.rds") # Saving rarefied phyloseq object
@@ -1522,9 +1539,6 @@ geo_distm <- distm(plant_traits |>
 rownames(geo_distm) <- names_rarefy
 colnames(geo_distm) <- names_rarefy
 ```
-
-
-
 
 #### Hill number plots
 

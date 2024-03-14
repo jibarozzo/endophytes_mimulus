@@ -223,6 +223,9 @@ nmds_traits <- plant_traits |>
 #sum(!is.na(plant_traits$hill_1[plant_traits$Species != "B"])) # No missing values
 #sum(!is.na(plant_traits$hill_2[plant_traits$Species != "B"])) # No missing values
 
+# Functions
+source(file.path(path, "functions/pval_format.R"))
+
 #Comparisons
 my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
 my_comparisons3 <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
@@ -335,14 +338,14 @@ theme_lfspp_discrete <-      theme_classic(base_size = 16) +
   theme(legend.title = element_text(face = "bold"),
         strip.text = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 12), #Make legend text italic
+        legend.text = element_text(face = "italic"), #Make legend text italic
         axis.text.x = element_blank())
 
 # Theme for leaf trait plots: continuous
 theme_lfspp_continuous <- theme_classic(base_size = 16) +
   theme(legend.title = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 12), #Make legend text italic
+        legend.text = element_text(face = "italic"), #Make legend text italic
         axis.text.x = element_text(size = 14),
         legend.position = "bottom")
 
@@ -368,7 +371,7 @@ theme_lfdiv_continuous <- theme_classic(base_size = 16) +
    theme(legend.title = element_text(face = "bold"),
          strip.text = element_text(face = "bold.italic", size = 14),
          panel.border = element_rect(linetype = "blank", fill = NA),
-         legend.text = element_markdown(size = 14), #Make legend text italic
+        legend.text = element_text(face = "italic"), #Make legend text italic
          axis.text.x = element_text(size = 14))
 ```
 
@@ -418,7 +421,7 @@ pca_auto <- autoplot((pca), data = data.frame(leaf_traits.pca), # For some reaso
                      values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
   stat_ellipse(aes(color = Species), 
                geom = "path", 
-               size = 1.3, 
+               linewidth = 1.3, 
                position = "identity", 
                type = "t", 
                linetype = 1, 
@@ -490,7 +493,7 @@ hill0_diversity <- ggplot(data = plant_traits_MB,
                rr.digits = 2,
                p.digits = 3 ,
                parse = TRUE,
-               label.x = "left",
+               label.x = "right",
                label.y= "top",
                vstep = 0.08) +
    scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
@@ -548,7 +551,7 @@ hill1_diversity <- ggplot(data = plant_traits_MB,
                rr.digits = 2,
                p.digits = 3 ,
                parse = TRUE,
-               label.x = "left",
+               label.x = "right",
                label.y = "top",
                vstep = 0.08) +
    #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
@@ -607,7 +610,7 @@ hill2_diversity <- ggplot(data = plant_traits_MB,
                rr.digits = 2,
                p.digits = 3 ,
                parse = TRUE,
-               label.x = "left",
+               label.x = "right",
                label.y = "top",
                vstep = 0.08) +
    #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
@@ -1292,35 +1295,25 @@ errbar_lims <- group_by(leaf_traits_noB, Site) |>
               summarize(mean = mean(logLMA), se = sd(logLMA)/sqrt(n()), 
                         upper = mean+(2*se), lower = mean-(2*se))
 #Comparisons
-my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
+my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
 
 #By Site discrete comparison
 lma <- ggplot(leaf_traits_noB, aes(y = logLMA, x = Species)) +
-  geom_violin(aes(fill = Species)) +
-  geom_crossbar(stat = "summary",
-                fun = mean,
-                fun.max = mean,
-                fun.min = mean,
-                fatten = 1.5, width = 0.8) +
+  #geom_violin(aes(fill = Species)) +
+  geom_boxplot(aes(fill= Species),width = 0.7, color = "grey30", alpha = 0.7) +
+  # geom_crossbar(stat = "summary",
+  #               fun = mean,
+  #               fun.max = mean,
+  #               fun.min = mean,
+  #               fatten = 1.5, width = 0.8) +
   geom_point(color = "black", alpha = 0.2,
              size = 1.7, 
              position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
   scale_color_manual(aes(color = "black")) +
-  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Archambault", n = 4, type = "discrete")) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"),
-        strip.text = element_text(face = "bold"),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14), #Make legend text italic
-        # axis.text.x = element_text(face="italic", 
-        #                             size = 10,  
-        #                             hjust = 1,
-        #                             angle = 30),
-        axis.text.x = element_blank()) +
+  theme_lfspp_discrete +
   labs(y = "log10[Leaf Mass per Area (LMA) (mg/mm)]", x = "") +
-  #scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
   stat_compare_means(comparisons = my_comparisons,
                      method = "wilcox.test",
                      #label.y = c(0.4, 0.6, 1),
@@ -1343,11 +1336,6 @@ lma_cont <- ggplot(leaf_traits_noB |> # Removing infinite values
              size = 2.5) +
   geom_smooth(aes(color = Species), method = lm, se = FALSE, na.rm = F) +
   geom_smooth(method = lm, se = TRUE, level = 0.95, na.rm = F, color = "black") +
-  # stat_regline_equation(aes(color = Species,
-  #                           label = paste(#..eq.label..,
-  #                                         ..adj.rr.label..,
-  #                                         sprintf("italic('p')~'%s'", elev_lma_p),
-  #                                         sep = "~~~~")), size = rel(6), color = "black") +
   stat_poly_eq(formula = y ~ x, 
                aes(color = Species,
                    label = paste(#..eq.label.., 
@@ -1363,12 +1351,7 @@ lma_cont <- ggplot(leaf_traits_noB |> # Removing infinite values
                vstep = 0.08) +
   scale_color_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14), #Make legend text italic
-        axis.text.x = element_text(size = 14),
-        legend.position = "bottom") +
+  theme_lfspp_continuous +
   labs(y = "log10[Leaf Mass per Area (LMA)]", x = "Elevation (m.a.s.l.)") 
 
 #lma_cont
@@ -1418,35 +1401,24 @@ errbar_lims <- group_by(leaf_traits_noB, Species) |>
                         upper = mean + (2*se), lower = mean - (2*se))
 
 #Comparisons
-my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
+my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
 
 
 aci <- ggplot(leaf_traits_noB, aes(y = logACI, x = Species)) +
-  geom_violin(aes(fill = Species)) +
-  geom_crossbar(stat="summary",
-                fun = mean,
-                fun.max = mean,
-                fun.min = mean,
-                fatten = 1.5, width = 0.8) +
+  #geom_violin(aes(fill = Species)) +
+  geom_boxplot(aes(fill= Species),width = 0.7, color = "grey30", alpha = 0.7) +
+  # geom_crossbar(stat="summary",
+  #               fun = mean,
+  #               fun.max = mean,
+  #               fun.min = mean,
+  #               fatten = 1.5, width = 0.8) +
   geom_point(color="black", alpha = 0.2,
              size=1.7, 
              position = position_jitter(w = 0.05))  +
-  scale_fill_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-                    values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
+  scale_fill_manual(values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   scale_color_manual(aes(color = "black")) +
-  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Isfahan2", n = 4, type = "discrete")) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"),
-        strip.text = element_text(face = "bold"),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14), #Make legend text italic
-        # axis.text.x = element_text(face="italic", 
-        #                             size = 14,  
-        #                             hjust = 1,
-        #                             angle = 30)
-        axis.text.x = element_blank()) +
+  theme_lfspp_discrete +
   labs(y = paste("log[Anthocyanin Content Index (ACI)]"), x = "") +
-  #scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
   stat_compare_means(comparisons = my_comparisons,
                      method = "wilcox.test",
                      #label.y = c(0.4, 0.6, 1),
@@ -1467,10 +1439,6 @@ aci_cont <- ggplot(leaf_traits_noB, aes(y = logACI, x = Elevation_m)) +
              size = 2.5)  +
   geom_smooth(aes(color = Species), method = lm, se = FALSE, na.rm = F) +
   geom_smooth(method = lm, se = TRUE, level = 0.95, na.rm = F, color = "black") +
-  # stat_regline_equation(aes(label = paste(#..eq.label.., 
-  #                                         ..adj.rr.label..,
-  #                                         sprintf("italic('p')~'%s'", elev_aci_p), 
-  #                                         sep = "~~~~")), size = rel(6), color = "black") +
   stat_poly_eq(formula = y ~ x, 
                aes(color = Species,
                    label = paste(#..eq.label.., 
@@ -1482,16 +1450,10 @@ aci_cont <- ggplot(leaf_traits_noB, aes(y = logACI, x = Elevation_m)) +
                parse = TRUE,
                label.x.npc = "left",
                vstep = 0.08) +
-  scale_color_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-                    values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14), #Make legend text italic
-        axis.text.x = element_text(size = 14),
-        axis.text.y = element_text(size = 12),
-        legend.position = "bottom") +
- labs(y = paste("log[Anthocyanin Content Index (ACI)]"), x = "Elevation (m.a.s.l.)", 
+  scale_color_manual(values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
+  theme_lfspp_continuous +
+  theme(plot.caption = element_text(size = 10)) +
+  labs(y = paste("log[Anthocyanin Content Index (ACI)]"), x = "Elevation (m.a.s.l.)", 
       caption = (expression(paste("ACI = % ", italic("A") [lambda]," at 931 nm / % ", italic("A") [lambda]," at 530 nm")))) +
   scale_y_continuous(expand = c(0.07, 0.07)) 
 
@@ -1501,7 +1463,7 @@ aci_cont <- ggplot(leaf_traits_noB, aes(y = logACI, x = Elevation_m)) +
 # Joining plots
 aci_elevation <- ggarrange(aci, "", aci_cont, ncol = 1, nrow = 3, 
                            widths = c(1, 0.1, 1),
-                           heights = c(1, 0.1, 1),
+                           heights = c(1, 0.1, 1.1),
                            common.legend = TRUE, 
                            legend = "bottom",
                            labels = c("A", "B")
@@ -1545,38 +1507,27 @@ errbar_lims <- group_by(leaf_traits_noB, Species) |>
                         upper = mean + (2*se), lower = mean - (2*se))
 
 #Comparisons
-my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
+my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
 
 lbi <- ggplot(leaf_traits_noB, aes(y = logLBI, x = Species)) +
-  geom_violin(aes(fill = Species)) +
-  #geom_boxplot(width = 0.3, color = "grey30", alpha = 0.2) +
-  geom_crossbar(stat = "summary",
-                fun = mean,
-                fun.max = mean,
-                fun.min = mean,
-                fatten = 1.5, width = 0.8) +
+  #geom_violin(aes(fill = Species)) +
+  geom_boxplot(aes(fill= Species),width = 0.7, color = "grey30", alpha = 0.7) +
+  # geom_crossbar(stat = "summary",
+  #               fun = mean,
+  #               fun.max = mean,
+  #               fun.min = mean,
+  #               fatten = 1.5, width = 0.8) +
   geom_point(color = "black", alpha = 0.2,
              size = 1.7,
              position = position_jitter(w = 0.05))  +
   scale_fill_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
                     values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
   scale_color_manual(aes(color = "black")) +
-  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Isfahan2", n = 4, type = "discrete")) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"),
-        strip.text = element_text(face = "bold"),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14), #Make legend text italic
-        # axis.text.x = element_text(face="italic", 
-        #                             size = 14,  
-        #                             hjust = 1,
-        #                             angle = 30))
-        axis.text.x = element_blank()) +
+  theme_lfspp_discrete +
   labs(y = "log[Leaf Lobe Index (LBI)", x = "") +
   #scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
   stat_compare_means(comparisons = my_comparisons,
-                     method = "wilcox.test",
-                     #label.y = c(0.4, 0.6, 1),
+                     method = "wilcox.test", 
                      label = "p.signif") +
    facet_wrap(~Elevation_cat)
 
@@ -1594,10 +1545,6 @@ lbi_cont <- ggplot(leaf_traits_noB, aes(y = logLBI, x = Elevation_m)) +
              size = 2.5)  +
   geom_smooth(aes(color = Species), method = lm, se = FALSE, na.rm = F) +
   geom_smooth(method = lm, se = TRUE, level = 0.95, na.rm = F, color = "black") +
-  # stat_regline_equation(aes(label = paste(#..eq.label.., 
-  #                                         ..adj.rr.label..,
-  #                                         sprintf("italic('p')~'%s'", elev_lbi_p), 
-  #                                         sep = "~~~~")), size = rel(6), color = "black") +
   stat_poly_eq(formula = y ~ x, 
                aes(color = Species,
                    label = paste(#..eq.label.., 
@@ -1634,7 +1581,7 @@ lbi_elevation <- ggarrange(lbi, lbi_cont, ncol = 1, nrow = 2,
 
 lbi_elevation
 
-ggsave(filename = file.path(path, "figures/supp_fig4.png"), plot = lbi_elevation, dpi=300, units=c("mm"), width=300, height=250)
+#ggsave(filename = file.path(path, "figures/supp_fig4.png"), plot = lbi_elevation, dpi=300, units=c("mm"), width=300, height=250)
 ```
 
 ## Figure S5
@@ -1669,30 +1616,19 @@ errbar_lims <- group_by(leaf_traits_noB, Species) |>
 
 
 lps <- ggplot(leaf_traits_noB, aes(y = logLPS, x = Species)) +
-  geom_violin(aes(fill = Species)) +
-  #geom_boxplot(width = 0.3, color = "grey30", alpha = 0.2) +
-  geom_crossbar(stat = "summary",
-                fun = mean,
-                fun.max = mean,
-                fun.min = mean,
-                fatten = 1.5, width = 0.8) +
+  #geom_violin(aes(fill = Species)) +
+  geom_boxplot(aes(fill= Species),width = 0.7, color = "grey30", alpha = 0.7) +
+  # geom_crossbar(stat = "summary",
+  #               fun = mean,
+  #               fun.max = mean,
+  #               fun.min = mean,
+  #               fatten = 1.5, width = 0.8) +
   geom_point(color = "black", alpha = 0.2,
              size = 1.7,
              position = position_jitter(w = 0.05))  +
-  scale_fill_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-                    values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
+  scale_fill_manual(values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
   scale_color_manual(aes(color = "black")) +
-  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Isfahan2", n = 4, type = "discrete")) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"),
-        strip.text = element_text(face = "bold"),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14), #Make legend text italic
-        # axis.text.x = element_text(face="italic", 
-        #                             size = 14,  
-        #                             hjust = 1,
-        #                             angle = 30)
-        axis.text.x = element_blank()) +
+  theme_lfspp_discrete +
   labs(y = expression(paste("Leaf punch strength (N mm","^-1)")), x = "") +
   #scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
   stat_compare_means(comparisons = my_comparisons,
@@ -1733,14 +1669,8 @@ lps_cont <- ggplot(leaf_traits_noB, aes(y = logLPS, x = Elevation_m)) +
                parse = TRUE,
                label.x.npc = "left",
                vstep = 0.08) +
-  scale_color_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-                    values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14), #Make legend text italic
-        axis.text.x = element_text(size = 14),
-        legend.position = "bottom") +
+  scale_color_manual(values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
+  theme_lfspp_continuous+
   labs(y = expression(paste("Leaf punch strength (LPS) (N mm","^-1)")), x = "Elevation (m.a.s.l.)") +
   scale_y_continuous(expand = c(0.07, 0.07)) 
 
@@ -1756,7 +1686,7 @@ lps_elevation <- ggarrange(lps, lps_cont, ncol = 1, nrow = 2,
 
 lps_elevation
 
-ggsave(filename = file.path(path, "figures/supp_fig5.png"), plot = lps_elevation, dpi=300, units=c("mm"), width=300, height=250)
+#ggsave(filename = file.path(path, "figures/supp_fig5.png"), plot = lps_elevation, dpi=300, units=c("mm"), width=300, height=250)
 ```
 
 ## Figure S6
@@ -1791,33 +1721,22 @@ errbar_lims <- group_by(leaf_traits_noB, Species) |>
                         upper = mean + (2*se), lower = mean - (2*se))
 
 #Comparisons
-my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
+my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
 
 lt <- ggplot(leaf_traits_noB, aes(y= logLT, x = Species)) +
-  geom_violin(aes(fill = Species)) +
-  #geom_boxplot(width = 0.3, color = "grey30", alpha = 0.2) +
-  geom_crossbar(stat = "summary",
-                fun = mean,
-                fun.max = mean,
-                fun.min = mean,
-                fatten = 1.5, width = 0.8) +
+  #geom_violin(aes(fill = Species)) +
+  geom_boxplot(aes(fill= Species),width = 0.7, color = "grey30", alpha = 0.7) +
+  # geom_crossbar(stat = "summary",
+  #               fun = mean,
+  #               fun.max = mean,
+  #               fun.min = mean,
+  #               fatten = 1.5, width = 0.8) +
   geom_point(color = "black", alpha = 0.2,
              size = 1.7,
              position = position_jitter(w = 0.05))  +
-  scale_fill_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-                    values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
+  scale_fill_manual(values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
   scale_color_manual(aes(color = "black")) +
-  #scale_color_manual(labels=c(''*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),values= met.brewer("Isfahan2", n = 4, type = "discrete")) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"),
-        strip.text = element_text(face = "bold"),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14), #Make legend text italic
-        # axis.text.x = element_text(face="italic", 
-        #                             size = 14,  
-        #                             hjust = 1,
-        #                             angle = 30)
-        axis.text.x = element_blank()) +
+  theme_lfspp_discrete +
   labs(y = expression(paste("log[Leaf thickness (LT) (",mu,"m)]")), x = "") +
   #scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
   stat_compare_means(comparisons = my_comparisons,
@@ -1840,10 +1759,6 @@ lt_cont <- ggplot(leaf_traits_noB, aes(y = logLT, x = Elevation_m)) +
              size = 2.5)  +
   geom_smooth(aes(color = Species), method = lm, se = FALSE, na.rm = F) +
   geom_smooth(method = lm, se = TRUE, level = 0.95, na.rm = F, color = "black") +
-  # stat_regline_equation(aes(label = paste(#..eq.label.., 
-  #                                         ..adj.rr.label..,
-  #                                         sprintf("italic('p')~'%s'", elev_lt_p), 
-  #                                         sep = "~~~~")), size = rel(6), color = "black") +
   stat_poly_eq(formula = y ~ x, 
                aes(color = Species,
                    label = paste(#..eq.label.., 
@@ -1858,15 +1773,9 @@ lt_cont <- ggplot(leaf_traits_noB, aes(y = logLT, x = Elevation_m)) +
                parse = TRUE,
                label.x.npc = "left",
                vstep = 0.08) +
-  scale_color_manual(labels =c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-                    values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        legend.text = element_markdown(size = 14), #Make legend text italic
-        axis.text.x = element_text(size = 14),
-        legend.position = "bottom") +
- labs(y = expression(paste("log[Leaf thickness (LT) (",mu,"m)]")), x = "Elevation (m.a.s.l.)") +
+  scale_color_manual(values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
+  theme_lfspp_continuous +
+  labs(y = expression(paste("log[Leaf thickness (LT) (",mu,"m)]")), x = "Elevation (m.a.s.l.)") +
   scale_y_continuous(expand = c(0.07, 0.07)) 
 
 #lt_cont
@@ -1879,7 +1788,7 @@ lt_elevation <- ggarrange(lt, lt_cont, ncol = 1, nrow = 2,
                            labels = c("A", "B"),
                            heights = c(1, 1))
 lt_elevation
-ggsave(filename = file.path(path, "figures/supp_fig6.png"), plot = lt_elevation, dpi=300, units=c("mm"), width=300, height=250)
+#ggsave(filename = file.path(path, "figures/supp_fig6.png"), plot = lt_elevation, dpi=300, units=c("mm"), width=300, height=250)
 ```
 
 ## Supplementary methods
