@@ -234,6 +234,13 @@ source("functions/pval_format.R")
 # Comparisons
 my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
 my_comparisons3 <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
+
+# List of ASV samples
+names_list <- colnames(ps_clean_3@otu_table) #List of samples
+
+#Subset data set for NMDS and dbRDA plot
+nmds_traits <- plant_traits |>
+  filter(Unique_ID %in% names_rarefy)
 ```
 
 ## Descriptive stats
@@ -1008,7 +1015,7 @@ ant_arranged_with_caption
 # PCA using covariates to explain species richness/abundance ####
 data.pca <- leaf_traits_noB |>
   na.omit() |>
-  select(c(19:23)) #Selecting only the log-transformed leaf trait columns. I use the log transformed data due to our findings of non-normality in the data. See this post for a hot take: https://stats.stackexchange.com/questions/164381/why-log-transforming-the-data-before-performing-principal-component-analysis
+  select(c(20:24)) #Selecting only the log-transformed leaf trait columns. I use the log transformed data due to our findings of non-normality in the data. See this post for a hot take: https://stats.stackexchange.com/questions/164381/why-log-transforming-the-data-before-performing-principal-component-analysis
 
 leaf_traits.pca <- na.omit(leaf_traits_noB) 
 
@@ -1190,7 +1197,7 @@ cover_goods <- ps_melt |>
             n_sing = sum(Abundance == 1),
             goods = 1 - (n_sing/n_seqs)) 
 cover_goods|>
-  filter(n_seqs > 5000) |> #Filtering samples with more than f000 reads
+  filter(n_seqs > 750) |> #Filtering samples with more than f000 reads
   ggplot(aes(x= n_seqs,y = goods)) +
   geom_point() # Similar to `phyloseq_coverage` results above but here we know how it is calculated.
           
@@ -1513,14 +1520,24 @@ asv_matrix <- ps_clean_3_df |>
   as.matrix()
 
 #Hellinger transformation of matrix rarefied to 750 reads
-set.seed(433)
-asv_avgdist <- avgdist(t(asv_matrix),
-                       sample = 750,
-                       distfun = vegdist,
-                       dmethod = "hellinger",
-                       meanfun = mean,
-                       iterations = 50) |>
-  as.matrix()
+
+transform_diver <- decostand(as.matrix(t(rep_otu_df(pseq_rrfb))), MARGIN = 1, method = "hellinger") # Hellinger transformation
+        
+# This is the Bray-Curtis dissimilarity matrix can be calculated when plotted. 
+dist_pc <- vegdist(transform_diver, method = "bray")
+pca<- prcomp(transform_diver, center = TRUE, scale = F)
+pca$rotation=-pca$rotation
+pca$x=-pca$x
+biplot(pca)
+# Previous 
+# set.seed(433)
+# asv_avgdist <- avgdist(t(asv_matrix),
+#                        sample = 750,
+#                        distfun = vegdist,
+#                        dmethod = "hellinger", #Transformation, later Bray_Curtis
+#                        meanfun = mean,
+#                        iterations = 50) |>
+#   as.matrix()
 
 # Bray-Curtis dissimilarity matrix
 # Calculated with the dbrda function from the vegan package downstream.
@@ -2454,7 +2471,7 @@ NMDS.scree <- function(x) { #where x is the name of the data frame variable
 NMDS.scree(x) #4 dimension seem to be appropriate to keep the stress around 0.15. More dimension will complicate the interpretation of results.
 
 NMDS <- metaMDS(x,
-                distance = "bray",
+
                 display = c("sites", "species"),
                 noshare = TRUE,
                 autotransform = FALSE,
@@ -2471,9 +2488,7 @@ data.scores <- as_tibble(vegan::scores(NMDS)$sites)#Using the scores function fr
 # Solution found here: https://stackoverflow.com/questions/71941069/species-scores-not-available-as-result-of-metamds
 
 # NMDS Aesthetics ####
-#Subset data set for NMDS and dbRDA plot
-nmds_traits <- plant_traits |>
-  filter(Unique_ID %in% names_list)
+#Subset data set for NMDS and dbRDA plot. See Cleaning Shaping chunk for more details.
 
  NMDS <- ggplot(data.scores, aes(NMDS1, NMDS2, color = nmds_traits$Species))+ 
   geom_point(data = data.scores,size = 3, alpha = 0.5, stroke = 1) +
@@ -2507,7 +2522,7 @@ m1 <- dbrda(asv_avgdist ~ ., method = "bray", data = nmds_traits, na.action = na
 m1 <- na.omit(m1)
 
 # Model with species, site, leaf traits and elevation. ####
-m2 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+m2 <- dbrda(transform_diver~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m + Site + Sample_Date+ Species, method = "bray", data = nmds_traits, na.action = na.omit)
 
 m2 <- na.omit(m2)
 Anova(m2)
@@ -2536,31 +2551,40 @@ Ordistep fails due to missing values in the data. I will select manually.
 
 ```{r}
 # Remove logLBI p-value = 0.869
-m3 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + logLMA + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+m3 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + logLMA + Elevation_m + Sample_Date + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
 # Anovas
 anova(m3, by = "margin") # test for sign. environ. variables
 
-# Remove logLMA p-value = 0.694 
-m4 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+# Remove logLMA p-value = 0.754 
+m4 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + Elevation_m + Sample_Date + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
 # Anovas
 anova(m4, by = "margin") # test for sign. environ. variables
 
-#Remove logLT p-value = 0.215
-m5 <- dbrda(asv_avgdist ~ logACI + logLPS + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+#Remove logLT p-value = 0.197
+m5 <- dbrda(asv_avgdist ~ logACI + logLPS + Elevation_m + Sample_Date + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
 # Anovas
 anova(m5, by = "margin") # test for sign. environ. variables
 
+#Remove Sample_Date p-value = 0.207
+m6 <- dbrda(asv_avgdist ~ logACI + logLPS + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+# Anovas
+anova(m6, by = "margin") # test for sign. environ. variables
+
+#Remove logLPS p-value = 0.124
+m7 <- dbrda(asv_avgdist ~ logACI + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+# Anovas
+anova(m7, by = "margin") # test for sign. environ. variables
 ```
-
-
-
 
 
 ##### Plot dbRDA
 
 ```{r, m2dbRDA}
-
-m2dbRDA <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m, distance = "bray", data = nmds_traits, na.action = na.omit)
+# Final model
+m7 <- dbrda(asv_avgdist ~ logACI + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+biplot(m7)
+plot(m7)
+m2dbRDA <- m7
 
 summary(m2dbRDA)
 plot(m2dbRDA)
@@ -2588,8 +2612,7 @@ dbrda_df <- nmds_traits |>
   filter(Unique_ID %in% dbrda_names) 
 
 A.3 <- right_join(A.2, dbrda_df, by = "Unique_ID") 
-A.3 <- A.3 |>
-  filter(!Species == "B")
+
 
 
 #scores for arrows
@@ -2603,52 +2626,52 @@ arrowhead = arrow(length = unit(0.02, "npc"))
 
 #subset A4 for labeling
 A.4 <- A.4[sort(rownames(A.4)),]
-A.4
+A.4sub <-A.4[1:2,]
 A4.sub1 <- A.4[1,] #Elevation
-A4.sub2 <- A.4[2,] #Anthocyanins
-A4.sub3 <- A.4[3,] #LBI
-A4.sub4 <- A.4[4,] #LMA
-A4.sub5 <- A.4[5,] #LPS
-A4.sub6 <- A.4[6,] #LT.
+A4.sub2 <- A.4[2,] #ACi
+# A4.sub3 <- A.4[3,] #LBI
+# A4.sub4 <- A.4[4,] #LMA
+# A4.sub5 <- A.4[5,] #LPS
+# A4.sub6 <- A.4[6,] #LT.
 
 A.4
 #A4.sub4
 
 # dbRDA plot based on species
 p_m2dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +
-  geom_point(data = A.3, aes(color = Species, shape = Species), size = rel(4), alpha = 0.7, stroke = 0.5) +
-  geom_segment(arrow_map, size = rel(.8), data = A.4, color = "black", arrow = arrowhead) +
+  geom_point(data = A.3, aes(color = Species, shape = Site), size = rel(4), alpha = 0.7, stroke = 1) +
+  geom_segment(arrow_map, size = rel(.8), data = A.4[1:2,], color = "black", arrow = arrowhead) +
   geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") + # plot vertical line
   geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") + # plot horizontal line
-  geom_text(label_map, size = rel(4), data = A4.sub1, fontface = "bold", show.legend = FALSE, label = c("Elv."), nudge_x = -0.1) +
-  geom_text(label_map, size = rel(4), data = A4.sub2, fontface = "bold", show.legend = FALSE, label = c("logACI"), nudge_y = 0.1, nudge_x = -0.1) +
-  geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI"), nudge_y = 0.1) +
-  geom_text(label_map, size = rel(4), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA"), nudge_y = 0.1, nudge_x = -0.1) +
-  geom_text(label_map, size = rel(4), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS"), nudge_y = 0.1, nudge_x = 0.2) +
-  geom_text(label_map, size = rel(4), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT"), nudge_x = 0.2) +
+  geom_text(label_map, size = rel(4), data = A4.sub1, fontface = "bold", show.legend = FALSE, label = c("Elev.")) +
+  geom_text(label_map, size = rel(4), data = A4.sub2, fontface = "bold", show.legend = FALSE, label = c("logACI")) +
+  # geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI")) +
+  # geom_text(label_map, size = rel(4), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA"), nudge_y = 0.1, nudge_x = -0.1) +
+  # geom_text(label_map, size = rel(4), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS"), nudge_y = 0.1, nudge_x = 0.2) +
+  # geom_text(label_map, size = rel(4), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT"), nudge_x = 0.2) +
   xlab(label = paste("dbRDA1 (", round(B$concont$importance[2,1]*100, digits = 1), "%)", sep="")) +
   ylab(label = paste("dbRDA2 (", round(B$concont$importance[2,2]*100, digits = 1), "%)", sep="")) + 
-  scale_color_manual(labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*'),
-                    values= met.brewer("Isfahan2", n = 3 , type = "discrete", direction = -1)) +
-  scale_shape_manual(values=c(15:18),labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
-  stat_ellipse(aes(color = Species), 
-               geom = "path", 
-               size = 1.7, 
+  scale_color_manual(values= met.brewer("Isfahan2", n = 3, type = "discrete", direction = -1)) +
+  scale_shape_manual(values=c(1:22)) +
+  stat_ellipse(aes(color = Species),
+               geom = "path",
+               size = 1.7,
                position = "identity",
                type = "t", linetype = 1,
-               level = 0.95, 
+               level = 0.95,
                segments = 51,
-               na.rm = FALSE, 
+               na.rm = FALSE,
                show.legend = NA, inherit.aes = TRUE) +
   theme_classic(base_size = 16) +
   theme(legend.title = element_text(face = "bold"),
-        legend.text = element_markdown()) 
-  guides(color = FALSE, size = FALSE)
-  labs(caption = "ACI = anthocyanins, LPS = leaf punch strength, LMA = leaf mass per area, LT = leaf thickness, LBI = leaf lobe index, Elv. = Elevation_m (f.a.s.l.)", hjust = 0)
+        legend.text = element_markdown()) +
+  guides(shape = guide_legend(ncol=2))
+  guides(color = FALSE, size = FALSE)guides(color = FALSE, size = FALSE)guides(color = FALSE, size = FALSE)
+  
      
 # Rearranging the order of layers so arrows are above the points.
 p_m2dbrda$layers
-p_m2dbrda$layers <- c(p_m2dbrda$layers, p_m2dbrda$layers[[2]], p_m2dbrda$layers[[5]], p_m2dbrda$layers[[6]], p_m2dbrda$layers[[7]], p_m2dbrda$layers[[8]])
+p_m2dbrda$layers <- c(p_m2dbrda$layers, p_m2dbrda$layers[[5]], p_m2dbrda$layers[[6]])
 p_m2dbrda
 
 #ggsave(filename=file.path(path, "figures/dbRDA_species.png"), plot = p_m2dbrda, dpi=600, units=c("mm"), width=150, height=150)
@@ -2659,13 +2682,11 @@ p_m2dbrda
 ```{r, adonis2}
 set.seed(123)
 perma <- adonis2(asv_avgdist ~ logACI + 
-                   logLT + 
-                   logLPS + 
-                   logLMA + 
-                   logLBI + 
-                   Elevation_m,
+                   Elevation_m + 
+                   Site + 
+                   Species,
                  data = nmds_traits,
-permutation = 9999, method = "bray", na.action = na.omit, 
+permutation = 9999, na.action = na.omit, 
 strata = NULL)
 print(perma)
 dfperma <- as.data.frame(perma)
@@ -2680,7 +2701,11 @@ Analysis of multivariate homogeneity of group dispersions.
 ```{r, PERMDISP}
 set.seed(123)
 # By Species
-beta <- betadisper(as.dist(asv_avgdist), nmds_traits$Species, type = "centroid", sqrt.dist = FALSE)
+
+beta <- betadisper(vegdist(t(asv_avgdist), method = "bray"), # This is a matrix of Hellinger transformed data rarefied 
+                   nmds_traits$Species, 
+                   type = "centroid", 
+                   sqrt.dist = FALSE)
 beta
 anova(beta)
 permutest(beta, permutations = 9999)

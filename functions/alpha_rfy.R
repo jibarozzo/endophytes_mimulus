@@ -20,23 +20,6 @@ rep_otu_df <- function(x) {
 }
 
 
-# alpha_rfy_DF <- function(x, diversity = c("shannon", "simpson", "invsimpson")) {
-#     md <- sample_data(x[[1]])
-#     
-#     div_df_list <- lapply(diversity, function(index) {
-#         div_values <- vegan::diversity(t(rep_otu_df(x)), index = index)
-#         if (!is.matrix(div_values)) {
-#             div_values <- as.matrix(div_values, ncol = 1, dimnames = list(rownames(div_values), NULL))
-#         }
-#         colnames(div_values) <- paste0(index, "_", colnames(div_values))
-#         return(data.frame(Unique_ID = rownames(div_values), div_values, stringsAsFactors = FALSE))
-#     })
-#     
-#     final <- reduce(div_df_list, function(df1, df2) inner_join(df1, df2, by = "Unique_ID"))
-#     final <- cbind(md, final)
-#     
-#     return(final)
-# }
 
 alpha_rfy_DF <- function(x, diversity = c("shannon", "simpson", "invsimpson")) {
     md <- sample_data(x[[1]])
