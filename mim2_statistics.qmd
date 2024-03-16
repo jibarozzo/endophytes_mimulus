@@ -89,7 +89,7 @@ leaf_traits <-  traits |>
          LBI = Leaf_lobe_index,
          LPS = Leaf_toughness,
          LT = Leaf_thickness) |> 
-  select(!c(5,12:15, 23:25)) |>
+  select(!c(5,13:15, 23:25)) |>
   group_by(Site, Species, Unique_ID) |>
   fill(ImageJ_1, ImageJ_2, LBI, .direction = 'down') |>
   mutate(Species = as.factor(Species), 
@@ -103,7 +103,7 @@ leaf_traits <-  traits |>
 #Plant level for ASV analyses
 plant_traits <- leaf_traits |>
   relocate(Unique_ID, .before = Site) |>
-  group_by(Unique_ID, Site, Species, Elevation_m, Elevation_cat, Longitude, Latitude)|>
+  group_by(Unique_ID, Site, Species, Sample_Date, Elevation_m, Elevation_cat, Longitude, Latitude)|>
   summarise(ACI = mean(ACI, na.rm = TRUE),
             LT = mean(LT, na.rm = TRUE),
             LPS= mean(LPS, na.rm =TRUE),
@@ -228,7 +228,8 @@ nas_names <- plant_traits |>
   pull(Unique_ID)
 
 # Functions
-source(file.path(path, "functions/pval_format.R"))
+source("functions/alpha_rfy.R")
+source("functions/pval_format.R")
 
 # Comparisons
 my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
@@ -1522,7 +1523,7 @@ asv_avgdist <- avgdist(t(asv_matrix),
   as.matrix()
 
 # Bray-Curtis dissimilarity matrix
-asv_vegdist <- vegdist(asv_avgdist, method = "bray") # Calculated bray curtis like this because I don't plot using the ordinate function from phyloseq. I use the vegan package directly.
+# Calculated with the dbrda function from the vegan package downstream.
 
 # Save
 #saveRDS(asv_avgdist, file = "clean_data/statistics/asv_avgdist.rds") # Saving rarefied phyloseq object
@@ -1540,7 +1541,7 @@ test <- sample_data(pseq_rrfb[[1]]) |> # Rarefied phyloseq object
   # as.character()
 
 # Check if the vectors are identical
-identical(sort(test), sort(names_rarefy)) 
+identical(sort(test), sort(names_rarefy)) # TRUE
 
 # Adding column and rownames
 rownames(asv_avgdist) <- names_rarefy
@@ -2499,50 +2500,66 @@ NMDS
 
 ```{r}
 # Model with intercept only ####
-m0 <- dbrda(asv_avgdist ~ 1, data = nmds_traits) #Model with intercept only.
+m0 <- dbrda(asv_avgdist ~ 1, method = "bray", data = nmds_traits) #Model with intercept only.
 m0
 m0 <- na.omit(m0)
-m1 <- dbrda(asv_avgdist ~ ., data = nmds_traits, na.action = na.omit) # Model with all explanatory variables.
-m1 <- 
+m1 <- dbrda(asv_avgdist ~ ., method = "bray", data = nmds_traits, na.action = na.omit) # Model with all explanatory variables.
+m1 <- na.omit(m1)
 
 # Model with species, site, leaf traits and elevation. ####
-m2 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_cat + Site + Species,  data = nmds_traits, na.action = na.omit)
-m2
+m2 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+
 m2 <- na.omit(m2)
 Anova(m2)
 
 #Anovas for m2
-anova(m2, by = "margin") 
+anova.cca(m2, by = "margin") 
 anova(m2, by = "axis")
 anova(m2, by = "axis", perm.max=500)
 ```
 
-##### Forward and backward selection with ordistep - just leaf traits
+##### Forward and backward selection with ordistep
 
 ```{r}
 #Both, forward and backward selection. This way I can see the step by step.
 #m3
-m2.forsel <-  ordistep(m1, scope = formula(m2), Pin = 0.5, Pout = 0.05 ,trace = T, permutations = how(nperm = 999), steps = 50, direction = "forward")
+m2.forsel <-  ordistep(m0, scope = formula(m1), Pin = 0.5, Pout = 0.05 , trace = T, permutations = how(nperm = 999), steps = 50, direction = "forward", na.action = na.omit)
 #m2.forsel$anova # I used m2 as the "scope" because it does not contain Trial_type. This is a factor that is only relevant for the ant an pathogen trial. Differences detected between the trial types not important or unrealistic for the question at hand. 
 
-#summary(m2.forsel)
-#m2.forsel$anova
-#anova(m2.forsel, by = "margin") # test for sign. environ. variables 
+summary(m2.forsel)
+anova(m2.forsel, by = "margin") # test for sign. environ. variables 
 #anova(m2.forsel, by = "axis") # test axes for significance
 #anova(m2.forsel, by="axis", perm.max=500) #tests for sign. variables, but adds them sequentially.
- 
-m3.forsel <- ordistep(m0, scope = formula(m3), Pin = 0.5, Pout = 0.1, trace = T, pstep = 1000, direction = "forward")
-#m3.forsel$terms
-#summary(m3.forsel)
-
-#anova(m3.forsel, by = "margin") 
-#anova(m3.forsel, by = "axis")
-#anova(m3.forsel, by="axis", perm.max=500) 
 ```
+
+Ordistep fails due to missing values in the data. I will select manually. 
+
+```{r}
+# Remove logLBI p-value = 0.869
+m3 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + logLMA + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+# Anovas
+anova(m3, by = "margin") # test for sign. environ. variables
+
+# Remove logLMA p-value = 0.694 
+m4 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+# Anovas
+anova(m4, by = "margin") # test for sign. environ. variables
+
+#Remove logLT p-value = 0.215
+m5 <- dbrda(asv_avgdist ~ logACI + logLPS + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+# Anovas
+anova(m5, by = "margin") # test for sign. environ. variables
+
+```
+
+
+
+
 
 ##### Plot dbRDA
 
 ```{r, m2dbRDA}
+
 m2dbRDA <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m, distance = "bray", data = nmds_traits, na.action = na.omit)
 
 summary(m2dbRDA)

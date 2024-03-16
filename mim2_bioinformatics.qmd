@@ -1811,7 +1811,7 @@ downstream analyses.
 # Saving phyloseq with not relative abundance calculated
 ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
   rename(ASV = OTU)
-#write.csv(ps_clean_3_df,file.path(out_dir, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons.csv"))
+write.csv(ps_clean_3_df,file.path(out_dir, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons.csv"))
 
 # Relative abundance calculated
 rel_ps_clean_df <- metagMisc::phyloseq_to_df(rel_abund_ps_clean, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
@@ -1819,7 +1819,7 @@ rel_ps_clean_df <- metagMisc::phyloseq_to_df(rel_abund_ps_clean, addtax = T, add
 
 #Replacing forced NaNs when turned into df
 rel_ps_clean_df  <- replace(rel_ps_clean_df , rel_ps_clean_df  == "NaN", 0) 
-#write.csv(rel_ps_clean_df, file.path(out_dir, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.csv"))
+write.csv(rel_ps_clean_df, file.path(out_dir, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.csv"))
 
 
 # Remove species B from the phyloseq object
@@ -1833,11 +1833,11 @@ rel_abund_ps_clean <- subset_samples(rel_abund_ps_clean, !Sample %in% bicolor)
 ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
   rename(ASV = OTU)
 
-#saveRDS(ps_clean_3, file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.rds"))
-#write.csv(ps_clean_3_df, file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.csv"))
+saveRDS(ps_clean_3, file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.rds"))
+write.csv(ps_clean_3_df, file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.csv"))
 # 
-#saveRDS(rel_abund_ps_clean, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
-#write.csv(rel_ps_clean_df, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
+saveRDS(rel_abund_ps_clean, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
+write.csv(rel_ps_clean_df, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
 ```
 
 Now we have the objects from `phyloseq` saved as R objects as well as
