@@ -207,7 +207,7 @@ colnames(geo_distm) <- names_rarefy
 #geo_dist <- as.dist(geo_matrix)
 
 # Subset data set for NMDS and dbRDA plot
-nmds_traits <- plant_traits |>
+ordi_traits <- plant_traits |>
   filter(Unique_ID %in% names_rarefy)
 
 
@@ -901,10 +901,10 @@ t1gg
 model <- asv_avgdist ~ logLBI + Elevation_m + Site + Species
 
 set.seed(123)
-m2dbRDA <- dbrda(model, distance = "bray", data = nmds_traits, na.action = na.omit) 
+m2dbRDA <- dbrda(model, distance = "bray", data = ordi_traits, na.action = na.omit) 
 
 # PERMANOVA = dbRDA
-adonis2(model, nmds_traits, distance = "bray", permutations = 999, by = "margin", add = FALSE, parallel = 2, na.action = na.omit, strata = NULL)
+adonis2(model, ordi_traits, distance = "bray", permutations = 999, by = "margin", add = FALSE, parallel = 2, na.action = na.omit, strata = NULL)
 
 # Results from dbRDA and adonis2 should be very similar. 
 #summary(m2dbRDA)
@@ -927,7 +927,7 @@ dbrda_names <- rownames(A.2)
 A.2 <- rownames_to_column(A.2, var = "Unique_ID")
 
 # Subset for the plot
-dbrda_df <- nmds_traits |>
+dbrda_df <- ordi_traits |>
   filter(Unique_ID %in% dbrda_names) 
 
 A.3 <- right_join(A.2, dbrda_df, by = "Unique_ID") 
@@ -999,7 +999,7 @@ p_m2dbrda$layers <- c(p_m2dbrda$layers, p_m2dbrda$layers[[2]], p_m2dbrda$layers[
 
 #####################################
 # dbRDA using Elevation 
-#m3bdrda <- dbrda(asv_vegdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_cat, distance = "bray", data = nmds_traits, na.action = na.omit)
+#m3bdrda <- dbrda(asv_vegdist ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_cat, distance = "bray", data = ordi_traits, na.action = na.omit)
 
 # dbRDA plot based on elevation
 elev_cat_dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +

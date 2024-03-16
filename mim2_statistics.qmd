@@ -239,7 +239,8 @@ my_comparisons3 <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
 names_list <- colnames(ps_clean_3@otu_table) #List of samples
 
 #Subset data set for NMDS and dbRDA plot
-nmds_traits <- plant_traits |>
+# Samples resulting from rarefaction
+ordi_traits <- plant_traits |>
   filter(Unique_ID %in% names_rarefy)
 ```
 
@@ -1423,36 +1424,7 @@ pseq_rrfb <- readRDS("clean_data/statistics/pseq_rrfb.rds") # Loading rarefied p
 final_names_methodB <- sample_names(pseq_rrfb[[1]]) # Sample names
 ```
 
-##### Rarefied data frame Method B
-
-```{r, rarefaction_outputB}
-# Method B output
-plant_traits_MB <- alpha_rfy_DF(pseq_rrfb, diversity = c("shannon", "simpson", "invsimpson")) # Alpha diversity indices
-
-plant_traits_MB <- plant_traits_MB |>
-  select(!c(11:12)) |> # Removing variables calculated before rarefactions
-  relocate(Unique_ID, .before = Site) |># Moving Unique_ID to the front
-  mutate(Unique_ID =  str_remove(Unique_ID, "^.*?(_|-)"),
-         hill_1 = exp(shannon_)) |> # Observed column is equivalent to hill_0
-  # Simpson index is (1-D) and InvSimpson (1/D) which is equivalent to hill_2
-  rename(
-    Observed = observed, 
-    Shannon = shannon_,
-    Simpson_1minusD = simpson_,
-    hill_2 = invsimpson_
-  ) |>
-  relocate(Observed, .before = Shannon)# Renaming and relocating columns
-
-# Saving rarefied data frame
-#saveRDS(plant_traits_MB, file = "clean_data/statistics/plant_traits_MB.rds") # Saving rarefied data frame
-#write.csv(plant_traits_MB, file = "clean_data/statistics/plant_traits_MB.csv") # Saving rarefied data frame as csv
-
-#Loading rarefied data frame
-plant_traits_MB <- readRDS("clean_data/statistics/plant_traits_MB.rds") # Loading rarefied data frame
-
-
-##### Compare rarefaction and rtandomization methods
-```
+#### Compare rarefaction and rtandomization methods
 
 ```{r, compare}
 # Methods A
@@ -1492,6 +1464,43 @@ ggplot() +
 
 For method A have a total of \~ 18-22 incdividual plants per elevation category, and 24 individual of *M. laciniatus*, 9 for *M. nasutus* and 28 for *M. guttatus*. for guttatus across all 50 rarefied datasets. Method B has 32 *M. laciniatus*, 15 *M. nasutus*, and 37 *M. guttatus*. Method B has 25-30 indivdual plants per elevation category a more balanced distribution of individuals per species. Density plots for observed richness show that the distribution of richness is similar between the two methods. Method B does capture better *M. nasutus*' richness better. Method B has better balanced between the species represented. Yes, it is less samples, but it has a better distribution of represent host species, due to maintaining more *M. nasutus* samples. Qualitatively they don't differ much. T-tests suggest no differences in observed richness, but significant differences in Shannon and Simpson diversity. **I will use method B for downstream analyses due to better balance of host species representation.**
 
+#### Rarefied data frame Method B
+
+```{r, rarefaction_outputB}
+# Method B output
+plant_traits_MB <- alpha_rfy_DF(pseq_rrfb, diversity = c("shannon", "simpson", "invsimpson")) # Alpha diversity indices
+
+
+# Remaking like plants_traits
+# Very much like in Cleaning and Shaping chunk
+plant_traits_MB <- plant_traits_MB |>
+  select(!c(12:13)) |> # Removing ImageJ measurments
+  mutate(X = Unique_ID, # Copyin column to new column
+    Unique_ID =  str_remove(Unique_ID, "^.*?(_|-)"),
+         hill_1 = exp(shannon_), 
+         logLBI = log10(LBI),
+         logACI = log10(ACI),
+         logLT = log10(LT),
+         logLPS = log10(LPS),
+         logLMA = log10(LMA)) |>
+  relocate(X, Unique_ID, .before = Site) |># Moving Unique_ID to the front
+  rename(
+    Observed = observed, 
+    Shannon = shannon_,
+    Simpson_1minusD = simpson_,
+    hill_2 = invsimpson_
+  ) |>
+  relocate(Observed, .before = Shannon)# Renaming and relocating columns
+
+# Saving rarefied data frame
+#saveRDS(plant_traits_MB, file = "clean_data/statistics/plant_traits_MB.rds") # Saving rarefied data frame
+#write.csv(plant_traits_MB, file = "clean_data/statistics/plant_traits_MB.csv") # Saving rarefied data frame as csv
+
+#Loading rarefied data frame
+plant_traits_MB <- readRDS("clean_data/statistics/plant_traits_MB.rds") # Loading rarefied data frame.
+```
+
+
 ::: callout-note
 All analyses for alpha and beta diversity below are completed with `plant_traits_MB` data frame.
 :::
@@ -1526,15 +1535,21 @@ rrfy_hell_matrix <- decostand(as.matrix(t(rep_otu_df(pseq_rrfb))), MARGIN = 1, m
 # Cleaning row names
 
 rrfy_hell_matrix <- as.data.frame(rrfy_hell_matrix) |>
-  rownames_to_column(var = "Unique_ID") |>
-  mutate(Unique_ID =  str_remove(Unique_ID, "^.*?(_|-)")) |>
-  t() |> # Transpose due to duplicate row names not allowed
- 
+  rownames_to_column(var = "X") |>
+  mutate(Unique_ID =  X, # Copyin column to new column 
+         Unique_ID =  str_remove(Unique_ID, "^.*?(_|-)")) |>
+  relocate(Unique_ID, .after = X) |>
+  left_join(plant_traits, by = "Unique_ID")
+  t() # Transpose due to duplicate row names not allowed
+
+# Save
+saveRDS(rrfy_hell_matrix, file = "clean_data/statistics/rrfy_hell_matrix.rds") 
         
 # This is the Bray-Curtis dissimilarity matrix can be calculated when plotted. 
-dist_pc <- vegdist(transform_diver, method = "bray")
+#asv_vegdist <- vegdist(rrfy_hell_matrix, method = "bray") #Samples as rows, ASVs as columns
 
 # Previous dissimilarity matrix
+# Mean dissimilarity matrix from rarefied data sets
 # set.seed(433)
 # asv_avgdist <- avgdist(t(asv_matrix),
 #                        sample = 750,
@@ -1547,7 +1562,7 @@ dist_pc <- vegdist(transform_diver, method = "bray")
 # Bray-Curtis dissimilarity matrix
 # Calculated with the dbrda function from the vegan package downstream.
 
-# Save
+
 #saveRDS(asv_avgdist, file = "clean_data/statistics/asv_avgdist.rds") # Saving rarefied phyloseq object
 
 # Load  
@@ -1570,15 +1585,17 @@ rownames(asv_avgdist) <- names_rarefy
 colnames(asv_avgdist) <- names_rarefy
 
 # Geographical matrix
-#geo_matrix <- distm(plant_traits[,c("Longitude", "Latitude")], fun = distHaversine)
-geo_distm <- distm(plant_traits |>
-                      filter(Unique_ID %in% names_rarefy) |>
+geo_distm <- distm(plant_traits_MB |>
+                      #filter(Unique_ID %in% names_rarefy) |>
                      # column_to_rownames(var = "Unique_ID") |>
                       select(Longitude, Latitude), fun = distVincentyEllipsoid)
                       
 # Adding column and rownames
-rownames(geo_distm) <- names_rarefy
-colnames(geo_distm) <- names_rarefy
+rownames(geo_distm) <- rownames(rrfy_hell_matrix)
+colnames(geo_distm) <- rownames(rrfy_hell_matrix)
+
+saveRDS(geo_distm, file = "clean_data/statistics/geo_distm.rds") # Saving rarefied phyloseq object
+
 ```
 
 #### Hill number plots
@@ -2366,91 +2383,7 @@ p2 <- plot_bar(microbiome::transform(ps_clean_3, "compositional")) +
   facet_wrap(~ sample_Species)
 p2
 
-
-
-# # Load libraries
-# library("multcomp")
-# library("multcompView")
-# 
-# # Perform ANOVA
-# anova <- aov(mean_abundance ~ sample_Species, data = ps_melt)
-# 
-# # Tukey's test for multiple comparisons
-# tukey <- glht(anova, linfct = mcp(sample_Species = "Tukey"))
-# cld <- cld(tukey, level = 0.05, decreasing = TRUE)
-# 
-# # Extract letters from Tukey's test
-# cld_table <- as.data.frame(cld[["mcletters"]][["Letters"]])
-# colnames(cld_table) <- "alphabet"
-# 
-# # Join letters with the main data
-# cld <- cld_table |> rownames_to_column(var = "sample_Species")
-# ps_melt <- ps_melt |> left_join(cld, by = "sample_Species")
-# 
-# # Plot bar chart with ggplot2
-# p2 <- ggbarplot(ps_melt, x = "Phylum", y = "mean_abundance", 
-#           add = c("mean_se"),
-#           color = "sample_Species", 
-#           position = position_dodge(0.8),
-#           error.plot = "errorbar") 
-# 
-#  p2 + geom_text(aes(x = Phylum, 
-#                                #y = mean_abundance + se + 1,
-#                                label = sample_Species, 
-#                                group = sample_Species),
-#             #fun = mean,
-#             stat = "identity", 
-#             position = "dodge",
-#             check_overlap = TRUE)
-# p2  
-# df <- ps_melt |>
-#   filter(!sample_Species == "B") |>
-#   group_by(Phylum, sample_Species, alphabet) |>
-#   summarise(mean_abundance = mean(Abundance), se = sd(Abundance)/sqrt(length(Abundance)))
-# 
-# # Another way to plot with ggplot2
-# ggplot(ps_melt, aes(x = factor(Phylum), y = mean_abundance, fill = sample_Species)) +
-#   geom_bar(stat = "identity", position = position_dodge(0.8)) 
-#   geom_errorbar(aes(ymin = mean_abundance - se, ymax = mean_abundance + se), position = position_dodge(0.8), width = 0.25, check_overlap = TRUE) 
-#   geom_text(aes(y = mean_abundance + se +1, label = alphabet),  hjust = -5) +
-#   labs(title = "Bar Plot of Mean Abundance by Species",
-#        x = "Sample Species",
-#        y = "Mean Abundance") +
-#   theme_minimal()
-# 
-# # Plot using microbiome package
-# plot_bar(microbiome::transform(ps_clean_3, "compositional"), "Phylum", fill = "sample_Species") +
-#   geom_bar(aes(fill = Phylum, color = Phylum), stat = "identity", position = "dodge")
-# 
-# # Statistical comparisons
-# stat_compare_means(aes(group = "sample_Species"), label = "p.signif", method = "t.test", hide.ns = TRUE)
-# 
-# # Wilcoxon rank-sum test for each Phylum
-# compare_means(mean_abundance ~ sample_Species,
-#               data = ps_melt,
-#               group.by = "Phylum",
-#               method = "wilcox.test",
-#               p.adjust.method = "BH",
-#               paired = FALSE,
-#               alternative = "two.sided",
-#               mu = 0,
-#               var.equal = FALSE,
-#               conf.level = 0.95)
-# 
-# # Another way to perform Tukey's test
-# tukey <- TukeyHSD(anova)
-# cld <- multcompLetters4(anova, tukey)
-# cld_table <- as.data.frame(cld[["mcletters"]][["Letters"]])
-# colnames(cld_table) <- "alphabet"
-# 
-# # Join letters with the main data
-# cld <- cld_table |> rownames_to_column(var = "sample_Species")
-# ps_melt <- ps_melt |> left_join(cld, by = "sample_Species")
-# 
-# # Extract species list
-# species_list <- names(as.list(distinct(as.data.frame(ps_melt$sample_Species))))
-# 
-# head(dput(p2))
+#ggsave(file.path(path, "figures/relabun_barplot.png") , plot = p2, dpi=300, units=c("mm"), width=200, height=150)
 ```
 
 ### NMDS
@@ -2495,7 +2428,7 @@ data.scores <- as_tibble(vegan::scores(NMDS)$sites)#Using the scores function fr
 # NMDS Aesthetics ####
 #Subset data set for NMDS and dbRDA plot. See Cleaning Shaping chunk for more details.
 
- NMDS <- ggplot(data.scores, aes(NMDS1, NMDS2, color = nmds_traits$Species))+ 
+ NMDS <- ggplot(data.scores, aes(NMDS1, NMDS2, color = ordi_traits$Species))+ 
   geom_point(data = data.scores,size = 3, alpha = 0.5, stroke = 1) +
   scale_shape_manual(values=c(1:24)) +
   # scale_color_manual(values = met.brewer(name = "Nizami", n = 8, type="discrete")) +
@@ -2520,20 +2453,21 @@ NMDS
 
 ```{r}
 # Model with intercept only ####
-m0 <- dbrda(asv_avgdist ~ 1, method = "bray", data = nmds_traits) #Model with intercept only.
-m0
+# Using rrfy_hell_matrix as the distance matrix
+m0 <- dbrda(rrfy_hell_matrix ~ 1, method = "bray", data = plant_traits_MB, na.action = na.omit) #Model with intercept only.
 m0 <- na.omit(m0)
-m1 <- dbrda(asv_avgdist ~ ., method = "bray", data = nmds_traits, na.action = na.omit) # Model with all explanatory variables.
+
+m1 <- dbrda(rrfy_hell_matrix ~ ., method = "bray", data = plant_traits_MB, na.action = na.omit) # Model with all explanatory variables.
 m1 <- na.omit(m1)
 
 # Model with species, site, leaf traits and elevation. ####
-m2 <- dbrda(transform_diver~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m + Site + Sample_Date+ Species, method = "bray", data = nmds_traits, na.action = na.omit)
+m2 <- dbrda(rrfy_hell_matrix ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m + Site + Sample_Date+ Species, method = "bray", data = plant_traits_MB, na.action = na.omit)
 
 m2 <- na.omit(m2)
 Anova(m2)
 
 #Anovas for m2
-anova.cca(m2, by = "margin") 
+anova.cca(m2, by = "margin", permutations = 99, parallel = 4)
 anova(m2, by = "axis")
 anova(m2, by = "axis", perm.max=500)
 ```
@@ -2544,39 +2478,36 @@ anova(m2, by = "axis", perm.max=500)
 #Both, forward and backward selection. This way I can see the step by step.
 #m3
 m2.forsel <-  ordistep(m0, scope = formula(m1), Pin = 0.5, Pout = 0.05 , trace = T, permutations = how(nperm = 999), steps = 50, direction = "forward", na.action = na.omit)
-#m2.forsel$anova # I used m2 as the "scope" because it does not contain Trial_type. This is a factor that is only relevant for the ant an pathogen trial. Differences detected between the trial types not important or unrealistic for the question at hand. 
 
 summary(m2.forsel)
 anova(m2.forsel, by = "margin") # test for sign. environ. variables 
-#anova(m2.forsel, by = "axis") # test axes for significance
-#anova(m2.forsel, by="axis", perm.max=500) #tests for sign. variables, but adds them sequentially.
 ```
 
 Ordistep fails due to missing values in the data. I will select manually. 
 
 ```{r}
 # Remove logLBI p-value = 0.869
-m3 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + logLMA + Elevation_m + Sample_Date + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+m3 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + logLMA + Elevation_m + Sample_Date + Site + Species, method = "bray", data = ordi_traits, na.action = na.omit)
 # Anovas
 anova(m3, by = "margin") # test for sign. environ. variables
 
 # Remove logLMA p-value = 0.754 
-m4 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + Elevation_m + Sample_Date + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+m4 <- dbrda(asv_avgdist ~ logACI + logLT + logLPS + Elevation_m + Sample_Date + Site + Species, method = "bray", data = ordi_traits, na.action = na.omit)
 # Anovas
 anova(m4, by = "margin") # test for sign. environ. variables
 
 #Remove logLT p-value = 0.197
-m5 <- dbrda(asv_avgdist ~ logACI + logLPS + Elevation_m + Sample_Date + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+m5 <- dbrda(asv_avgdist ~ logACI + logLPS + Elevation_m + Sample_Date + Site + Species, method = "bray", data = ordi_traits, na.action = na.omit)
 # Anovas
 anova(m5, by = "margin") # test for sign. environ. variables
 
 #Remove Sample_Date p-value = 0.207
-m6 <- dbrda(asv_avgdist ~ logACI + logLPS + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+m6 <- dbrda(asv_avgdist ~ logACI + logLPS + Elevation_m + Site + Species, method = "bray", data = ordi_traits, na.action = na.omit)
 # Anovas
 anova(m6, by = "margin") # test for sign. environ. variables
 
 #Remove logLPS p-value = 0.124
-m7 <- dbrda(asv_avgdist ~ logACI + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+m7 <- dbrda(asv_avgdist ~ logACI + Elevation_m + Site + Species, method = "bray", data = ordi_traits, na.action = na.omit)
 # Anovas
 anova(m7, by = "margin") # test for sign. environ. variables
 ```
@@ -2586,74 +2517,66 @@ anova(m7, by = "margin") # test for sign. environ. variables
 
 ```{r, m2dbRDA}
 # Final model
-m7 <- dbrda(asv_avgdist ~ logACI + Elevation_m + Site + Species, method = "bray", data = nmds_traits, na.action = na.omit)
+m7 <- dbrda(asv_avgdist ~ logACI + Elevation_m + Site + Species, method = "bray", data = ordi_traits, na.action = na.omit)
 biplot(m7)
 plot(m7)
-m2dbRDA <- m7
+m2dbRDA <- m2
 
 summary(m2dbRDA)
 plot(m2dbRDA)
 anova(m2dbRDA, by = "margin") 
 anova(m2dbRDA, by = "axis")
-#anova(m2.forsel, by="axis", perm.max=500)
-#GRAPHING dbRDA - m4.forsel -- with color by continous leaf lifespan
-#plot using ggplot2
+
 names(m2dbRDA)
 B <- summary(m2dbRDA)
 
 
 # Extracting scores for the plot
-A.1 <- vegan::scores(m2dbRDA)
-A.2 <- as.data.frame(A.1$sites) #converting to df
+ordination_scores <- as.data.frame(vegan::scores(m2dbRDA)$sites)
 
 # Extracting names for the plot
-dbrda_names <- rownames(A.2)
+ordination_names <- rownames(ordination_scores)
 
 # Row names to column
-A.2 <- rownames_to_column(A.2, var = "Unique_ID")
+ordination_scores$Unique_ID <- rownames(ordination_scores)
 
 # Subset for the plot
-dbrda_df <- nmds_traits |>
-  filter(Unique_ID %in% dbrda_names) 
+dbrda_df <- plant_traits_MB
+  #filter(Unique_ID %in% ordination_names)
 
-A.3 <- right_join(A.2, dbrda_df, by = "Unique_ID") 
+# Merge scores with trait data
+merged_data <- right_join(ordination_scores, dbrda_df, by = c("Unique_ID" = "X"))
 
-
-
-#scores for arrows
-A.4 <- data.frame(vegan::scores(m2dbRDA, display = "bp"))
-A.4
+# Extracting scores for arrows
+arrow_scores <- as.data.frame(vegan::scores(m2dbRDA, display = "bp"))
 
 # Define the arrow aesthetic mapping
 arrow_map <- aes(xend = (dbRDA1*2), yend = (dbRDA2*2), x = 0, y = 0, shape = NULL, color = NULL, fill = NULL)
-label_map <- aes(x = 2*dbRDA1, y = 2*dbRDA2, label = row.names(A.4), shape = NULL, color = NULL, fill = NULL)
+label_map <- aes(x = 2*dbRDA1, y = 2*dbRDA2, label = row.names(arrow_scores), shape = NULL, color = NULL, fill = NULL)
 arrowhead = arrow(length = unit(0.02, "npc"))
 
 #subset A4 for labeling
-A.4 <- A.4[sort(rownames(A.4)),]
-A.4sub <-A.4[1:2,]
-A4.sub1 <- A.4[1,] #Elevation
-A4.sub2 <- A.4[2,] #ACi
-# A4.sub3 <- A.4[3,] #LBI
-# A4.sub4 <- A.4[4,] #LMA
-# A4.sub5 <- A.4[5,] #LPS
-# A4.sub6 <- A.4[6,] #LT.
+arrow_scores <- arrow_scores[sort(rownames(arrow_scores)),]
 
-A.4
-#A4.sub4
+A4.sub1 <- arrow_scores[1,] #Elevation
+A4.sub2 <- arrow_scores[2,] #ACi
+A4.sub3 <- arrow_scores[3,] #LBI
+A4.sub4 <- arrow_scores[4,] #LMA
+A4.sub5 <- arrow_scores[5,] #LPS
+A4.sub6 <- arrow_scores[6,] #LT.
 
 # dbRDA plot based on species
-p_m2dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +
-  geom_point(data = A.3, aes(color = Species, shape = Site), size = rel(4), alpha = 0.7, stroke = 1) +
-  geom_segment(arrow_map, size = rel(.8), data = A.4[1:2,], color = "black", arrow = arrowhead) +
+p_m2dbrda <- ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
+  geom_point(data = merged_data, aes(color = Species, shape = Site), size = rel(4), alpha = 0.7, stroke = 1) +
+  geom_segment(arrow_map, size = rel(.8), data = arrow_scores[1:2,], color = "black", arrow = arrowhead) +
   geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") + # plot vertical line
   geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") + # plot horizontal line
   geom_text(label_map, size = rel(4), data = A4.sub1, fontface = "bold", show.legend = FALSE, label = c("Elev.")) +
   geom_text(label_map, size = rel(4), data = A4.sub2, fontface = "bold", show.legend = FALSE, label = c("logACI")) +
-  # geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI")) +
-  # geom_text(label_map, size = rel(4), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA"), nudge_y = 0.1, nudge_x = -0.1) +
-  # geom_text(label_map, size = rel(4), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS"), nudge_y = 0.1, nudge_x = 0.2) +
-  # geom_text(label_map, size = rel(4), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT"), nudge_x = 0.2) +
+  geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI")) +
+  geom_text(label_map, size = rel(4), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA")) +
+  geom_text(label_map, size = rel(4), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS")) +
+  geom_text(label_map, size = rel(4), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT")) +
   xlab(label = paste("dbRDA1 (", round(B$concont$importance[2,1]*100, digits = 1), "%)", sep="")) +
   ylab(label = paste("dbRDA2 (", round(B$concont$importance[2,2]*100, digits = 1), "%)", sep="")) + 
   scale_color_manual(values= met.brewer("Isfahan2", n = 3, type = "discrete", direction = -1)) +
@@ -2671,7 +2594,7 @@ p_m2dbrda <- ggplot(data = A.3, aes(x = dbRDA1, y = dbRDA2)) +
   theme(legend.title = element_text(face = "bold"),
         legend.text = element_markdown()) +
   guides(shape = guide_legend(ncol=2))
-  guides(color = FALSE, size = FALSE)guides(color = FALSE, size = FALSE)guides(color = FALSE, size = FALSE)
+  #guides(color = FALSE, size = FALSE)guides(color = FALSE, size = FALSE)guides(color = FALSE, size = FALSE)
   
      
 # Rearranging the order of layers so arrows are above the points.
@@ -2690,7 +2613,7 @@ perma <- adonis2(asv_avgdist ~ logACI +
                    Elevation_m + 
                    Site + 
                    Species,
-                 data = nmds_traits,
+                 data = ordi_traits,
 permutation = 9999, na.action = na.omit, 
 strata = NULL)
 print(perma)
@@ -2708,7 +2631,7 @@ set.seed(123)
 # By Species
 
 beta <- betadisper(vegdist(t(asv_avgdist), method = "bray"), # This is a matrix of Hellinger transformed data rarefied 
-                   nmds_traits$Species, 
+                   ordi_traits$Species, 
                    type = "centroid", 
                    sqrt.dist = FALSE)
 beta
@@ -2722,7 +2645,7 @@ boxplot(beta, xlab = "", las = 2, cex.axis = 0.8)
 # No significant differences in the dispersion of the fungal community across species.
 
 # By Elevation
-beta2 <- betadisper(as.dist(asv_avgdist), nmds_traits$Elevation_cat, type = "centroid", sqrt.dist = FALSE)
+beta2 <- betadisper(as.dist(asv_avgdist), ordi_traits$Elevation_cat, type = "centroid", sqrt.dist = FALSE)
 anova(beta2)
 TukeyHSD(beta2)
 boxplot(beta2, xlab = "", las = 2, cex.axis = 0.8)
@@ -2735,7 +2658,7 @@ plot(beta2, hull=FALSE, ellipse=TRUE)
 Who contributes more to differneces in the community composition?
 
 ```{r, SIMPER}
-(sim <- with(nmds_traits, simper(asv_avgdist, Elevation_cat, permutations = 999)))
+(sim <- with(ordi_traits, simper(asv_avgdist, Elevation_cat, permutations = 999)))
 summary(sim)
 ```
 
@@ -2754,7 +2677,7 @@ asv_matrix_df <- asv_matrix|>
   as.data.frame() |>
   rownames_to_column(var = "Unique_ID") #This data set can also be created from ps_clean_3_df
 
-asv_indicspp <- left_join(asv_matrix_df, nmds_traits, by = "Unique_ID") |># Joining to the NMDS traits data frame which has the same number of rows as the asv_matrix_df
+asv_indicspp <- left_join(asv_matrix_df, ordi_traits, by = "Unique_ID") |># Joining to the NMDS traits data frame which has the same number of rows as the asv_matrix_df
     select(!c(237:255)) |>
   relocate(Species, Site, Elevation_cat, Elevation_m, .after = Unique_ID)
 ```
