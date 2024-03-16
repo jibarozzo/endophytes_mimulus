@@ -227,6 +227,7 @@ nmds_traits <- plant_traits |>
 #sum(!is.na(plant_traits$hill_2[plant_traits$Species != "B"])) # No missing values
 
 # Functions
+source(file.path(path, "functions/alpha_rfy.R"))
 source(file.path(path, "functions/pval_format.R"))
 
 #Comparisons
