@@ -137,7 +137,7 @@ plant_traits_MB <- readRDS(file.path(path, "clean_data/statistics/plant_traits_M
 
 #Removing species B
 leaf_traits_noB <- leaf_traits |>
-  filter(!Species == "B")
+  filter(!Species == "M. bicolor")
 
 #### Phyloseq objects ####
 #Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data.
@@ -148,8 +148,8 @@ ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_non
 ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.csv"))
 
 #Load Relative abundance phyloseq
-rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
-rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
+#rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
+#rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
 
 # Load ps_melt
 #ps_melt <- readRDS(file.path(path, "clean_data/statistics/ps_melt.rds"))
@@ -160,14 +160,16 @@ rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabu
 # Select randomized samples for beta diversity rarefaction
 names_list <- colnames(ps_clean_3@otu_table) #List of samples Method B
 
-set.seed(443)
-methodB_samples <- sample(names_list, 136, replace = FALSE)
+#set.seed(443)
+#methodB_samples <- sample(names_list, 136, replace = FALSE)
 
-asv_matrix <- ps_clean_3_df |>
-  select(!c(1, 3:9)) |>
-  column_to_rownames(var = "ASV") |>
-  select(contains(methodB_samples)) |> # Samples from method B randomization
-  as.matrix()
+# asv_matrix <- ps_clean_3_df |>
+#   select(!c(1, 3:9)) |>
+#   column_to_rownames(var = "ASV") |>
+#   select(contains(methodB_samples)) |> # Samples from method B randomization
+#   as.matrix()
+
+# Hellinger transformed matrix (see mim2_statistics.qmd)
 
 # #Bray-Curtis dissimilarity matrix rarefied to 750 reads
 # set.seed(433)
@@ -194,7 +196,7 @@ colnames(asv_avgdist) <- names_rarefy
 #geo_matrix <- distm(plant_traits[,c("Longitude", "Latitude")], fun = distHaversine)
 geo_distm <- distm(plant_traits |>
                       filter(Unique_ID %in% names_rarefy) |>
-                     # column_to_rownames(var = "Unique_ID") |>
+                      column_to_rownames(var = "Unique_ID") |>
                       select(Longitude, Latitude), fun = distVincentyEllipsoid)
                       
 # Adding column and rownames

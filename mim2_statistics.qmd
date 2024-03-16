@@ -1235,7 +1235,7 @@ accum_curve
 
 It seems we sampled enough, based on the species accumulation curve. The rarefaction curve also shows that species richness is not necessarily increasing with greater sequencing depth. There seems to be a range of \~35 ASVs per \~50,000 reads. Other samples \>200,000 reads also have around 35 ASVs. With the rarefaction of the data set to a sequence depth of 5000 reads we are left with 86 samples. About have of our original sample number.
 
-### Rarefaction strategy
+### Rarefaction strategy for alpha diversity
 
 Initially, I played around with rarefying at a 750 reads and was left with 99 samples. This is a decent balance between sequence depth and breadth. I attempted to use the `mirlyn` package to calculate 100 rarefied data sets per sequence depth parameter (e.g. 500, 1000, 3000) but the resulting phyloseq object is a list of phyloseq objects. I can select one and run analyses, but what I wanted was to average the all the data sets. The issue with averaging is that it returns doubles not integers. It then makes calculations of dissimilarity matrices and other analyses difficult. The final object from the chunk above calculates an estimate of alpha diversity from rarefied data sets. The `phyloseq_mult_raref_div` function returns a list of data frames with the alpha diversity indices. The plan is to wrangle this output to and join with `plant_traits` data to calculate correlations and other analyses.
 
@@ -1408,7 +1408,11 @@ pseq_rrfb <-  mirl(methodB_ps,
 # Save 
 #saveRDS(pseq_rrfb, file = "clean_data/statistics/pseq_rrfb.rds") # Saving rarefied phyloseq object
 
+# Load
+pseq_rrfb <- readRDS("clean_data/statistics/pseq_rrfb.rds") # Loading rarefied phyloseq object
+
 # A total of 84 samples result from method B
+final_names_methodB <- sample_names(pseq_rrfb[[1]]) # Sample names
 ```
 
 ##### Rarefied data frame Method B
@@ -1439,7 +1443,7 @@ plant_traits_MB <- plant_traits_MB |>
 plant_traits_MB <- readRDS("clean_data/statistics/plant_traits_MB.rds") # Loading rarefied data frame
 
 
-##### Compare raefaction and rtandomization methods
+##### Compare rarefaction and rtandomization methods
 ```
 
 ```{r, compare}
@@ -1486,43 +1490,57 @@ All analyses for alpha and beta diversity below are completed with `plant_traits
 
 ### Dissimilarity and geographic distance matrices
 
+#### Rarefaction strategy for beta diversity
+
+1.  Subset matrix to sample output from alpha diversity rarefaction
+    1.  Method B
+2.  Hellinger transformation of the ASV matrix and rarefaction
+    1.  See here for a [brief discussion.](https://stats.stackexchange.com/questions/594876/should-i-use-hellinger-transformed-species-abundance-data-for-nmds-if-this-is)
+    2.  @legendre2001
+3.  Bray-Curtis dissimilarity matrix of mean from rarefied datasets.
+
 ```{r, diss_matrix}
 #| echo: false
 #| eval: true
 #| tidy: true
-# Select randomized samples for beta diversity rarefaction
+
+# Matrix
 asv_matrix <- ps_clean_3_df |>
   select(!c(1, 3:9)) |>
   column_to_rownames(var = "ASV") |>
-  select(contains(methodB_samples)) |> # Samples from method B randomization
+  select(contains(final_names_methodB)) |> # Samples from method B randomization
   as.matrix()
 
-#Bray-Curtis dissimilarity matrix rarefied to 750 reads
-# set.seed(433)
-# asv_avgdist <- avgdist(t(asv_matrix), 
-#                        sample = 750,
-#                        dmethod = "bray",
-#                        meanfun = mean,
-#                        iterations = 50,
-#                        diag =  FALSE, 
-#                        upper = FALSE) |>
-#   as.matrix()
+#Hellinger transformation of matrix rarefied to 750 reads
+set.seed(433)
+asv_avgdist <- avgdist(t(asv_matrix),
+                       sample = 750,
+                       distfun = vegdist,
+                       dmethod = "hellinger",
+                       meanfun = mean,
+                       iterations = 50) |>
+  as.matrix()
+
+# Bray-Curtis dissimilarity matrix
+asv_vegdist <- vegdist(asv_avgdist, method = "bray") # Calculated bray curtis like this because I don't plot using the ordinate function from phyloseq. I use the vegan package directly.
 
 # Save
-saveRDS(asv_avgdist, file = "clean_data/statistics/asv_avgdist.rds") # Saving rarefied phyloseq object
+#saveRDS(asv_avgdist, file = "clean_data/statistics/asv_avgdist.rds") # Saving rarefied phyloseq object
+
+# Load  
+asv_avgdist <- readRDS("clean_data/statistics/asv_avgdist.rds") # Loading rarefied phyloseq object
 
 # Rarefied data frame names
 names_rarefy <- colnames(asv_avgdist) # Rarefied data frame names from avgdist
 
 # Checking if alpha and beta diversity rarefied objects are the same
 test <- sample_data(pseq_rrfb[[1]]) |> # Rarefied phyloseq object
-  rownames() |>
-  arrange() |>
-  as.character()
+  rownames() 
+  # arrange() |>
+  # as.character()
 
 # Check if the vectors are identical
-identical(sort(test), sort(names_rarefy)) # TRUE
-
+identical(sort(test), sort(names_rarefy)) 
 
 # Adding column and rownames
 rownames(asv_avgdist) <- names_rarefy
