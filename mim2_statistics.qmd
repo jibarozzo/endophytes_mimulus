@@ -1522,7 +1522,7 @@ All analyses for alpha and beta diversity below are completed with `plant_traits
 #| eval: true
 #| tidy: true
 
-# Simple Matrix
+# Simple Matrix of 84 samples from Method B pipeline
 asv_matrix <- ps_clean_3_df |>
   select(!c(1, 3:9)) |>
   column_to_rownames(var = "ASV") |>
@@ -2452,50 +2452,48 @@ NMDS
 
 ### dbRDA
 
-##### Choosing traits for dbRDA model
+#### dbRDA modelling
+
+##### Hellinger transformed rarefied data
 
 ```{r}
 # Traits for dbRDA
 dbrda_hell_matrix <- rrfy_hell_matrix |>
   column_to_rownames(var = "X") |>
   select(-c(1, 233:256))
+
 dbrda_traits <- rrfy_hell_matrix |>
   select(X, Unique_ID, Site, Species, Elevation_m, Sample_Date, logACI, logLT, logLPS, logLMA, logLBI)
 
 # Model with intercept only ####
 # Using rrfy_hell_matrix as the distance matrix
-m0 <- dbrda(dbrda_hell_matrix ~ 1,
+m0_hell <- dbrda(dbrda_hell_matrix ~ 1,
             distance = "bray",
             dfun = vegdist,
             data = dbrda_traits,
             parallel = 8, #Passes parallelization to metaMDS function
             na.action = na.omit) #Model with intercept only.
-is.na(m0)
 
-m1 <- dbrda(dbrda_hell_matrix ~ ., 
+m1_hell <- dbrda(dbrda_hell_matrix ~ ., 
             distance = "bray", 
             dfun = vegdist,
             data = dbrda_traits,
             parallel = 8, #Passes parallelization to metaMDS function
             na.action = na.omit) # Model with all explanatory variables.
-m1 <- na.omit(m1)
 
 # Model with species, site, leaf traits and elevation. ####
-m2 <- dbrda(dbrda_hell_matrix ~ Elevation_m + Site + Sample_Date + Species,  
+m2_hell <- dbrda(dbrda_hell_matrix ~  logACI + logLT + logLPS + logLMA + Elevation_m + Sample_Date + Site + Species,  
             distance = "bray",
             dfun = vegdist,
             data = dbrda_traits,
             parallel = 8, #Passes parallelization to metaMDS function
             na.action = na.omit)
 
-m2 <- na.omit(m2)
-Anova(m2)
-
 #Anovas for m2
-anova.cca(m2, by = "margin", permutations = 99, parallel = 4)
-anova(m2, by = "axis")
-anova(m2, by = "axis", perm.max=500)
-is.na(plant_traits_MB)
+set.seed(123)
+anova.cca(m2_hell, by = "margin", permutations = 999, parallel = 8)
+anova(m2_hell, by = "axis")
+anova(m2_hell, by = "axis", perm.max=500)
 ```
 
 ##### Forward and backward selection with ordistep
@@ -2524,7 +2522,52 @@ m2.forsel <-  ordiR2step(m0, m1,
 #anova(m2.forsel, by = "margin") # test for sign. environ. variables 
 ```
 
-Ordistep fails due to missing values in the data. I will select manually. 
+:::warning
+Ordistep fails to compute with `dbrda_hell_matrix`. Results from `anova.cca` on m2 show that all terms are significant. This is too good to be true and seems to be overfitting. I will try to remove the least significant terms and re-run the model. From `vif.cca` help page: *Variance inflation is a diagnostic tool to identify useless constraints. A common rule is that values over 10 indicate redundant constraints.*
+:::
+
+```{r}
+#Variance inflation factor for constrained ordination
+vif.cca(m2)
+```
+
+All of the sampling dates are redundant. I will remove `Sampling_Date` term. Elevation alsohas an extremely high vif, but it is part of the question. Let's keep it for a minute. 
+```{r}
+m3_hell <- dbrda(dbrda_hell_matrix ~  logACI + logLT + logLPS + logLMA + Elevation_m + Site + Species,  
+            distance = "bray",
+            dfun = vegdist,
+            data = dbrda_traits,
+            parallel = 8, #Passes parallelization to metaMDS function
+            na.action = na.omit)
+
+vif.cca(m3_hell)
+inertcomp(m3_hell, display = c("sites"),
+    unity = F, proportional = TRUE)
+```
+
+Sites are redundant. 
+
+```{r}
+m4_hell <- dbrda(dbrda_hell_matrix ~  logACI + logLT + logLPS + logLMA + Elevation_m + Species,  
+            distance = "bray",
+            dfun = vegdist,
+            data = dbrda_traits,
+            parallel = 8, #Passes parallelization to metaMDS function
+            na.action = na.omit)
+
+vif.cca(m4_hell) # Excellent VIFs
+```
+
+##### More model selection
+
+Continuation of model selection now that I removed redundant terms. 
+
+```{r}
+# Anovas
+set.seed(123)
+anova.cca(m4_hell, by = "margin", permutations = 999, parallel = 8) # test for sign. environ. variables
+permustats(anova(cca1))
+```
 
 ```{r}
 # Remove logLBI p-value = 0.869
@@ -2597,7 +2640,8 @@ label_map <- aes(x = 2*dbRDA1, y = 2*dbRDA2, label = row.names(arrow_scores), sh
 arrowhead = arrow(length = unit(0.02, "npc"))
 
 #subset A4 for labeling
-arrow_scores <- arrow_scores[sort(rownames(arrow_scores)),]
+arrow_scores <- arrow_scores[order(rownames(arrow_scores)), ]
+A4 <- lapply(1:6, function(i) arrow_scores[i, ])
 
 A4.sub1 <- arrow_scores[1,] #Elevation
 A4.sub2 <- arrow_scores[2,] #ACi
@@ -2609,15 +2653,15 @@ A4.sub6 <- arrow_scores[6,] #LT.
 # dbRDA plot based on species
 p_m2dbrda <- ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
   geom_point(data = merged_data, aes(color = Species, shape = Site), size = rel(4), alpha = 0.7, stroke = 1) +
-  geom_segment(arrow_map, size = rel(.8), data = arrow_scores[1:2,], color = "black", arrow = arrowhead) +
+  geom_segment(arrow_map, size = rel(.8), data = arrow_scores, color = "black", arrow = arrowhead) +
   geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") + # plot vertical line
   geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") + # plot horizontal line
-  geom_text(label_map, size = rel(4), data = A4.sub1, fontface = "bold", show.legend = FALSE, label = c("Elev.")) +
-  geom_text(label_map, size = rel(4), data = A4.sub2, fontface = "bold", show.legend = FALSE, label = c("logACI")) +
-  geom_text(label_map, size = rel(4), data = A4.sub3, fontface = "bold", show.legend = FALSE, label = c("logLBI")) +
-  geom_text(label_map, size = rel(4), data = A4.sub4, fontface = "bold", show.legend = FALSE, label = c("logLMA")) +
-  geom_text(label_map, size = rel(4), data = A4.sub5, fontface = "bold", show.legend = FALSE, label = c("logLPS")) +
-  geom_text(label_map, size = rel(4), data = A4.sub6, fontface = "bold", show.legend = FALSE, label = c("logLT")) +
+  geom_text(label_map, size = rel(4), data = A4[[1]], fontface = "bold", show.legend = FALSE, label = c("Elev.")) +
+  geom_text(label_map, size = rel(4), data = A4[[2]], fontface = "bold", show.legend = FALSE, label = c("logACI")) +
+  geom_text(label_map, size = rel(4), data = A4[[3]], fontface = "bold", show.legend = FALSE, label = c("logLBI")) +
+  geom_text(label_map, size = rel(4), data = A4[[4]], fontface = "bold", show.legend = FALSE, label = c("logLMA")) +
+  geom_text(label_map, size = rel(4), data = A4[[5]], fontface = "bold", show.legend = FALSE, label = c("logLPS")) +
+  geom_text(label_map, size = rel(4), data = A4[[6]], fontface = "bold", show.legend = FALSE, label = c("logLT")) +
   xlab(label = paste("dbRDA1 (", round(B$concont$importance[2,1]*100, digits = 1), "%)", sep="")) +
   ylab(label = paste("dbRDA2 (", round(B$concont$importance[2,2]*100, digits = 1), "%)", sep="")) + 
   scale_color_manual(values= met.brewer("Isfahan2", n = 3, type = "discrete", direction = -1)) +
@@ -2633,10 +2677,9 @@ p_m2dbrda <- ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
                show.legend = NA, inherit.aes = TRUE) +
   theme_classic(base_size = 16) +
   theme(legend.title = element_text(face = "bold"),
-        legend.text = element_markdown()) +
+        legend.text = element_text(face = "italic")) +
   guides(shape = guide_legend(ncol=2))
-  #guides(color = FALSE, size = FALSE)guides(color = FALSE, size = FALSE)guides(color = FALSE, size = FALSE)
-  
+
      
 # Rearranging the order of layers so arrows are above the points.
 p_m2dbrda$layers
@@ -2644,72 +2687,6 @@ p_m2dbrda$layers <- c(p_m2dbrda$layers, p_m2dbrda$layers[[5]], p_m2dbrda$layers[
 p_m2dbrda
 
 #ggsave(filename=file.path(path, "figures/dbRDA_species.png"), plot = p_m2dbrda, dpi=600, units=c("mm"), width=150, height=150)
-
-
-###########
-# Final model
-m7 <- dbrda(asv_avgdist ~ logACI + Elevation_m + Site + Species, method = "bray", data = ordi_traits, na.action = na.omit)
-biplot(m7)
-plot(m7)
-
-# Summary and ANOVA
-m2dbRDA <- m2
-summary(m2dbRDA)
-plot(m2dbRDA)
-anova(m2dbRDA, by = "margin")
-anova(m2dbRDA, by = "axis")
-names(m2dbRDA)
-B <- summary(m2dbRDA)
-
-# Extracting scores for the plot
-ordination_scores <- as.data.frame(vegan::scores(m2dbRDA)$sites)
-ordination_scores$Unique_ID <- rownames(ordination_scores)
-
-# Subset for the plot
-dbrda_df <- plant_traits_MB
-
-# Merge scores with trait data
-merged_data <- right_join(ordination_scores, dbrda_df, by = c("Unique_ID" = "X"))
-
-# Extracting scores for arrows
-arrow_scores <- as.data.frame(vegan::scores(m2dbRDA, display = "bp"))
-
-# Define the arrow aesthetic mapping
-arrow_map <- aes(xend = (dbRDA1*2), yend = (dbRDA2*2), x = 0, y = 0, shape = NULL, color = NULL, fill = NULL)
-label_map <- aes(x = 2*dbRDA1, y = 2*dbRDA2, label = row.names(arrow_scores), shape = NULL, color = NULL, fill = NULL)
-arrowhead <- arrow(length = unit(0.02, "npc"))
-
-# Subset A4 for labeling
-arrow_scores <- arrow_scores[order(rownames(arrow_scores)), ]
-A4.sub <- lapply(1:6, function(i) arrow_scores[i, ])
-
-# dbRDA plot based on species
-p_m2dbrda <- ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
-  geom_point(aes(color = Species, shape = Site), size = rel(4), alpha = 0.7, stroke = 1) +
-  geom_segment(arrow_map, size = rel(.8), data = arrow_scores[1:2, ], color = "black", arrow = arrowhead) +
-  geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") +
-  geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") +
-  geom_text(label_map, size = rel(4), data = A4.sub, fontface = "bold", show.legend = FALSE, label = c("Elev.", "logACI", "logLBI", "logLMA", "logLPS", "logLT")) +
-  xlab(label = paste("dbRDA1 (", round(B$concont$importance[2, 1] * 100, digits = 1), "%)", sep = "")) +
-  ylab(label = paste("dbRDA2 (", round(B$concont$importance[2, 2] * 100, digits = 1), "%)", sep = "")) + 
-  scale_color_manual(values = met.brewer("Isfahan2", n = 3, type = "discrete", direction = -1)) +
-  scale_shape_manual(values = c(1:22)) +
-  stat_ellipse(aes(color = Species), geom = "path", size = 1.7, position = "identity", type = "t", linetype = 1, level = 0.95, segments = 51, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) +
-  theme_classic(base_size = 16) +
-  theme(legend.title = element_text(face = "bold"), legend.text = element_markdown()) +
-  guides(shape = guide_legend(ncol = 2))
-
-# Rearrange the order of layers so arrows are above the points
-p_m2dbrda$layers <- c(p_m2dbrda$layers, p_m2dbrda$layers[[5]], p_m2dbrda$layers[[6]])
-
-p_m2dbrda
-
-
-
-
-
-
-
 ```
 
 ### PERMANOVA
@@ -2722,7 +2699,7 @@ perma <- adonis2(rrfy_hell_matrix ~ logACI +
                    Species,
                  data = plant_traits_MB,
                  method = "bray",
-                 parallel = 4,
+                 parallel = 8,
                  permutation = 9999, 
                  na.action = na.omit, 
                  strata = NULL)
@@ -2739,9 +2716,8 @@ Analysis of multivariate homogeneity of group dispersions.
 ```{r, PERMDISP}
 set.seed(123)
 # By Species
-
-beta <- betadisper(vegdist(t(asv_avgdist), method = "bray"), # This is a matrix of Hellinger transformed data rarefied 
-                   ordi_traits$Species, 
+beta <- betadisper(vegdist(dbrda_hell_matrix, method = "bray"), # This is a matrix of Hellinger transformed data rarefied 
+                   dbrda_traits$Species, 
                    type = "centroid", 
                    sqrt.dist = FALSE)
 beta
@@ -2853,8 +2829,3 @@ colnames(multipatt_analysis_sign)[1]  <- "ASV"
 No ASVs significantly correlated with Mimulus species. When we test for correlations in elevation categories and adjust the p value for multiple comparison we are left with only 0 ASVs.
 
 NO evidence of a core ASV community associated with Mimulus or elevation types.
-
-```{r}
-
-
-```
