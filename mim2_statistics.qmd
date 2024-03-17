@@ -1151,7 +1151,6 @@ How to decide sampling depth for rarefaction?
 Visual assessment of sampling depth.
 
 ```{r, sampling_depth}
-
 # Reads per sample
 names_list <- colnames(ps_clean_3@otu_table) #List of samples
 reads <- readcount(ps_clean_3) |>  
@@ -1204,6 +1203,7 @@ cover_goods|>
   geom_point() # Similar to `phyloseq_coverage` results above but here we know how it is calculated.
           
 cover_goods |>
+  filter(n_seqs > 750) |>
   arrange(goods)
 ```
 
@@ -1222,12 +1222,7 @@ Rarefaction is subject to debate, see [@mcmurdie2014] and [@cameron2021] for a d
 set.seed(123)
 # Initial matrices, before rarefaction
 # ASV abundance matrix
-asv_matrix <- ps_clean_3_df |>
-  select(!c(1,3:9))|>
-  #select(contains(c("ASV",names_rarefy))) |>
-  column_to_rownames(var = "ASV") |>
-  as.matrix()
-# Results in 231 x 157 matrix
+asv_matrix <- as.matrix(otu_table(ps_clean_3)) # Results in 231 x 157 matrix
 
 # Vegan
 # Rarefaction curve
@@ -1300,7 +1295,7 @@ pseq_rrfa <- readRDS("clean_data/statistics/pseq_rrfa.rds") # Loading rarefied p
 # Select sample names
 seq_sample_names <- sample_names(pseq_rrfa[[1]]) # Sample names
 
-# Randomize sample names
+# Randomize sample names wit custom functions
 rand_matrix <- matrix(NA_character_, nrow = 95, ncol = 95)
 
 set.seed(443)
@@ -1312,6 +1307,7 @@ rand_select <- function(mat) {
     j <- sample(seq_len(ncol(mat)), size=1)
     rand_matrix[, j, drop=TRUE]    ## (Use `drop=FALSE` to say "don't convert 1-column matrices to vectors")
 }
+
 # Select random sample column
 set.seed(443)
 random_samples <- rand_select(rand_matrix)
@@ -1425,7 +1421,7 @@ pseq_rrfb <- readRDS("clean_data/statistics/pseq_rrfb.rds") # Loading rarefied p
 final_names_methodB <- sample_names(pseq_rrfb[[1]]) # Sample names
 ```
 
-#### Compare rarefaction and rtandomization methods
+#### Compare rarefaction and randomization methods
 
 ```{r, compare}
 # Methods A
@@ -1445,6 +1441,20 @@ t.test(plant_traits_MA$Observed, plant_traits_MB$Observed) # Observed richness
 t.test(plant_traits_MA$Shannon, plant_traits_MB$Shannon) # Shannon diversity
 t.test(plant_traits_MA$Simpson_1minusD, plant_traits_MB$Simpson_1minusD) # Simpson diversity
 
+
+# Good's coverage
+reads_rrfa <- readcount(pseq_rrfa[[1]]) |>  #Unsing first phyloseq object to explore
+  as.data.frame() |>
+  rownames_to_column(var = "Unique_ID") |>
+  rename(n_seqs = "readcount(ps_clean_3)") |>
+  right_join(plant_traits, by = "Unique_ID") |>
+  select(Unique_ID, Site, Species, n_seqs)
+
+# Sum of reads per site per species
+reads_sum <- reads |>
+  group_by(Site, Species) |>
+  filter(Unique_ID %in% names_list) |>
+  summarise(n_seqs = sum(n_seqs)) 
 
 #Observed richness comparison
 ggplot()+
@@ -1523,9 +1533,8 @@ All analyses for alpha and beta diversity below are completed with `plant_traits
 #| tidy: true
 
 # Simple Matrix of 84 samples from Method B pipeline
-asv_matrix <- ps_clean_3_df |>
-  select(!c(1, 3:9)) |>
-  column_to_rownames(var = "ASV") |>
+asv_matrix <- otu_table(ps_clean_3) |> # ASV matrix
+  as.data.frame() |>
   select(contains(final_names_methodB)) |> # Samples from method B randomization
   as.matrix()
 
@@ -2464,7 +2473,27 @@ dbrda_hell_matrix <- rrfy_hell_matrix |>
 
 dbrda_traits <- rrfy_hell_matrix |>
   select(X, Unique_ID, Site, Species, Elevation_m, Sample_Date, logACI, logLT, logLPS, logLMA, logLBI)
+```
 
+After some thought, and seeing how unrealistic using the same trait data from host species applied to all rarefied datasets results in a model with all terms significant, I decided to use simulate data based on the same distribution and characteristics of the original data and compare results.
+
+```{r}
+# Simulating data
+sim_ACI <- rnorm(4200, mean = mean(leaf_traits_noB$ACI, na.rm = T), sd = sd(leaf_traits_noB$ACI, na.rm = T)) 
+sim_LT <- rnorm(4200, mean = mean(leaf_traits_noB$LT, na.rm = T), sd = sd(leaf_traits_noB$LT, na.rm = T))
+sim_LPS <- rnorm(4200, mean = mean(leaf_traits_noB$LPS, na.rm = T), sd = sd(leaf_traits_noB$LPS, na.rm = T))
+sim_LMA <- rnorm(4200, mean = mean(leaf_traits_noB$LMA, na.rm = T), sd = sd(leaf_traits_noB$LMA, na.rm = T))
+
+sim_data <- lapply(leaf_traits_noB[,13:16], function(trait) {
+    rnorm(n, mean = mean(trait, na.rm = TRUE), sd = sd(trait, na.rm = TRUE))
+  })
+
+# Adding to the data frame
+sim_traits <- dbrda_traits |>
+  mutate(logACI = log10(sim_ACI), logLT = log10(sim_LT), logLPS = log10(sim_LPS), logLMA = log10(sim_LMA))
+```
+
+```{r}
 # Model with intercept only ####
 # Using rrfy_hell_matrix as the distance matrix
 m0_hell <- dbrda(dbrda_hell_matrix ~ 1,
@@ -2548,6 +2577,7 @@ inertcomp(m3_hell, display = c("sites"),
 Sites are redundant. 
 
 ```{r}
+# Real data
 m4_hell <- dbrda(dbrda_hell_matrix ~  logACI + logLT + logLPS + logLMA + Elevation_m + Species,  
             distance = "bray",
             dfun = vegdist,
@@ -2556,7 +2586,23 @@ m4_hell <- dbrda(dbrda_hell_matrix ~  logACI + logLT + logLPS + logLMA + Elevati
             na.action = na.omit)
 
 vif.cca(m4_hell) # Excellent VIFs
+summary(m4_hell)
+
+#save(m4_hell, file = "clean_data/statistics/m4_hell.rda")
+
+
+# Simulated data
+m4_sim <- dbrda(dbrda_hell_matrix ~  logACI + logLT + logLPS + logLMA + Elevation_m + Species,  
+            distance = "bray",
+            dfun = vegdist,
+            data = sim_traits,
+            parallel = 8, #Passes parallelization to metaMDS function
+            na.action = na.omit)
+vif.cca(m4_sim) # Excellent VIFs
+summary(m4_sim)
+save(m4_sim, file = "clean_data/statistics/m4_sim.rda")
 ```
+
 
 ##### More model selection
 
@@ -2565,9 +2611,38 @@ Continuation of model selection now that I removed redundant terms.
 ```{r}
 # Anovas
 set.seed(123)
-anova.cca(m4_hell, by = "margin", permutations = 999, parallel = 8) # test for sign. environ. variables
-permustats(anova(cca1))
+anova.m4hell <- anova.cca(m4_hell, by = "margin", permutations = 999, parallel = 8) # test for sign. environ. variables
+save(anova.m4hell, file = "clean_data/statistics/anova_m4hell.rda")
+
+set.seed(123)
+anova_m4sim <- anova.cca(m4_sim, by = "margin", permutations = 999, parallel = 8) # test for sign. environ. variables
+save(anova_m4sim, file = "clean_data/statistics/anova_m4sim.rda")
 ```
+
+##### Model validation
+
+Compare synthetic model to real data model.
+
+```{r}
+# Real matrix
+dbrda_real_traits <- plant_traits |>
+  filter(Unique_ID %in% final_names_methodB) |>
+  select(logACI, logLT, logLPS, logLMA, Elevation_m, Species)
+
+m1_real <- dbrda(t(asv_matrix) ~ ., 
+            distance = "bray", 
+            dfun = vegdist,
+            data = dbrda_real_traits,
+            parallel = 8, #Passes parallelization to metaMDS function
+            na.action = na.omit) # Model with all explanatory variables.
+
+vif.cca(m1_real)
+anova.cca(m1_real, by = "margin", permutations = 999, parallel = 8) # test for sign. environ. variables
+plot(m1_real)
+plot(m4_sim)
+```
+
+
 
 ```{r}
 # Remove logLBI p-value = 0.869
@@ -2597,26 +2672,18 @@ anova(m7, by = "margin") # test for sign. environ. variables
 ```
 
 
-##### Plot dbRDA
+#### Plot dbRDA
 
-```{r, m2dbRDA}
+```{r, final_model}
 # Final model
-m7 <- dbrda(asv_avgdist ~ logACI + Elevation_m + Site + Species, method = "bray", data = ordi_traits, na.action = na.omit)
-biplot(m7)
-plot(m7)
-m2dbRDA <- m2
+final_model <- m4_hell
 
-summary(m2dbRDA)
-plot(m2dbRDA)
-anova(m2dbRDA, by = "margin") 
-anova(m2dbRDA, by = "axis")
-
-names(m2dbRDA)
-B <- summary(m2dbRDA)
+names(final_model)
+B <- summary(final_model)
 
 
 # Extracting scores for the plot
-ordination_scores <- as.data.frame(vegan::scores(m2dbRDA)$sites)
+ordination_scores <- as.data.frame(vegan::scores(final_model)$sites)
 
 # Extracting names for the plot
 ordination_names <- rownames(ordination_scores)
@@ -2632,7 +2699,7 @@ dbrda_df <- plant_traits_MB
 merged_data <- right_join(ordination_scores, dbrda_df, by = c("Unique_ID" = "X"))
 
 # Extracting scores for arrows
-arrow_scores <- as.data.frame(vegan::scores(m2dbRDA, display = "bp"))
+arrow_scores <- as.data.frame(vegan::scores(final_model, display = "bp"))
 
 # Define the arrow aesthetic mapping
 arrow_map <- aes(xend = (dbRDA1*2), yend = (dbRDA2*2), x = 0, y = 0, shape = NULL, color = NULL, fill = NULL)
@@ -2651,7 +2718,7 @@ A4.sub5 <- arrow_scores[5,] #LPS
 A4.sub6 <- arrow_scores[6,] #LT.
 
 # dbRDA plot based on species
-p_m2dbrda <- ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
+p_final_model <- ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
   geom_point(data = merged_data, aes(color = Species, shape = Site), size = rel(4), alpha = 0.7, stroke = 1) +
   geom_segment(arrow_map, size = rel(.8), data = arrow_scores, color = "black", arrow = arrowhead) +
   geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") + # plot vertical line
@@ -2668,7 +2735,7 @@ p_m2dbrda <- ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
   scale_shape_manual(values=c(1:22)) +
   stat_ellipse(aes(color = Species),
                geom = "path",
-               size = 1.7,
+               linewidth = 1.7,
                position = "identity",
                type = "t", linetype = 1,
                level = 0.95,
@@ -2682,9 +2749,9 @@ p_m2dbrda <- ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
 
      
 # Rearranging the order of layers so arrows are above the points.
-p_m2dbrda$layers
-p_m2dbrda$layers <- c(p_m2dbrda$layers, p_m2dbrda$layers[[5]], p_m2dbrda$layers[[6]])
-p_m2dbrda
+p_final_model$layers
+p_final_model$layers <- c(p_final_model$layers, p_final_model$layers[[5]], p_final_model$layers[[6]])
+p_final_model
 
 #ggsave(filename=file.path(path, "figures/dbRDA_species.png"), plot = p_m2dbrda, dpi=600, units=c("mm"), width=150, height=150)
 ```
@@ -2692,21 +2759,46 @@ p_m2dbrda
 ### PERMANOVA
 
 ```{r, adonis2}
+# Real data
 set.seed(123)
-perma <- adonis2(rrfy_hell_matrix ~ logACI + 
+perma <- adonis2(t(asv_matrix) ~ logACI + logLT + logLPS + logLMA +
                    Elevation_m + 
-                   Site + 
+                 
                    Species,
-                 data = plant_traits_MB,
+                 data = dbrda_real_traits,
                  method = "bray",
                  parallel = 8,
-                 permutation = 9999, 
+                 permutation = 999, 
                  na.action = na.omit, 
                  strata = NULL)
 print(perma)
-dfperma <- as.data.frame(perma)
 
-fwrite(dfperma, file.path(path, "Plots", "/permanova.csv"))
+# Rarefied data
+set.seed(123)
+perma2 <- adonis2(dbrda_hell_matrix ~ logACI + logLT + logLPS + logLMA +
+                   Elevation_m + 
+                   Species,
+                 data = dbrda_traits,
+                 method = "bray",
+                 parallel = 8,
+                 permutation = 999, 
+                 na.action = na.omit, 
+                 strata = NULL)
+print(perma2)
+
+# Simulated data
+set.seed(123)
+perma3 <- adonis2(dbrda_hell_matrix ~ logACI + logLT + logLPS + logLMA +
+                   Elevation_m + 
+                   Species,
+                 data = sim_traits,
+                 method = "bray",
+                 parallel = 8,
+                 permutation = 999, 
+                 na.action = na.omit, 
+                 strata = NULL)
+print(perma3)
+
 ```
 
 ### PERMDISP
@@ -2716,7 +2808,7 @@ Analysis of multivariate homogeneity of group dispersions.
 ```{r, PERMDISP}
 set.seed(123)
 # By Species
-beta <- betadisper(vegdist(dbrda_hell_matrix, method = "bray"), # This is a matrix of Hellinger transformed data rarefied 
+beta <- betadisper(vegdist(dbrda_hell_matrix, method = "bray"), # Matrix of Hellinger transformed data rarefied 
                    dbrda_traits$Species, 
                    type = "centroid", 
                    sqrt.dist = FALSE)
@@ -2741,16 +2833,16 @@ plot(beta2, hull=FALSE, ellipse=TRUE)
 
 ```
 
-Who contributes more to differneces in the community composition?
+Who contributes more to differences in the community composition?
 
 ```{r, SIMPER}
-(sim <- with(ordi_traits, simper(asv_avgdist, Elevation_cat, permutations = 999)))
+(sim <- with(dbrda_traits, simper(dbrda_hell_matrix, Species, permutations = 9999, parallel = 8)))
 summary(sim)
 ```
 
 # Indicator species analysis
 
-This analysis allows us to determine what endophytes are associated with particular groups (e.g. tree species). According to this vgnette from Cáceres ([2022](https://cran.r-project.org/web/packages/indicspecies/vignettes/IndicatorSpeciesAnalysis.html)) `multipatt` function can provides us with Indicators Value Index and correlation index. Both are similar, but the differences lies in the question they help answer. Indicator value index "\[...\]are used for assessing the predictive values of species as indicators of the conditions prevailing in site groups, e.g. for field determination of community types or ecological monitoring." While the correlation index can be used for "\[...\] determining the ecological preferences of species among a set of alternative site groups or site group combinations."
+This analysis allows us to determine what endophytes are associated with particular groups (e.g. tree species). According to this vignette from Cáceres ([2022](https://cran.r-project.org/web/packages/indicspecies/vignettes/IndicatorSpeciesAnalysis.html)) `multipatt` function can provides us with Indicators Value Index and correlation index. Both are similar, but the differences lies in the question they help answer. Indicator value index "\[...\]are used for assessing the predictive values of species as indicators of the conditions prevailing in site groups, e.g. for field determination of community types or ecological monitoring." While the correlation index can be used for "\[...\] determining the ecological preferences of species among a set of alternative site groups or site group combinations."
 
 ```{r, indicspp}
 
