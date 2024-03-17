@@ -41,6 +41,7 @@ library("metagMisc") # Miscellaneous functions
 library("microbiome") # Expands phyloseq 
 library("mirlyn")
 
+library("parallelly")
 library("conflicted")
 conflict_prefer("select", "dplyr")
 conflict_prefer("filter", "dplyr")
@@ -240,8 +241,8 @@ names_list <- colnames(ps_clean_3@otu_table) #List of samples
 
 #Subset data set for NMDS and dbRDA plot
 # Samples resulting from rarefaction
-ordi_traits <- plant_traits |>
-  filter(Unique_ID %in% names_rarefy)
+#ordi_traits <- plant_traits |>
+#  filter(Unique_ID %in% names_rarefy)
 ```
 
 ## Descriptive stats
@@ -1528,12 +1529,10 @@ asv_matrix <- ps_clean_3_df |>
   select(contains(final_names_methodB)) |> # Samples from method B randomization
   as.matrix()
 
-
 #Hellinger transformation of matrices rarefied to 750 reads
 rrfy_hell_matrix <- decostand(as.matrix(t(rep_otu_df(pseq_rrfb))), MARGIN = 1, method = "hellinger")
 
 # Cleaning row names
-
 rrfy_hell_matrix <- as.data.frame(rrfy_hell_matrix) |>
   rownames_to_column(var = "X") |>
   mutate(Unique_ID =  X, # Copyin column to new column 
@@ -1544,7 +1543,10 @@ rrfy_hell_matrix <- as.data.frame(rrfy_hell_matrix) |>
 
 # Save
 saveRDS(rrfy_hell_matrix, file = "clean_data/statistics/rrfy_hell_matrix.rds") 
-        
+
+# Load
+rrfy_hell_matrix <- readRDS("clean_data/statistics/rrfy_hell_matrix.rds")
+
 # This is the Bray-Curtis dissimilarity matrix can be calculated when plotted. 
 #asv_vegdist <- vegdist(rrfy_hell_matrix, method = "bray") #Samples as rows, ASVs as columns
 
@@ -1566,7 +1568,7 @@ saveRDS(rrfy_hell_matrix, file = "clean_data/statistics/rrfy_hell_matrix.rds")
 #saveRDS(asv_avgdist, file = "clean_data/statistics/asv_avgdist.rds") # Saving rarefied phyloseq object
 
 # Load  
-asv_avgdist <- readRDS("clean_data/statistics/asv_avgdist.rds") # Loading rarefied phyloseq object
+#asv_avgdist <- readRDS("clean_data/statistics/asv_avgdist.rds") # Loading rarefied phyloseq object
 
 # Rarefied data frame names
 names_rarefy <- colnames(asv_avgdist) # Rarefied data frame names from avgdist
@@ -2022,7 +2024,8 @@ alpha_beta_diversity
 #| tidy: true
 # Prepare the data for correlation plot
 # Longer format
-asv_long <- asv_avgdist |>
+asv_vegdist <- as.matrix(vegdist(rrfy_hell_matrix, method = "bray"))
+asv_long <-  asv_vegdist |>
   as_tibble(rownames = "A") |>
   pivot_longer(-A, names_to = "B", values_to = "bray_diss")
 
@@ -2032,13 +2035,13 @@ geo_long <- geo_distm |>
 
 # Merge the two dataframes
 asv_geo_matrix_long <- inner_join(asv_long, geo_long, by = c("A", "B")) |>
-  inner_join(plant_traits |>
-               dplyr::select(Unique_ID, Site, Species, Elevation_cat), by = c("A" = "Unique_ID"))
+  inner_join(plant_traits_MB |>
+               dplyr::select( X, Unique_ID, Site, Species, Elevation_cat), by = c("A" = "X"))
 
 # Visualize the correlation
 # Species labels
 labels_list <- c("M. laciniatus", "M. nasutus", "M. guttatus")
-names(labels_list) <- c("L", "N", "G")
+names(labels_list) <- c("M. laciniatus", "M. nasutus", "M. guttatus")
 
 # Correlation ggplot
 mantel_test <- ggplot(asv_geo_matrix_long, aes(y = bray_diss, x = geo_dist)) +
@@ -2051,7 +2054,7 @@ mantel_test <- ggplot(asv_geo_matrix_long, aes(y = bray_diss, x = geo_dist)) +
    labs(y = "Bray_Curtis dissimilarity", x = "Geographic distance", col = "") + 
    scale_x_continuous(labels = function(x) format(x, scientific = FALSE)) +
   theme_lfspp_continuous +
-  facet_wrap(~ Species, labeller = labeller(Species = labels_list)) 
+  facet_wrap(~ Species)
 
 mantel_test
 
@@ -2452,16 +2455,38 @@ NMDS
 ##### Choosing traits for dbRDA model
 
 ```{r}
+# Traits for dbRDA
+dbrda_hell_matrix <- rrfy_hell_matrix |>
+  column_to_rownames(var = "X") |>
+  select(-c(1, 233:256))
+dbrda_traits <- rrfy_hell_matrix |>
+  select(X, Unique_ID, Site, Species, Elevation_m, Sample_Date, logACI, logLT, logLPS, logLMA, logLBI)
+
 # Model with intercept only ####
 # Using rrfy_hell_matrix as the distance matrix
-m0 <- dbrda(rrfy_hell_matrix ~ 1, method = "bray", data = plant_traits_MB, na.action = na.omit) #Model with intercept only.
-m0 <- na.omit(m0)
+m0 <- dbrda(dbrda_hell_matrix ~ 1,
+            distance = "bray",
+            dfun = vegdist,
+            data = dbrda_traits,
+            parallel = 8, #Passes parallelization to metaMDS function
+            na.action = na.omit) #Model with intercept only.
+is.na(m0)
 
-m1 <- dbrda(rrfy_hell_matrix ~ ., method = "bray", data = plant_traits_MB, na.action = na.omit) # Model with all explanatory variables.
+m1 <- dbrda(dbrda_hell_matrix ~ ., 
+            distance = "bray", 
+            dfun = vegdist,
+            data = dbrda_traits,
+            parallel = 8, #Passes parallelization to metaMDS function
+            na.action = na.omit) # Model with all explanatory variables.
 m1 <- na.omit(m1)
 
 # Model with species, site, leaf traits and elevation. ####
-m2 <- dbrda(rrfy_hell_matrix ~ logACI + logLT + logLPS + logLMA + logLBI + Elevation_m + Site + Sample_Date+ Species, method = "bray", data = plant_traits_MB, na.action = na.omit)
+m2 <- dbrda(dbrda_hell_matrix ~ Elevation_m + Site + Sample_Date + Species,  
+            distance = "bray",
+            dfun = vegdist,
+            data = dbrda_traits,
+            parallel = 8, #Passes parallelization to metaMDS function
+            na.action = na.omit)
 
 m2 <- na.omit(m2)
 Anova(m2)
@@ -2470,6 +2495,7 @@ Anova(m2)
 anova.cca(m2, by = "margin", permutations = 99, parallel = 4)
 anova(m2, by = "axis")
 anova(m2, by = "axis", perm.max=500)
+is.na(plant_traits_MB)
 ```
 
 ##### Forward and backward selection with ordistep
@@ -2477,10 +2503,25 @@ anova(m2, by = "axis", perm.max=500)
 ```{r}
 #Both, forward and backward selection. This way I can see the step by step.
 #m3
-m2.forsel <-  ordistep(m0, scope = formula(m1), Pin = 0.5, Pout = 0.05 , trace = T, permutations = how(nperm = 999), steps = 50, direction = "forward", na.action = na.omit)
+m2.forsel <-  ordistep(m0, scope = formula(m1), Pin = 0.009, Pout = 0.06 , 
+                       trace = T, 
+                       permutations = how(nperm = 10),
+                       parallel = 8,
+                       steps = 50, 
+                       direction = "both", 
+                       na.action = na.omit)
 
-summary(m2.forsel)
-anova(m2.forsel, by = "margin") # test for sign. environ. variables 
+m2.forsel <-  ordiR2step(m0, m1, 
+                       Pin = 0.009,
+                       R2scope = TRUE,
+                       permutations = how(nperm = 499), 
+                       trace = TRUE, 
+                       R2permutations = 1000, 
+                       na.action = na.omit)
+
+
+#summary(m2.forsel)
+#anova(m2.forsel, by = "margin") # test for sign. environ. variables 
 ```
 
 Ordistep fails due to missing values in the data. I will select manually. 
@@ -2603,19 +2644,88 @@ p_m2dbrda$layers <- c(p_m2dbrda$layers, p_m2dbrda$layers[[5]], p_m2dbrda$layers[
 p_m2dbrda
 
 #ggsave(filename=file.path(path, "figures/dbRDA_species.png"), plot = p_m2dbrda, dpi=600, units=c("mm"), width=150, height=150)
+
+
+###########
+# Final model
+m7 <- dbrda(asv_avgdist ~ logACI + Elevation_m + Site + Species, method = "bray", data = ordi_traits, na.action = na.omit)
+biplot(m7)
+plot(m7)
+
+# Summary and ANOVA
+m2dbRDA <- m2
+summary(m2dbRDA)
+plot(m2dbRDA)
+anova(m2dbRDA, by = "margin")
+anova(m2dbRDA, by = "axis")
+names(m2dbRDA)
+B <- summary(m2dbRDA)
+
+# Extracting scores for the plot
+ordination_scores <- as.data.frame(vegan::scores(m2dbRDA)$sites)
+ordination_scores$Unique_ID <- rownames(ordination_scores)
+
+# Subset for the plot
+dbrda_df <- plant_traits_MB
+
+# Merge scores with trait data
+merged_data <- right_join(ordination_scores, dbrda_df, by = c("Unique_ID" = "X"))
+
+# Extracting scores for arrows
+arrow_scores <- as.data.frame(vegan::scores(m2dbRDA, display = "bp"))
+
+# Define the arrow aesthetic mapping
+arrow_map <- aes(xend = (dbRDA1*2), yend = (dbRDA2*2), x = 0, y = 0, shape = NULL, color = NULL, fill = NULL)
+label_map <- aes(x = 2*dbRDA1, y = 2*dbRDA2, label = row.names(arrow_scores), shape = NULL, color = NULL, fill = NULL)
+arrowhead <- arrow(length = unit(0.02, "npc"))
+
+# Subset A4 for labeling
+arrow_scores <- arrow_scores[order(rownames(arrow_scores)), ]
+A4.sub <- lapply(1:6, function(i) arrow_scores[i, ])
+
+# dbRDA plot based on species
+p_m2dbrda <- ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
+  geom_point(aes(color = Species, shape = Site), size = rel(4), alpha = 0.7, stroke = 1) +
+  geom_segment(arrow_map, size = rel(.8), data = arrow_scores[1:2, ], color = "black", arrow = arrowhead) +
+  geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") +
+  geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") +
+  geom_text(label_map, size = rel(4), data = A4.sub, fontface = "bold", show.legend = FALSE, label = c("Elev.", "logACI", "logLBI", "logLMA", "logLPS", "logLT")) +
+  xlab(label = paste("dbRDA1 (", round(B$concont$importance[2, 1] * 100, digits = 1), "%)", sep = "")) +
+  ylab(label = paste("dbRDA2 (", round(B$concont$importance[2, 2] * 100, digits = 1), "%)", sep = "")) + 
+  scale_color_manual(values = met.brewer("Isfahan2", n = 3, type = "discrete", direction = -1)) +
+  scale_shape_manual(values = c(1:22)) +
+  stat_ellipse(aes(color = Species), geom = "path", size = 1.7, position = "identity", type = "t", linetype = 1, level = 0.95, segments = 51, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) +
+  theme_classic(base_size = 16) +
+  theme(legend.title = element_text(face = "bold"), legend.text = element_markdown()) +
+  guides(shape = guide_legend(ncol = 2))
+
+# Rearrange the order of layers so arrows are above the points
+p_m2dbrda$layers <- c(p_m2dbrda$layers, p_m2dbrda$layers[[5]], p_m2dbrda$layers[[6]])
+
+p_m2dbrda
+
+
+
+
+
+
+
 ```
 
 ### PERMANOVA
 
 ```{r, adonis2}
 set.seed(123)
-perma <- adonis2(asv_avgdist ~ logACI + 
+perma <- adonis2(rrfy_hell_matrix ~ logACI + 
                    Elevation_m + 
                    Site + 
                    Species,
-                 data = ordi_traits,
-permutation = 9999, na.action = na.omit, 
-strata = NULL)
+                 data = plant_traits_MB,
+                 method = "bray",
+                 parallel = 4,
+                 permutation = 9999, 
+                 na.action = na.omit, 
+                 strata = NULL)
 print(perma)
 dfperma <- as.data.frame(perma)
 
