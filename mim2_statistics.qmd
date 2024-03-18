@@ -212,20 +212,20 @@ ps_melt <- readRDS(file.path(path, "clean_data/statistics/ps_melt.rds"))
 # Samples with species to subset/filter matrices downstream
 # M. laciniatus
 lac_names <- plant_traits |>
-  slice(1:160) |> # Only selecting observations with ASV data 
-  filter(Species == "L") |>
+  slice(1:157) |> # Only selecting observations with ASV data 
+  filter(Species == "M. laciniatus") |>
   pull(Unique_ID) 
 
 # M. guttatus
 gut_names <- plant_traits |> 
-  slice(1:160) |> # Only selecting observations with ASV data 
-  filter(Species == "G") |>
+  slice(1:157) |> # Only selecting observations with ASV data 
+  filter(Species == "M. guttatus") |>
   pull(Unique_ID)
 
 # M. nasutus
 nas_names <- plant_traits |> 
-  slice(1:160) |> # Only selecting observations with ASV data 
-  filter(Species == "N") |>
+  slice(1:157) |> # Only selecting observations with ASV data 
+  filter(Species == "M. nasutus") |>
   pull(Unique_ID)
 
 # Functions
@@ -461,6 +461,32 @@ pairwise.wilcox.test(imagej1$logLBI, g = imagej1$Genotype)
 # Figures
 
 ### Leaf traits
+```{r, correlations}
+#Barplots with microeco
+# Quick addition trais log transformed
+ps_clean_3@sam_data <- plant_traits |>
+  filter(Unique_ID %in% names_list) |>
+  select(c(1:12, 15:20)) |>
+  sample_data()
+
+micro_psclean <- phyloseq2meco(ps_clean_3) # First convert phyloseq to meco
+
+t4 <- trans_env$new(dataset = micro_psclean, env_cols = 14:18)
+
+t4gg <- t4$cal_autocor(group = "Species", upper = list(continuous = GGally::wrap("cor", method= "spearman"))) + 
+  theme(
+    legend.title = element_text(face = "bold"),
+         strip.text = element_text(face = "bold", size = 12),
+         panel.border = element_rect(linetype = "blank", fill = NA)) +
+  scale_fill_manual(values = met.brewer("Isfahan2", n = 3, type = "discrete", direction = c(-1))) +
+  scale_color_manual(values = met.brewer("Isfahan2", n = 3, type = "discrete", direction = c(-1)))
+
+t4gg
+#ggplot2::ggsave(file.path(path, "figures/supp_fig1.png") , plot = t4gg, dpi=300, units=c("mm"), width=300, height=300)
+```
+
+It looks like logLPS and logLMA are highly correlated globally and per species. The only traits not correlated are logLT and logLBI. Fot further analyses like dbRDA I will use logACI, logLBI, and logLT as part of the initial model. 
+
 
 ```{r, themes}
 #ggplot themes
@@ -1075,6 +1101,8 @@ Here we are going to explore the relationship between elevation and FEF communit
 
 ```{r, summary_info}
 # How many ASVs per Phyla and reads per sample are there after decontamination?
+# Previous exploration of the data is in `mim2_bioinformatics.qmd`
+
 readcount(ps_clean_3) #Read count
 phyloseq_summary(ps_clean_3, more_stats = F, long = F) # metagMisc overall summary
 summarize_phyloseq(ps_clean_3) #Microbiome package summary
@@ -1111,17 +1139,17 @@ ps_average <- phyloseq_average(
   ps_clean_3,
   avg_type = "arithmetic",
   acomp_zero_impute = NULL,
-  aldex_samples = 128,
+  aldex_samples = 157,
   aldex_denom = "all",
   group = "Species",
-  drop_group_zero = FALSE,
+  drop_group_zero = TRUE,
   verbose = TRUE,
   progress = "text",
 )
 
 # Core ASV abundance
 core_abundance(
-  ps_clean_3,
+  ps_clean_3@otu_table,
   detection = 0.1/100,
   prevalence = 50/100,
   include.lowest = FALSE
@@ -1129,12 +1157,12 @@ core_abundance(
 
 # Rare ASVs
 rare_abundance(
-  ps_clean_3,
+  ps_clean_3@otu_table,
   detection = 0.1/100,
   prevalence = 50/100,
   include.lowest = FALSE
 )
-
+sample_names(ps_clean_3)
 # Core taxa
 core_tax <- core_members(ps_clean_3, detection = 0.1/100, prevalence = 50/100, include.lowest = FALSE)
 
@@ -1531,7 +1559,6 @@ All analyses for alpha and beta diversity below are completed with `plant_traits
 #| echo: false
 #| eval: true
 #| tidy: true
-
 # Simple Matrix of 84 samples from Method B pipeline
 asv_matrix <- otu_table(ps_clean_3) |> # ASV matrix
   as.data.frame() |>
@@ -1539,6 +1566,7 @@ asv_matrix <- otu_table(ps_clean_3) |> # ASV matrix
   as.matrix()
 
 #Hellinger transformation of matrices rarefied to 750 reads
+# To be used for dbRDA and adonis2
 rrfy_hell_matrix <- decostand(as.matrix(t(rep_otu_df(pseq_rrfb))), MARGIN = 1, method = "hellinger")
 
 # Cleaning row names
@@ -1556,28 +1584,23 @@ saveRDS(rrfy_hell_matrix, file = "clean_data/statistics/rrfy_hell_matrix.rds")
 # Load
 rrfy_hell_matrix <- readRDS("clean_data/statistics/rrfy_hell_matrix.rds")
 
-# This is the Bray-Curtis dissimilarity matrix can be calculated when plotted. 
-#asv_vegdist <- vegdist(rrfy_hell_matrix, method = "bray") #Samples as rows, ASVs as columns
 
-# Previous dissimilarity matrix
-# Mean dissimilarity matrix from rarefied data sets
-# set.seed(433)
-# asv_avgdist <- avgdist(t(asv_matrix),
-#                        sample = 750,
-#                        distfun = vegdist,
-#                        dmethod = "hellinger", #Transformation, later Bray_Curtis
-#                        meanfun = mean,
-#                        iterations = 50) |>
-#   as.matrix()
+# Mean Hellinger transformation of rarefied data sets
+# For Mantel tests
+set.seed(433)
+asv_avgdist <- avgdist(t(asv_matrix),
+                       sample = 750,
+                       distfun = vegdist,
+                       dmethod = "hellinger", #Transformation, later Bray_Curtis
+                       meanfun = mean,
+                       iterations = 50) |>
+  as.matrix()
 
-# Bray-Curtis dissimilarity matrix
-# Calculated with the dbrda function from the vegan package downstream.
-
-
+# Save
 #saveRDS(asv_avgdist, file = "clean_data/statistics/asv_avgdist.rds") # Saving rarefied phyloseq object
 
 # Load  
-#asv_avgdist <- readRDS("clean_data/statistics/asv_avgdist.rds") # Loading rarefied phyloseq object
+asv_avgdist <- readRDS("clean_data/statistics/asv_avgdist.rds") # Loading rarefied phyloseq object
 
 # Rarefied data frame names
 names_rarefy <- colnames(asv_avgdist) # Rarefied data frame names from avgdist
@@ -1596,17 +1619,20 @@ rownames(asv_avgdist) <- names_rarefy
 colnames(asv_avgdist) <- names_rarefy
 
 # Geographical matrix
-geo_distm <- distm(plant_traits_MB |>
-                      #filter(Unique_ID %in% names_rarefy) |>
-                     # column_to_rownames(var = "Unique_ID") |>
+geo_distm <- distm(plant_traits |>
+                      filter(Unique_ID %in% final_names_methodB) |>
+                      column_to_rownames(var = "Unique_ID") |>
                       select(Longitude, Latitude), fun = distVincentyEllipsoid)
                       
 # Adding column and rownames
-rownames(geo_distm) <- rownames(rrfy_hell_matrix)
-colnames(geo_distm) <- rownames(rrfy_hell_matrix)
+rownames(geo_distm) <- rownames(asv_avgdist)
+colnames(geo_distm) <- rownames(asv_avgdist)
 
-saveRDS(geo_distm, file = "clean_data/statistics/geo_distm.rds") # Saving rarefied phyloseq object
+# Save
+saveRDS(geo_distm, file = "clean_data/statistics/geo_distm.rds") 
 
+# Load
+geo_distm <- readRDS("clean_data/statistics/geo_distm.rds")
 ```
 
 #### Hill number plots
@@ -2033,8 +2059,7 @@ alpha_beta_diversity
 #| tidy: true
 # Prepare the data for correlation plot
 # Longer format
-asv_vegdist <- as.matrix(vegdist(rrfy_hell_matrix, method = "bray"))
-asv_long <-  asv_vegdist |>
+asv_long <-  asv_avgdist |>
   as_tibble(rownames = "A") |>
   pivot_longer(-A, names_to = "B", values_to = "bray_diss")
 
@@ -2044,8 +2069,8 @@ geo_long <- geo_distm |>
 
 # Merge the two dataframes
 asv_geo_matrix_long <- inner_join(asv_long, geo_long, by = c("A", "B")) |>
-  inner_join(plant_traits_MB |>
-               dplyr::select( X, Unique_ID, Site, Species, Elevation_cat), by = c("A" = "X"))
+  inner_join(plant_traits |>
+               dplyr::select(Unique_ID, Site, Species, Elevation_cat), by = c("A" ="Unique_ID"))
 
 # Visualize the correlation
 # Species labels
@@ -2072,8 +2097,12 @@ mantel_test
 # Mantel test
 # All data points
 set.seed(859)
-abund_geo  <- mantel(asv_avgdist, geo_distm, method = "spearman", permutations = 999, na.rm = TRUE)
-#abund_geo
+abund_geo  <- mantel(asv_avgdist, geo_distm, 
+                     method = "spearman", 
+                     parallel = 8,
+                     permutations = 9999, 
+                     na.rm = TRUE)
+abund_geo
 
 # Mantel test by species
 # M. laciniatus
@@ -2081,8 +2110,8 @@ abund_geo  <- mantel(asv_avgdist, geo_distm, method = "spearman", permutations =
 # Samples with species to subset/filter matrices downstream
 # M. laciniatus
 lac_names_rfy <- plant_traits |>
-  slice(1:160) |> # Only selecting observations with ASV data 
-  filter(Unique_ID %in% names_rarefy,
+  slice(1:157) |> # Only selecting observations with ASV data 
+  filter(Unique_ID %in% final_names_methodB,
     Species == "L") |>
   pull(Unique_ID) 
 
@@ -2097,13 +2126,13 @@ lac_mantel  <- mantel(asv_long |> # Subset the data
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
-                      method = "spearman", permutations = 999, na.rm = TRUE)
+                      method = "spearman", permutations = 9999, parallel = 8, na.rm = TRUE)
 lac_mantel
 
 # M. nasutus
 nas_names_rfy <- plant_traits |> 
-  slice(1:160) |> # Only selecting observations with ASV data 
-  filter(Unique_ID %in% names_rarefy,
+  slice(1:157) |> # Only selecting observations with ASV data 
+  filter(Unique_ID %in% final_names_methodB,
          Species == "N") |>
   pull(Unique_ID)
 nas_mantel  <- mantel(asv_long |> # Subset the data
@@ -2116,13 +2145,13 @@ nas_mantel  <- mantel(asv_long |> # Subset the data
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(), 
-                     method = "spearman", permutations = 999, na.rm = TRUE)
+                     method = "spearman", permutations = 9999, parallel = 8, na.rm = TRUE)
 nas_mantel
 
 # M. guttatus
 gut_names_rfy <- plant_traits |> 
-  slice(1:160) |> # Only selecting observations with ASV data 
-  filter(Unique_ID %in% names_rarefy,
+  slice(1:157) |> # Only selecting observations with ASV data 
+  filter(Unique_ID %in% final_names_methodB,
          Species == "G") |>
   pull(Unique_ID)
 # Subset the data
@@ -2136,7 +2165,7 @@ gut_mantel  <- mantel(asv_long |> # Subset the data
                        pivot_wider(names_from = B, values_from = geo_dist) |>
                        column_to_rownames(var = "A") |>
                        as.matrix(),
-                     method = "spearman", permutations = 999, na.rm = TRUE)
+                     method = "spearman", permutations = 9999, parallel = 8, na.rm = TRUE)
 gut_mantel
 ```
 
@@ -2348,116 +2377,27 @@ ant_arranged_with_caption
 #### ASV barplot
 
 ```{r, asv_barplot}
+#Barplots with microeco
+# Quick addition trais log transformed
+ps_clean_3@sam_data <- plant_traits |>
+  filter(Unique_ID %in% names_list) |>
+  select(c(1:12, 15:20)) |>
+  sample_data()
 
-# Phylum level per elevation catergory and species
-p1 <- ggplot(ps_melt |>
-  filter(!sample_Species == "B"), aes(x = sample_Species, y = Abundance)) +
-  geom_bar(aes(fill = Phylum, color = Phylum), stat="identity", position = "fill") +
-  scale_fill_manual(labels=c('Ascomycota', 'Basidiomycota', 'Chytridiomycota', 'Fungi_ord_Incertae_sedis', 'Mortierellomycota', 'Olpidiomycota'),values= met.brewer("Lakota", n = 6 , type = "discrete", override.order = TRUE)) +
-  scale_color_manual(labels=c('Ascomycota', 'Basidiomycota', 'Chytridiomycota', 'Fungi_ord_Incertae_sedis', 'Mortierellomycota', 'Olpidiomycota'), values = met.brewer("Lakota", n = 6, type = "discrete", override.order = TRUE)) +
-  theme_classic(base_size = 14) +
-  theme(strip.background = element_rect(fill = "white"),
-        strip.text.x = element_text(colour = "black", face = "bold"),
-        legend.text = element_text(size = 12),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(face="italic", 
-                                    size = 10,  
-                                    hjust = 1,
-                                    angle = 30)) +
-  scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
-  labs(y = "Relative Abundance", x = "") +
-  facet_grid(~Elevation_cat)
+micro_psclean <- phyloseq2meco(ps_clean_3) # First convert phyloseq to meco
 
-  
-p1 
-#ggsave(file.path(path, "figures/relabun_barplot.png") , plot = p1, dpi=300, units=c("mm"), width=200, height=150)
 
-# Phylum le per sample
-
-p2 <- plot_bar(microbiome::transform(ps_clean_3, "compositional")) +
-  guides(fill = guide_legend(title = "Phylum"), color = guide_legend(title = "Phylum")) +
-  geom_bar(aes(fill = Phylum, color = Phylum), stat = "identity", position = "fill") +
-  scale_fill_manual(labels=c('Ascomycota', 'Basidiomycota', 'Chytridiomycota', 'Fungi_ord_Incertae_sedis', 'Mortierellomycota', 'Olpidiomycota'),values= met.brewer("Lakota", n = 6 , type = "discrete", override.order = TRUE)) +
-  scale_color_manual(labels=c('Ascomycota', 'Basidiomycota', 'Chytridiomycota', 'Fungi_ord_Incertae_sedis', 'Mortierellomycota', 'Olpidiomycota'), values = met.brewer("Lakota", n = 6, type = "discrete", override.order = TRUE)) +
-  theme_classic(base_size = 14) +
-  theme(strip.background = element_rect(fill = "white"),
-        strip.text.x = element_text(colour = "black", face = "bold"),
-        legend.text = element_text(size = 12),
-        panel.border = element_rect(linetype = "blank", fill = NA),
-        axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(face="italic", 
-                                    size = 3,  
-                                    hjust = 1,
-                                    angle = 30)) +
-  #scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
-  labs(y = "Relative Abundance", x = "") +
-  facet_wrap(~ sample_Species)
-p2
-
-#ggsave(file.path(path, "figures/relabun_barplot.png") , plot = p2, dpi=300, units=c("mm"), width=200, height=150)
+t1 <- trans_abund$new(dataset = micro_psclean, taxrank = "Phylum", ntaxa = 8)
+t1gg <- t1$plot_bar(others_color = "grey70", facet = c("Species", "Elevation_cat"), xtext_keep = FALSE, legend_text_italic = FALSE, color_values = RColorBrewer::brewer.pal(8, "Set3"))
+t1gg <- t1gg + theme(legend.title = element_text(face = "bold"),
+         strip.text = element_text(face = "bold.italic", size = 12),
+         panel.border = element_rect(linetype = "blank", fill = NA),
+         axis.text.x = element_blank())
+t1gg
+#ggsave(file.path(path, "figures/figure3.png") , plot = t1gg, dpi=300, units=c("mm"), width=200, height=250)
 ```
 
-### NMDS
 
-```{r, NMDS}
-#| echo: false
-#| eval: true
-#| tidy: true
-#| 
-set.seed(123)
-#Ordination - NMDS with bray-curtis #########
-x <- as.matrix(asv_avgdist)
-#x <- replace(x, x == "NaN", 0)
-x <- na.omit(x) #apparently there are some NAs in the matrix fro "Bray-Curtis"
-# Choosing the number of dimensions
-NMDS.scree <- function(x) { #where x is the name of the data frame variable
-  plot(rep(1, 10), replicate(10, metaMDS(x, autotransform = F, k = 1)$stress), xlim = c(1, 10),ylim = c(0, 0.30), xlab = "# of Dimensions", ylab = "Stress", main = "NMDS stress plot")
-  for (i in 1:10) {
-    points(rep(i + 1,10),replicate(10, metaMDS(x, autotransform = F, k = i + 1)$stress))
-  }
-}
-
-NMDS.scree(x) #4 dimension seem to be appropriate to keep the stress around 0.15. More dimension will complicate the interpretation of results.
-
-NMDS <- metaMDS(x,
-
-                display = c("sites", "species"),
-                noshare = TRUE,
-                autotransform = FALSE,
-                wascores = TRUE,
-                tidy = TRUE,
-                k = 2,trymax = 500)
-stressplot(NMDS)
-
-
-#Adding site scores to `NMDS`
-sppscores(NMDS) <- t(asv_matrix) 
-
-data.scores <- as_tibble(vegan::scores(NMDS)$sites)#Using the scores function from vegan to extract the site scores and convert to df for ggplot use.
-# Solution found here: https://stackoverflow.com/questions/71941069/species-scores-not-available-as-result-of-metamds
-
-# NMDS Aesthetics ####
-#Subset data set for NMDS and dbRDA plot. See Cleaning Shaping chunk for more details.
-
- NMDS <- ggplot(data.scores, aes(NMDS1, NMDS2, color = ordi_traits$Species))+ 
-  geom_point(data = data.scores,size = 3, alpha = 0.5, stroke = 1) +
-  scale_shape_manual(values=c(1:24)) +
-  # scale_color_manual(values = met.brewer(name = "Nizami", n = 8, type="discrete")) +
-  geom_hline(yintercept = 0, colour = "grey50", linewidth = 0.65) +
-  geom_vline(xintercept = 0, colour = "grey50", linewidth = 0.65) +
-  theme_bw(base_size = 12) +
-  theme(legend.position="right", legend.title = element_text(),
-        legend.text = element_text(face = "italic")) +
-  stat_ellipse(mapping = NULL, data = data.scores, geom = "path", size = 1.3,
-position = "identity", type = "t", linetype = 1, level = 0.95, segments = 51,
-na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) 
-
-NMDS
-#ggsave(filename ="Aim3_NMDS_06272022.jpeg" , plot = NM.DS, dpi=600, units=c("mm"), width=200, height=200)
-#
-#
-```
 
 ### dbRDA
 
@@ -2475,23 +2415,6 @@ dbrda_traits <- rrfy_hell_matrix |>
   select(X, Unique_ID, Site, Species, Elevation_m, Sample_Date, logACI, logLT, logLPS, logLMA, logLBI)
 ```
 
-After some thought, and seeing how unrealistic using the same trait data from host species applied to all rarefied datasets results in a model with all terms significant, I decided to use simulate data based on the same distribution and characteristics of the original data and compare results.
-
-```{r}
-# Simulating data
-sim_ACI <- rnorm(4200, mean = mean(leaf_traits_noB$ACI, na.rm = T), sd = sd(leaf_traits_noB$ACI, na.rm = T)) 
-sim_LT <- rnorm(4200, mean = mean(leaf_traits_noB$LT, na.rm = T), sd = sd(leaf_traits_noB$LT, na.rm = T))
-sim_LPS <- rnorm(4200, mean = mean(leaf_traits_noB$LPS, na.rm = T), sd = sd(leaf_traits_noB$LPS, na.rm = T))
-sim_LMA <- rnorm(4200, mean = mean(leaf_traits_noB$LMA, na.rm = T), sd = sd(leaf_traits_noB$LMA, na.rm = T))
-
-sim_data <- lapply(leaf_traits_noB[,13:16], function(trait) {
-    rnorm(n, mean = mean(trait, na.rm = TRUE), sd = sd(trait, na.rm = TRUE))
-  })
-
-# Adding to the data frame
-sim_traits <- dbrda_traits |>
-  mutate(logACI = log10(sim_ACI), logLT = log10(sim_LT), logLPS = log10(sim_LPS), logLMA = log10(sim_LMA))
-```
 
 ```{r}
 # Model with intercept only ####
@@ -2511,7 +2434,7 @@ m1_hell <- dbrda(dbrda_hell_matrix ~ .,
             na.action = na.omit) # Model with all explanatory variables.
 
 # Model with species, site, leaf traits and elevation. ####
-m2_hell <- dbrda(dbrda_hell_matrix ~  logACI + logLT + logLPS + logLMA + Elevation_m + Sample_Date + Site + Species,  
+m2_hell <- dbrda(dbrda_hell_matrix ~ logLBI + Elevation_m + Sample_Date + Site + Species,  
             distance = "bray",
             dfun = vegdist,
             data = dbrda_traits,
@@ -2560,25 +2483,31 @@ Ordistep fails to compute with `dbrda_hell_matrix`. Results from `anova.cca` on 
 vif.cca(m2)
 ```
 
-All of the sampling dates are redundant. I will remove `Sampling_Date` term. Elevation alsohas an extremely high vif, but it is part of the question. Let's keep it for a minute. 
+All of the sampling dates are redundant. I will remove `Sampling_Date` term. Elevation also has an extremely high `vif`, but it is part of the question. Let's keep it for a minute. 
+
 ```{r}
-m3_hell <- dbrda(dbrda_hell_matrix ~  logACI + logLT + logLPS + logLMA + Elevation_m + Site + Species,  
+# No sampling date
+m3_hell <- dbrda(dbrda_hell_matrix ~  logLBI + Elevation_m + Site + Species,  
             distance = "bray",
             dfun = vegdist,
             data = dbrda_traits,
             parallel = 8, #Passes parallelization to metaMDS function
             na.action = na.omit)
+save(m3_hell, file = "clean_data/statistics/m3_hell.rda")
 
 vif.cca(m3_hell)
-inertcomp(m3_hell, display = c("sites"),
-    unity = F, proportional = TRUE)
+summary(m3_hell)
+
+set.seed(123)
+anova_m3hell <- anova.cca(m3_hell, by = "margin", permutations = 999, parallel = 8) # test for sign. environ. variables
 ```
 
-Sites are redundant. 
+
+Sites are redundant. It over fits the model given all the site factors (n= 21) 
 
 ```{r}
-# Real data
-m4_hell <- dbrda(dbrda_hell_matrix ~  logACI + logLT + logLPS + logLMA + Elevation_m + Species,  
+# No site
+m4_hell <- dbrda(dbrda_hell_matrix ~  logACI + logLT + Elevation_m + Species,  
             distance = "bray",
             dfun = vegdist,
             data = dbrda_traits,
@@ -2587,20 +2516,11 @@ m4_hell <- dbrda(dbrda_hell_matrix ~  logACI + logLT + logLPS + logLMA + Elevati
 
 vif.cca(m4_hell) # Excellent VIFs
 summary(m4_hell)
+set.seed(123)
+anova.m4_hell <- anova.cca(m4_hell, by = "margin", permutations = 999, parallel = 8) # test for sign. environ. variables
 
 #save(m4_hell, file = "clean_data/statistics/m4_hell.rda")
 
-
-# Simulated data
-m4_sim <- dbrda(dbrda_hell_matrix ~  logACI + logLT + logLPS + logLMA + Elevation_m + Species,  
-            distance = "bray",
-            dfun = vegdist,
-            data = sim_traits,
-            parallel = 8, #Passes parallelization to metaMDS function
-            na.action = na.omit)
-vif.cca(m4_sim) # Excellent VIFs
-summary(m4_sim)
-save(m4_sim, file = "clean_data/statistics/m4_sim.rda")
 ```
 
 
@@ -2611,7 +2531,7 @@ Continuation of model selection now that I removed redundant terms.
 ```{r}
 # Anovas
 set.seed(123)
-anova.m4hell <- anova.cca(m4_hell, by = "margin", permutations = 999, parallel = 8) # test for sign. environ. variables
+anova_m4hell <- anova.cca(m4_hell, by = "margin", permutations = 999, parallel = 8) # test for sign. environ. variables
 save(anova.m4hell, file = "clean_data/statistics/anova_m4hell.rda")
 
 set.seed(123)
@@ -2676,7 +2596,7 @@ anova(m7, by = "margin") # test for sign. environ. variables
 
 ```{r, final_model}
 # Final model
-final_model <- m4_hell
+final_model <- m3_hell
 
 names(final_model)
 B <- summary(final_model)

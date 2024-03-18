@@ -195,16 +195,17 @@ final_names_methodB <- sample_names(pseq_rrfb[[1]]) # Sample names
 
 # Geographical matrix
 #geo_matrix <- distm(plant_traits[,c("Longitude", "Latitude")], fun = distHaversine)
-geo_distm <- distm(plant_traits |>
-                      filter(Unique_ID %in% names_rarefy) |>
-                      column_to_rownames(var = "Unique_ID") |>
+geo_distm <- distm(plant_traits_MB |>
+                      #filter(Unique_ID %in% names_rarefy) |>
+                      #column_to_rownames(var = "Unique_ID") |>
                       select(Longitude, Latitude), fun = distVincentyEllipsoid)
                       
 # Adding column and rownames
 rownames(geo_distm) <- final_names_methodB  #names_rarefy
 colnames(geo_distm) <- final_names_methodB  #names_rarefy
-# Converting to distance object
-#geo_dist <- as.dist(geo_matrix)
+
+# Load
+geo_distm <- readRDS(file.path(path, "clean_data/statistics/geo_distm.rds"))
 
 # Subset data set for NMDS and dbRDA plot
 ordi_traits <- plant_traits |>
@@ -283,13 +284,13 @@ Before performing statistical analyses, we checked for normality and homoscedast
 
 To account for uneven sampling effort and over-representation of sequences, we normalized libraries by repeated rarefying, following Cameron et al. [-@cameron2021]. We determined a sequence depth of 750 by calculating Good's coverage and qualitative evaluation of libraries to determine a balanced coverage and breadth of samples [@schloss2024]. This approach allowed for a proportionate representation of observed sequences from host species and a robust characterization of random variation inherent in rarefaction of small libraries [@cameron2021; @schloss2024]. First, we randomly selected 136 samples out of the 157 that resulted from the bioinformatic pipeline (refer to the Results section below). The sample pool was reduced to 136 to match the theoretical reduction of one sample per site (*n* = 21). We generated 50 rarefied abundance matrices without replacement by using the `mirl` function from the `mirlyn` package [@cameron2021]. After which, we calculated alpha diversity per sample as Hill orders, the observed richness (𝑞 = 0), the exponent of Shannon's entropy (𝑞 = 1), and the Inverse Simpson's Diversity (𝑞 = 2) by applying a modified version of the function `alphadivDF`[@cameron2021], which wraps the common diversity indices in `vegan` [@okasanen2022] (see custom script in Supplementary material). Finally, for beta diversity analyses, we performed a Hellinger transformation on the rarefied abundance matrices and calculated a Bray-Curtis dissimilarity matrix for each.
 
-To answer how FEF communities differ *among* host species (Q1) and *between* sites (Q2) and facilitate our understanding of the effects of elevation on FEF communities, we categorized elevation as "low" (\< 1219 m.a.s.l), "mid" (1220 - 1828 m.a.s.l.) and "high" (\> 1829 m.a.s.l.). Additionally, we applied a distance-based Redundancy Analysis (dbRDA) on the Bray-Curis dissimilarities to statistically compare the FEF community similarities within each host species per site (Q3). Its visualizations effectively portray underlying patterns of compositional differences [@anderson2017; @legendre1999; @mcardle2001], akin to permutational analysis of variance. We initiated dbRDA analyses by creating a model with all leaf functional traits, sampling date, site, and elevation as a continuous variable. With the initial model, determined the variance inflation factor (VIF) of each term with function `vif.cca` and eliminated redundant ones: site and sampling date. We performed manual model selection by evaluating the marginal significance of constraining variables after 999 permutations with function `anova.cca` [@legendre2011; @legendre2012; @oksanen2022]. We corroborated homogeneous dispersion of variances with a permutational analysis of multivariate dispersion (PERMDISP) using the `betadisper` with parameter `type = "centroid"`, and `permutest` functions from `vegan`, the latter with 9999 permutations [@oksanen2022]. We used a post-hoc Tukey's test to compare the differences in the dispersion of the FEF communities among sites and elevation categories. We used the `simper` function from `vegan` to discriminate which species contribute the most to compositional differences between groups [@oksanen2022]. To determine if there is a core FEF community associated with host species or elevation categories, we conducted an indicators species analyses (ISA) using the `multipatt` function from the `indicspecies` package [@decaceres2009].
+To answer how FEF communities differ *among* host species (Q1) and *between* sites (Q2) and facilitate our understanding of the effects of elevation on FEF communities, we categorized elevation as "low" (\< 1219 m.a.s.l), "mid" (1220 - 1828 m.a.s.l.) and "high" (\> 1829 m.a.s.l.). Additionally, we applied a distance-based Redundancy Analysis (dbRDA) on the Bray-Curtis dissimilarities to statistically compare the FEF community similarities within each host species per site (Q3). Its visualizations effectively portray underlying patterns of compositional differences [@anderson2017; @legendre1999; @mcardle2001], akin to permutational analysis of variance. We calculated Spearman's rho for all leaf traits (Fig. S1) and informed our selection of leaf traits with results from the PCA (Fig. 1), and selected those with the lowest correlation coefficient per host species: logLBI. Our initial dbRDA model consisted of terms logLBI, sampling date, site, and elevation (m). The leaf functional trait data, as well as elevation, was not randomized or subsampled to match rarefied dataset, the same values applied to all 50 rarefied matrices. For our initial model, we determined the variance inflation factor (VIF) of each term with function `vif.cca` and eliminated redundant ones: site, and sampling date. We performed manual model selection by evaluating the marginal significance of constraining variables after 999 permutations with function `anova.cca` [@legendre2011; @legendre2012; @oksanen2022]. We corroborated homogeneous dispersion of variances with a permutational analysis of multivariate dispersion (PERMDISP) using the `betadisper` with parameter `type = "centroid"`, and `permutest` functions from `vegan`, the latter with 9999 permutations [@oksanen2022]. We used a post-hoc Tukey's test to compare the differences in the dispersion of the FEF communities among sites and elevation categories. We used the `simper` function from `vegan` to discriminate which species contribute the most to compositional differences between groups [@oksanen2022]. To determine if there is a core FEF community associated with host species or elevation categories, we conducted an indicators species analyses (ISA) using the `multipatt` function from the `indicspecies` package [@decaceres2009].
 
 Ultimately, to assess correlations between pairwise FEF community dissimilarity and the geographical distance matrix per host species (Q4), we computed a Mantel tests with Spearman's rho and 999 permutations using the `mantel` function [@oksanen2022]. We calculated a matrix of geographical distances between sites using the Vicenty (ellipsoid) method with the `geosphere` package [@hijmans2022]. All statistical analyses were performed in *R* programming language [v.4.3.2; @rcoreteam2023]. We present the log-transformed leaf functional trait data at the leaf level: ACI (*n* = `r sum(!is.na(leaf_traits_noB$logACI))`), LT (*n* = `r sum(!is.na(leaf_traits_noB$logLT))`), LPS (*n* = `r sum(!is.na(leaf_traits_noB$logLPS))`), LMA (*n* = `r sum(!is.na(leaf_traits_noB$logLMA))`), LBI (*n* = `r sum(!is.na(leaf_traits_noB$logLBI))`). The FEF community data is presented at the plant/sample level (*n* = `r sum(!is.na(plant_traits$Observed[plant_traits$Species != "B"]))`).
 
 # Results
 
-We obtained 5,082,229 reads representing 726 ASVs from 174 samples after processing samples through the DADA2 pipeline. The raw reads obtained were composed of 26.81% Ascomycota, 71.53% Basidiomycota, \<0.05% Chytridiomycota, \<0.5% Mortierellomycota, \<0.03% Olpidiomycota, 0.01% Rozellomycota, \<0.001% Aphelidiomycota, and 1.19% missed BLAST hits. After decontamination, and removal of singletons we obtained 4,971,645 reads representing 231 ASVs from 160 samples composed of 25.88% Ascomycota, 73.1% Basidiomycota, 0.01% Chytridiomycota, \<0.1% Mortierellomycota, 0.02% Olpidiomycota, \<0.002% Rozellomycota and \<1.0% unknown reads. <!-- The core taxa members are *Vishniacozyma victoriae* (ASV_1), *Cladosporium herbanum* (ASV_2) and *Cladosporium* spp. (ASV_7). The rest of the ASVs (228) are rare.  -->
+We obtained 5,082,229 reads representing 726 ASVs from 174 samples after processing samples through the DADA2 pipeline. The raw reads obtained were composed of 26.81% Ascomycota, 71.53% Basidiomycota, \<0.05% Chytridiomycota, \<0.5% Mortierellomycota, \<0.03% Olpidiomycota, 0.01% Rozellomycota, \<0.001% Aphelidiomycota, and 1.19% missed BLAST hits. After decontamination, and removal of singletons we obtained 4,856,220 reads representing 231 ASVs from 157 samples composed of 26% Ascomycota, 73% Basidiomycota, 0.01% Chytridiomycota, \<0.1% Mortierellomycota, 0.03% Olpidiomycota, \<0.002% Rozellomycota and \<1.0% unknown reads. <!-- The core taxa members are *Vishniacozyma victoriae* (ASV_1), *Cladosporium herbanum* (ASV_2) and *Cladosporium* spp. (ASV_7). The rest of the ASVs (228) are rare.  -->
 
 
 We found that leaf functional traits differed among and within *Mimulus* species across elevation (Fig. S3 - S7). For LMA, when we observed all host species, we saw a statistically significant positive correlation between LMA and elevation (R^2^-adjusted = .041, *p* \< .001, Fig. S3A). When we observed this relationship with categorical elevation, we found that species do not differ in LMA values at low elevations (Fig. S3B). At mid elevations, *M. laciniatus* and *M. guttatus* have statistically significant differences in LMA (*p* \< .001), while at high elevation this difference dissipates. At high elevation we saw that *M. nasutus* differs significantly from both *M. laciniatus* and *M. guttatus* (*p* \< .0001, Fig. S3B). For ACI, when we observed all species, we found no correlation with elevation (R^2^-adjusted \< -.000, *p* \< .0001, Fig. S4A). But when we observed the elevation categories we saw that *M. laciniatus* had statistically significant differences (*p* \< .0001) from *M. nasutus* and *M. guttatus*, while the latter two did not differ (Fig. S4B). At mid elevation we saw that *M. laciniatus* and *M. guttatus* had statistically significant differences (*p* \< .0001), while at high elevations *M. laciniatus* had significantly lower levels (*p* \< .0001) of ACI than *M. nasutus*, and *M. guttatus* (*p* \< .01, Fig. S4B). We also saw statistically significant differences between *M. nasutus* and *M. guttatus* at high elevations (*p* \< .0001)(Fig. S4B). The LBI trait is a measure of leaf "lobeness" and it is confounded with species, since not all host species exhibit the trait plasticity with elevation change. Regardless, our comparisons show that LBI is significantly correlated with elevation (Fig. S5A). Our categorical comparison shows that *M. laciniatus* had statistically significant greater values of LBI compared to *M. nasutus* and *M. guttatus* at all elevation categories (Fig. S5B). At low elevations, *M. nasutus* and *M. guttatus* did not differ, but they did have significant differences at high elevations (p \< .0001, Fig. S5B). Our measure of leaf toughness, LPS, was significantly positively correlated with elevation (R^2^-adjusted = .004, *p* = .032, Fig. S6A). At low elevations we saw a statistically significant difference in LPS between *M. nasutus* and *M. guttatus* (*p* \< .01), while at mid elevations *M. laciniatus* and *M. guttatus* showed a similar pattern (*p* \< .0001, Fig. S6B). At high elevations we only saw significant differences between *M. laciniatus* and *M. nasutus* (*p* \< .01, Fig. S6B). Finally, we saw a significant positive correlation between LT and elevation (R^2^-adjusted = .013, *p* \< .0001), when we observe all species together (Fig. S7A). We only see statistically significant differences between *M. laciniatus* and *M. nasutus* at low elevations(*p* \< .05), while at mid we see significant differences between *M. laciniatus* and *M. guttatus* (*p* \< .0001) and at high elevations as well (*p* \< .0001, Fig. S7B). At high elevations, *M. guttatus* and *M. nasutus* also show significant differences (*p* \< .0001, Fig. S7B).
@@ -297,19 +298,22 @@ We found that leaf functional traits differed among and within *Mimulus* species
 
 Our PCA analysis showed how leaf functional traits were related. We plotted leaf functional traits according to species groups on the PCA axes to show how the variance in the complete data set is explained by PC1 (42.57%) and PC2 (23.27%) (Fig. 1). The PCA analyses showed correlations between ACI, LT, LPS, and LMA as loadings tracked along PC1 towards positive values (Fig. 1). We observed that LBI loading is orthogonal along PC2 to the other traits, indicative of low correlation. We note distinct groupings by species along PC2 such that *M. laciniatus*, the most lobed species, is distinct from *M.gutatus* and *M. nasutus*. The latter two overlap along PC1 and PC2 (Fig. 1).
 
-To determine the correlation between FEF diversity and elevation, we calculated simple linear regressions between elevation and alpha diversity (Q3). At the species level, we did not observe a significant change in alpha diversity as elevation increased (Fig. S2A - S2C). Nevertheless, the general trend was a decline in alpha diversity as elevation increased (Fig. 2). When we observed the complete data set we did see a statistically significant negative correlation between elevation and observed richness (𝑞 = 0) (R^2^-adjusted = .05, *F*~158~= 6.795, *p* = .01), the exponent of Shannon's entropy (𝑞 = 1) (R^2^-adjusted = .08, *F*~158~= 15.06, *p* \< .001), and the Inverse Simpson's Diversity (𝑞 = 2) (R^2^-adjusted = .08, *F*~158~= 14.24, *p* \< .001). We found statistically significant differences in alpha diversity between *M. laciniatus* and *M. guttatus* (Fig. 2A - 2C), while *M. nasutus* differed significantly from *M. laciniatus* in Hill order 1 (𝑞 = 1) (*p* \< .01) and Hill order 2 (𝑞 = 2) (*p* \< .05). We observed statistically significant differences in beta diversity between low and high elevation sites for Hill order 1 (*p* \< .01) and 2 (*p* \< 0.05, @violin_hill_ordersE - @violin_hill_ordersF). We also observed statistically significant differences in Hill order 0 (𝑞 = 0) between mid in high elevation sites (Fig. 3D). The presence of Ascomycota and Basidiomycota was consistent across all sites and species, with Basidiomycota being the most abundant phylum across all samples (Fig. 4). MAYBE ADD SOME MORE INFO HERE. SOON. Indicator species revealed no correlations.
+To determine the correlation between FEF diversity and elevation, we calculated simple linear regressions between elevation and alpha diversity (Q3). At the species level, we did not observe a significant change in alpha diversity as elevation increased (Fig. S2A - S2C). Nevertheless, the general trend was a decline in alpha diversity as elevation increased (Fig. 2). When we observed the complete data set we did see a statistically significant negative correlation between elevation and observed richness (𝑞 = 0) (R^2^-adjusted = .05, *F*~158~= 6.795, *p* = .01), the exponent of Shannon's entropy (𝑞 = 1) (R^2^-adjusted = .08, *F*~158~= 15.06, *p* \< .001), and the Inverse Simpson's Diversity (𝑞 = 2) (R^2^-adjusted = .08, *F*~158~= 14.24, *p* \< .001). The alpha diversity measures from rarefied data showed statistically significant differences between all host species (Fig. 2A - 2C), with the exception of *M. laciniatus*  and *M. nasutus* in Hill order 1 (𝑞 = 1, *p* \> .05, Fig. 2B). We observed a similar pattern in beta diversity between elevation sites (Fig. 2D -2C).  We saw no differences in beta diversity between low and mid elevation sites for Hill order 2 (𝑞 = 2, *p* \> 0.05, Fig. 2F).
 
-To test for differences in FEF community composition, we used a distance-based Redundancy Analysis (dbRDA) to model the relationship between FEF communities, leaf functional traits and elevation (Q3). The best fit model revealed that 48% of the overall variance inf FEF communities was accounted for by log-transformed ACI, site, and elevation, the constraining variables. We saw that the first axis (dbRDA1) explained 44% and the second axis (dbRDA2) explained 17% of the constrained variance (Fig. 5).
+The presence of Ascomycota (92%) and Basidiomycota (97%) was consistent in samples across all sites and host species in the un-rarefied data (Table ??). Three core taxa members are were detected in the un-rarefied data *Vishniacozyma victoriae* (Basidiomycota, ASV_1), *Cladosporium herbanum* (Ascomycota, ASV_2) and *Cladosporium* spp. (Ascomycota, ASV_7). The rest of the ASVs (228) are rare.by being the most abundant phylum across all samples (Fig. 4, Fig. ). MAYBE ADD SOME MORE INFO HERE. SOON. Indicator species revealed no correlations.
 
-We observed a distinct, yet overlapping, grouping of FEF communities by species (Fig. 5A), as well as when visualized by elevation category (Fig. 5B). Elevation tracks along the dbRDA1 axis while leaf functional traits track along the dbRDA2 axis (Fig. 5). We found that LBI and elevation are significantly correlated with FEF communities (PERMANOVA TABLE COMMING SOON). To corroborate our findings, we used a permutational analysis of multivariate dispersion (PERMDISP) to test for homogeneity of variances in FEF communities. We found that FEF communities were homogeneous across all species (*F*~2,154~= 2.66, *p* = .07). The post-hoc Tukey's test revealed that all species comparison were not significant. We did find statistically significant differences in the dispersion of FEF communities by elevation category (*F*~2,154~= 3.89, *p* = .02). The post-hoc Tukey's test showed that low and high elevation sites had significantly different dispersion of FEF communities (*p* \< .05). Finally, we tested for FEF community dissimilarity by geographical distance and found a statistically significant positive correlation when we observed all host species (*r* = .06, *p* \< .01, Fig. 6A). At the host species level, we saw no significant correlation between FEF community and geographical distance for *M. laciniatus* (*r* = 0.03, *p* = 0.26) and *M. guttatus* (*r* = .05, *p* = .15, Fig. 6B). For *M. nasutus* we saw an opposite trend, we saw a negative correlation between FEF communities and geographic distance (*r* = .20, *p* = .001, Fig. 6B).
+To test for differences in FEF community composition, we used a distance-based Redundancy Analysis (dbRDA) to model the relationship between FEF communities, leaf functional traits and elevation (Q3). The best fit model revealed that NEED% of the overall variance inf FEF communities was accounted for by log-transformed ACI, site, and elevation, the constraining variables. We saw that the first axis (dbRDA1) explained 35% and the second axis (dbRDA2) explained 16.4% of the constrained variance (Fig. 4).
+
+We observed a distinct, yet overlapping, grouping of FEF communities by species (Fig. 4A), as well as when visualized by elevation category (Fig. 4B). Elevation tracks along the dbRDA1 axis while leaf functional traits track along the dbRDA2 axis (Fig. 5). We found that LBI and elevation are significantly correlated with FEF communities (PERMANOVA TABLE COMMING SOON). To corroborate our findings, we used a permutational analysis of multivariate dispersion (PERMDISP) to test for homogeneity of variances in FEF communities. We found that FEF communities were homogeneous across all species (*F*~2,154~= 2.66, *p* = .07). The post-hoc Tukey's test revealed that all species comparison were not significant. We did find statistically significant differences in the dispersion of FEF communities by elevation category (*F*~2,154~= 3.89, *p* = .02). The post-hoc Tukey's test showed that low and high elevation sites had significantly different dispersion of FEF communities (*p* \< .05). Finally, we tested for FEF community dissimilarity by geographical distance and found a statistically significant positive correlation when we observed all host species (*r* = .06, *p* \< .01, Fig. 6A). At the host species level, we saw no significant correlation between FEF community and geographical distance for *M. laciniatus* (*r* = 0.03, *p* = 0.26) and *M. guttatus* (*r* = .05, *p* = .15, Fig. 6B). For *M. nasutus* we saw an opposite trend, we saw a negative correlation between FEF communities and geographic distance (*r* = .20, *p* = .001, Fig. 6B).
 
 # Discussion
 
 Our results show how leaf functional traits differ among and within *Mimulus* species across elevation. Specifically LMA, LBI, LPS and LT, show a positive correlation with elevation at the genus level, reflecting a conserved plastic response to environmental changes along elevation. Principal Component Analysis (PCA) (Fig 1) illustrated correlations between leaf functional traits while demonstrating the distinct groupings of *M. laciniatus*, *M. guttatus*, and *M. nasutus* based on LBI differences compared to the rest of the traits, ACI, LMA, LPS and LT. The distinct grouping of host species along LBI trait reflects findings by XXXXX and XXXXX in previous studies showing how lobed leaves are more common in alpine environments, where they are thought to be an adaptation to reduce water loss and increase heat dissipation \[CITE\]. *Mimulus laciniatus* is considered the most lobed species (Fig. 1 and Fig. S4)\[CITE all evidence here\], and thrives at higher elevation.
 
-<!-- We observed higher FEF abundances in mid and high elevations in *M. laciniatus* compared to *M. nasutus* and *M. guttatus* (@scatter_hill_orders) and our evidence suggests that LBI plays an important role in shaping FEF community composition compared to other leaf traits, yet the greatest overall predictor is elevation.  -->
+The observed declined in alpha diversity with increased elevation echos well known ecological patterns of community ecology (CITE). Nonetheless, this quinteseential question remains relevant in the midst of climate change scenarios. For microbial ecology, patterns of diversity and community composition exhibit more nuances(CITE). in an experimental setup, Kivlin et al [@kivlin2022]
 
-This pattern did not translate to higher richness or diversity, since alpha and beta diversity in FEF communities significantly decreased with increasing elevation at the genus level. This trend echos well known ecological patterns of community ecology, generally as elevation increases, species richness and diversity decreases (CITE).
+
+This pattern did not translate to higher richness or diversity, since alpha and beta diversity in FEF communities significantly decreased with increasing elevation at the genus level. 
 
 Our dbRDA results (Fig. 5) indicate that LBI and elevation together account for 4.30% of the variance in FEF community composition. Subsequent PERMDISP analyses also support significant differences in FEF community composition at high and low elevations. Further insight from our Mantel tests indicates a significant correlation between FEF community dissimilarity and geographical distance at the genus level, rather than at the host species level. This provides additional evidence supporting our hypothesis that alpha diversity would be similar and beta diversity between sites irrespective of host species. Contrary to our results, Kivlin et al. [-@kivlin2022] demonstrated that leaf-associated endophytes are more strongly influenced by perennial grass host species than by elevation. Our findings did not support the idea that distinct FEF communities are structured by annual herbaceous plants.
 
@@ -641,7 +645,7 @@ ggsave(filename = file.path(path, "figures/figure2.png"), plot = alpha_beta_dive
 #| fig-width: 6
 #| fig-height: 6
 #| label: rabun_barplot
-#| fig-cap: "Bar plot of relative abundance of fungal phyla by species and elevation category."
+#| fig-cap: "Bar plot of relative abundance of fungal phyla in un-rarefied data, by species and elevation category."
 
 
 #Barplots with microeco
@@ -649,6 +653,8 @@ ggsave(filename = file.path(path, "figures/figure2.png"), plot = alpha_beta_dive
 ps_clean_3@sam_data <- plant_traits |>
   filter(Unique_ID %in% names_list) |>
   select(c(1:12, 15:20)) |>
+  mutate(X = Unique_ID) |>
+  column_to_rownames(var = "X") |>
   sample_data()
 
 micro_psclean <- phyloseq2meco(ps_clean_3) # First convert phyloseq to meco
@@ -824,14 +830,9 @@ ggsave(file.path(path, "figures/figure4.png"), plot = double_dbrda, dpi=300, uni
 #| label: mantel_plot
 #| fig-cap: "Dissimilarity of FEF communities associates with *Mimulus* as a function of geographic distance per site. Data represent pairwise Bray-Curtis dissimilarity among sites. A) Fefe community dissimilarity in considering all host species. B) FEf community dissimilarity by host species. Blue filled points correspond to *M. laciniatus*, green filled to *M. nasutus*, and yellow to *M. guttatus*."
 
-# remove_upper_triangle <- function(mat) {
-#   mat[upper.tri(mat)] <- NA
-#   return(mat)
-# }
-
 # Prepare the data for correlation plot
 # Longer format
-asv_vegdist <- as.matrix(vegdist(rrfy_hell_matrix, method = "bray"))
+asv_vegdist <- as.matrix(vegdist(dbrda_hell_matrix, method = "bray"))
 
 asv_long <-  asv_vegdist |>
   as_tibble(rownames = "A") |>
@@ -849,7 +850,11 @@ asv_geo_matrix_long <- inner_join(asv_long, geo_long, by = c("A", "B")) |>
 # Mantel test
 # All data points
 set.seed(859)
-abund_geo  <- mantel(asv_avgdist, geo_distm, method = "spearman", permutations = 999, na.rm = TRUE)
+abund_geo  <- mantel(asv_vegdist, geo_distm,
+                     method = "spearman", 
+                     parallel = 8,
+                     permutations = 9999, 
+                     na.rm = TRUE)
 abund_geo
 
 # Mantel test by species
@@ -1788,8 +1793,22 @@ t2gg
 ggplot2::ggsave(filename = file.path(path, "figures/supp_fig8.png"), plot = t2gg, dpi=300, units=c("mm"), width=300, height=250)
 ```
 
-```
+## Table 1
 
+```{r, supp_table1}
+
+
+phyloseq_ntaxa_by_tax(
+  ps_clean_3,
+  TaxRank ="Phylum",
+  relative = F,
+  add_meta_data = T
+) |>
+  as.data.frame() |>
+  mutate(sum = sum(N.OTU)) |>
+  group_by(Species, Phylum) |>
+  summarise(occurance_in_samples = n())
+```
 
 ## Supplementary methods
 
