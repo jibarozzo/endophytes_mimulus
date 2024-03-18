@@ -1759,7 +1759,7 @@ summarize_phyloseq(ps_clean_3) #Microbiome package summary
 clean_relabundance_phyla <- tax_glom(ps_clean_3, 
                                      taxrank = "Phylum", 
                                      NArm = FALSE, bad_empty=c(NA, "", " ", "\t")) |>
-  phyloseq_to_df() |>
+  metagMisc::phyloseq_to_df() |>
   select(-OTU) |> #Remove OTU column. It represents the first ASV of Phylum
   mutate(total_reads_phy = rowSums(across(where(is.numeric))),
          relabun_reads_phy = total_reads_phy/sum(total_reads_phy)*100) |> #Relative abundance of phyla
@@ -1769,15 +1769,14 @@ clean_relabundance_phyla <- tax_glom(ps_clean_3,
 # How many samples with ASVs per phyla are there AFTER decontamination?
 percent_phyla_clean <- phyloseq_ntaxa_by_tax(
   ps_clean_3,
-  TaxRank = "Phylum",
+  TaxRank ="Phylum",
   relative = F,
-  add_meta_data = F
+  add_meta_data = T
 ) |>
   as.data.frame() |>
   mutate(sum = sum(N.OTU)) |>
-  group_by(Phylum) |>
+  group_by(Species, Phylum) |>
   summarise(occurance_in_samples = n())# Count the number of ASV per phylum
-
 
 # Coverage
 phyloseq_coverage(ps_clean_3, correct_singletons = F) #Coverage

@@ -217,6 +217,31 @@
       ],
       "Hash": "d44690649579ffe364de942a3008878d"
     },
+    "GGally": {
+      "Package": "GGally",
+      "Version": "2.2.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "RColorBrewer",
+        "dplyr",
+        "ggplot2",
+        "ggstats",
+        "grDevices",
+        "grid",
+        "gtable",
+        "lifecycle",
+        "magrittr",
+        "plyr",
+        "progress",
+        "rlang",
+        "scales",
+        "tidyr",
+        "utils"
+      ],
+      "Hash": "b11ac45c916608b7d1374ff87da053d5"
+    },
     "GenomeInfoDb": {
       "Package": "GenomeInfoDb",
       "Version": "1.36.4",
@@ -826,6 +851,27 @@
         "tidyr"
       ],
       "Hash": "fd25391c3c4f6ecf0fa95f1e6d15378c"
+    },
+    "broom.helpers": {
+      "Package": "broom.helpers",
+      "Version": "1.14.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "broom",
+        "cli",
+        "dplyr",
+        "labelled",
+        "lifecycle",
+        "purrr",
+        "rlang",
+        "stats",
+        "stringr",
+        "tibble",
+        "tidyr"
+      ],
+      "Hash": "ea30eb5d9412a4a5c2740685f680cd49"
     },
     "bslib": {
       "Package": "bslib",
@@ -1533,6 +1579,24 @@
       ],
       "Hash": "8c406b7284bbaef08e01c6687367f195"
     },
+    "file2meco": {
+      "Package": "file2meco",
+      "Version": "0.7.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "Matrix",
+        "R",
+        "ape",
+        "dplyr",
+        "magrittr",
+        "microeco",
+        "rhdf5",
+        "tidyr",
+        "yaml"
+      ],
+      "Hash": "c113bd1b8a05c7935490bc7062662be9"
+    },
     "flashClust": {
       "Package": "flashClust",
       "Version": "1.01-2",
@@ -1743,6 +1807,24 @@
       ],
       "Hash": "ae0e011aa23b95682e2872fd7a7e5682"
     },
+    "ggh4x": {
+      "Package": "ggh4x",
+      "Version": "0.2.8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "cli",
+        "ggplot2",
+        "grid",
+        "gtable",
+        "lifecycle",
+        "rlang",
+        "scales",
+        "stats",
+        "vctrs"
+      ],
+      "Hash": "012d7705b4cdc7b5ee89895aeefc1d45"
+    },
     "ggplot2": {
       "Package": "ggplot2",
       "Version": "3.5.0",
@@ -1891,6 +1973,29 @@
         "ggplot2"
       ],
       "Hash": "a57f0f5dbcfd0d77ad4ff33032f5dc79"
+    },
+    "ggstats": {
+      "Package": "ggstats",
+      "Version": "0.5.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "broom.helpers",
+        "cli",
+        "dplyr",
+        "forcats",
+        "ggplot2",
+        "lifecycle",
+        "magrittr",
+        "patchwork",
+        "purrr",
+        "rlang",
+        "scales",
+        "stats",
+        "stringr",
+        "tidyr"
+      ],
+      "Hash": "006a64911e79a7dc7cbf839a57baaff4"
     },
     "ggtext": {
       "Package": "ggtext",
@@ -2358,6 +2463,23 @@
       ],
       "Hash": "b64ec208ac5bc1852b285f665d6368b3"
     },
+    "labelled": {
+      "Package": "labelled",
+      "Version": "2.12.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "dplyr",
+        "haven",
+        "lifecycle",
+        "rlang",
+        "stringr",
+        "tidyr",
+        "vctrs"
+      ],
+      "Hash": "1ec27c624ece6c20431e9249bd232797"
+    },
     "lambda.r": {
       "Package": "lambda.r",
       "Version": "1.2.4",
@@ -2636,6 +2758,31 @@
       ],
       "Hash": "60f9f87da858dfa4f5ce2d39619285f3"
     },
+    "microeco": {
+      "Package": "microeco",
+      "Version": "1.5.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "R6",
+        "RColorBrewer",
+        "ape",
+        "data.table",
+        "dplyr",
+        "ggplot2",
+        "grid",
+        "igraph",
+        "magrittr",
+        "reshape2",
+        "rlang",
+        "scales",
+        "stats",
+        "tibble",
+        "vegan"
+      ],
+      "Hash": "203d277521a72b1e92944eaa30dc48eb"
+    },
     "mime": {
       "Package": "mime",
       "Version": "0.12",
@@ -2864,6 +3011,36 @@
         "stats"
       ],
       "Hash": "5a15e068f0bd9bac4252f8f9e11dc79f"
+    },
+    "parallelly": {
+      "Package": "parallelly",
+      "Version": "1.37.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "parallel",
+        "tools",
+        "utils"
+      ],
+      "Hash": "5410df8d22bd36e616f2a2343dbb328c"
+    },
+    "patchwork": {
+      "Package": "patchwork",
+      "Version": "1.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "cli",
+        "ggplot2",
+        "grDevices",
+        "graphics",
+        "grid",
+        "gtable",
+        "rlang",
+        "stats",
+        "utils"
+      ],
+      "Hash": "9c8ab14c00ac07e9e04d1664c0b74486"
     },
     "pbkrtest": {
       "Package": "pbkrtest",
