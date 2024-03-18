@@ -67,6 +67,9 @@ The goal of this notebook is to explore the relationship between leaf endophytes
 
 This section cleans and shapes the raw data into two main data frames: `leaf_traits` and `plant_traits`. The first has all data point for leaf trait measurements at the leaf level (raw) and the second one represents the average per plant while incorporating FEF community data. The FEF community data is only available for 160/320 samples. For the downstream analyses, we eliminated *M. bicolor* or species "B" from the leaf trait data set and the phyloseq object (see `mim2_bioinformatics.qmd`). The removal of this is due to a small sample size for leaf trait measurements and even smaller for FEF community data (*n* = 3). The removal is not explicit in `plant_traits` it is only explicit in the subset `leaf_traits_noB` and and phyloseq objects. This is important for the rarefaction of sequence dept and later on in the `asv_matrix` that gives way for community analyses in [Community Diversity]. I include a custom function for p-value formatting.
 
+### Raw data sets
+
+
 ```{r, cleaning_chaping_data}
 #| echo: false
 #| eval: true
@@ -138,8 +141,10 @@ plant_traits <- plant_traits |>
          logLT = log10(LT),
          logLPS = log10(LPS),
          logLMA = log10(LMA))
+```
 
-
+### Phyloseq objects
+```{r, cleaning_chaping_data}
 ###################################
 #### Load Phyloseq objects ########
 ###################################
@@ -149,12 +154,57 @@ plant_traits <- plant_traits |>
 ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.rds"))
 #ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.csv"))
 
-# Load Relative abundance phyloseq
-# rel_abund_ps_clean <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
-# rel_ps_clean_df <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
+pseq_rrfb <- readRDS(file.path(path, "clean_data/statistics/pseq_rrfb.rds"))
 
 
+# Mirl object to phyloseq
+# Taking the mirl object from Method B and converting it to a phyloseq object
 
+# Names of samples cleaned an filtered
+final_names <- sample_names(pseq_rrfb[[1]]) # Names of samples)
+
+rrfy_asv_table <- as.data.frame(t(rep_otu_df(pseq_rrfb))) |> # Rarefied counts
+  rownames_to_column("X") |>
+  mutate(Unique_ID =  X, # Copyin column to new column 
+         Unique_ID =  str_remove(Unique_ID, "^.*?(_|-)")) |>
+  relocate(Unique_ID, .after = X) |>
+  left_join(plant_traits, by = "Unique_ID")
+
+
+#ASV table
+ASV <- rrfy_asv_table |>
+                   column_to_rownames(var = "X") |>
+                 select(-c(1, 232:256))|> 
+                 as.matrix()
+ASV <- otu_table(t(ASV), taxa_are_rows = TRUE)
+taxa_names(ASV) #Should be ASV_#
+
+#Taxonomixc table
+TAXA <- read.csv(file.path(path,"clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.csv")) # Taxonomic table
+TAXA <- TAXA|>
+  
+  filter(colnames(10:166) %in% final_names)
+select(-c(1))|>
+  column_to_rownames(var = "ASV") |>
+  as.matrix() |>
+  tax_table()
+
+# Sample data
+
+SAMP <- rrfy_asv_table |>
+  select(c(1:2, 234:257)) |>
+  as.data.frame() |>
+  column_to_rownames(var = "X") |>
+  sample_data()
+
+# Rarfefied phyloseq object
+
+rrfps <- phyloseq(ASV, SAMP, TAXA)
+```
+
+### Leaf traits with community data
+
+```{r}
 #### Leaf traits with community data ####
 # Calculating Hill orders on non-rarefied data
 # The estimate_richness() is meant to be used with untrimmed data. It is highly dependnet on singletons. My data is already trimmed and decontaminated. My singleton "removal" eliminates ASVs with all zeros or samples wil all zeros. Singletons do remain, so this is not a problem.
@@ -200,7 +250,10 @@ ps_melt <- ps_clean_3 |>
 # # Save ps_melt
 # saveRDS(ps_melt, file.path(path, "clean_data/statistics/ps_melt.rds"))
 # write.csv(ps_melt, file.path(path, "clean_data/statistics/ps_melt.csv"))
+```
 
+### Load files
+```{r}
 #####################################################
 ############### Load master files here ##############
 #####################################################
@@ -2396,6 +2449,21 @@ t1gg <- t1gg + theme(legend.title = element_text(face = "bold"),
          axis.text.x = element_blank())
 t1gg
 #ggsave(file.path(path, "figures/figure3.png") , plot = t1gg, dpi=300, units=c("mm"), width=200, height=250)
+
+# rarefied Abundance
+micro_rarefied_ps <- phyloseq2meco(rrfps) # First convert phyloseq to meco
+
+
+r1 <- trans_abund$new(dataset = micro_rarefied_ps, taxrank = "Phylum", ntaxa = 8)
+t1gg <- t1$plot_bar(others_color = "grey70", facet = c("Species", "Elevation_cat"), xtext_keep = FALSE, legend_text_italic = FALSE, color_values = RColorBrewer::brewer.pal(8, "Set3"))
+t1gg <- t1gg + theme(legend.title = element_text(face = "bold"),
+         strip.text = element_text(face = "bold.italic", size = 12),
+         panel.border = element_rect(linetype = "blank", fill = NA),
+         axis.text.x = element_blank())
+t1gg
+
+
+
 ```
 
 ### dbRDA
@@ -2682,32 +2750,32 @@ beta_dis1 <- betadisper(vegdist(dbrda_hell_matrix, method = "bray"), # Matrix of
                    dbrda_traits$Species,
                    type = "median", 
                    sqrt.dist = FALSE)
-save(beta_dis1, file = "clean_data/statistics/beta.rda")
-anova(beta)
+save(beta_dis1, file = "clean_data/statistics/beta_dis1.rda")
+anova(beta_dis1)
 
 set.seed(123)
-beta_perm <- permutest(beta_dis1, parallel = 8, permutations = 999, by = "margin")
-beta_perm1
+beta_perm1 <- permutest(beta_dis1, parallel = 8, permutations = 999, by = "margin")
+save(beta_perm1, file = "clean_data/statistics/beta_perm1.rda")
 
-plot(beta_dis1, hull=FALSE, ellipse=TRUE)
-TukeyHSD(beta_dis1)
+TukeyHSD(beta_dis1, conf.level = 0.95)
 
-
-# No significant differences in the dispersion of the fungal community across species.
 
 # By Elevation
+# set.seed(123)
+# beta_dis2 <- betadisper(vegdist(dbrda_hell_matrix, method = "bray"), 
+#                    dbrda_traits$Elevation_cat, 
+#                    type = "median", 
+#                    sqrt.dist = FALSE)
+# save(beta_dis2, file = "clean_data/statistics/beta_dis2.rda")
+# anova(beta_dis2)
+
 set.seed(123)
-beta2 <- betadisper(vegdist(dbrda_hell_matrix, method = "bray"), 
-                   dbrda_traits$Elevation_cat, 
-                   type = "median", 
-                   sqrt.dist = FALSE)
-anova(beta2)
-TukeyHSD(beta2)
-boxplot(beta2, xlab = "", las = 2, cex.axis = 0.8)
-plot(beta2, hull=FALSE, ellipse=TRUE)
+beta_perm2 <- permutest(beta_dis2, parallel = 8, permutations = 999, by = "margin")
+save(beta_perm2, file = "clean_data/statistics/beta_perm2.rda")
+beta_perm2
 
-# I see significant differences in the dispersion of the fungal community across elevation categories. 
 
+TukeyHSD(beta_dis2, conf.level = 0.95)
 ```
 
 Who contributes more to differences in the community composition?
@@ -2725,22 +2793,19 @@ This analysis allows us to determine what endophytes are associated with particu
 
 #Subset data frame for indicator species analysis
 #Community Data
-
-asv_matrix_df <- as.data.frame(t(asv_matrix))
-asv_matrix_df <- asv_matrix|>
-  t()|>
-  as.data.frame() |>
-  rownames_to_column(var = "Unique_ID") #This data set can also be created from ps_clean_3_df
-
-asv_indicspp <- left_join(asv_matrix_df, ordi_traits, by = "Unique_ID") |># Joining to the NMDS traits data frame which has the same number of rows as the asv_matrix_df
-    select(!c(237:255)) |>
+test <- as.matrix(t(rep_otu_df(pseq_rrfb)))
+                 
+asv_matrix_df <- as.data.frame(as.matrix(t(rep_otu_df(pseq_rrfb))))|># mirl object
+  rownames_to_column(var = "Unique_ID") 
+asv_indicspp <- left_join(asv_matrix_df, dbrda_traits, by = "Unique_ID")|> # Joining to the NMDS traits data frame which has the same number of rows as the asv_matrix_df
+    select(!c(238:243)) |>
   relocate(Species, Site, Elevation_cat, Elevation_m, .after = Unique_ID)
 ```
 
 ```{r indicspp}
 #Making vector of groups for analysis
 set.seed(123)
-indiabun <- asv_indicspp[, 6:ncol(asv_indicspp)]
+indiabun <- asv_indicspp[, 7:ncol(asv_indicspp)]
 
 species <- asv_indicspp$Species
 elecat <- asv_indicspp$Elevation_cat
