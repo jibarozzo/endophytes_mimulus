@@ -154,8 +154,7 @@ plant_traits <- plant_traits |>
 ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.rds"))
 #ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.csv"))
 pseq_rrfb <- readRDS(file.path(path, "clean_data/statistics/pseq_rrfb.rds")) #Mirlyn object from Method B
-
-
+rarefied_phyloseq <- readRDS(file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
 ```
 
 ### Leaf traits with community data
@@ -194,6 +193,10 @@ ps_melt <- ps_clean_3 |>
   dplyr::select(!c(4, 6:15))  #Reordering columns 
 #This data frame is useful for barplots and other visualizations.
 
+
+##########################################################
+############### Save files after changes #################
+##########################################################
 # Save file
 # Leaf traits
 # saveRDS(leaf_traits, file.path(path, "clean_data/statistics/leaf_traits.rds"))
@@ -1597,7 +1600,7 @@ rarefied_phyloseq <- phyloseq(ASV, SAMP, TAXA)
 
 #saveRDS(rarefied_phyloseq, file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
 
-rarefied_phyloseq <- readRDS(file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
+
 
 # Rarefied summary 
 # Core ASV abundance
