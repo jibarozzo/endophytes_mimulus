@@ -263,6 +263,12 @@ names_list <- colnames(ps_clean_3@otu_table) #List of samples
 #| echo: false
 #| eval: true
 #| tidy: true
+# Sites and Species sampled
+leaf_traits_noB |>
+  group_by(Site,Species, Longitude, Latitude) |>
+  summarise(n = as.integer(n()/3))|> # Dividing by 3 due to replicate measurments of each sample
+  pivot_wider(names_from = Species, values_from = n)|>
+  knitr::kable(caption = "Number of samples per population/site and species.")
 
 #LBI
 hist(leaf_traits$LBI) #Skewed to the left, non-normal distribution of LBI data

@@ -73,7 +73,7 @@ execute:
 warning: false
 ---
 
-```{r, cleaning_chaping_data}
+```{r, cleaning_shaping_data}
 #| echo: false
 #| eval: true
 #| tidy: true
@@ -265,7 +265,7 @@ TALK ABOUT THE EXPANDED PHENOTYPE
 
 ## Sample Collection
 
-We collected plant specimens during April-July 2021 and 2022 from populations of *M. guttatus*, *M. laciniatus*, and *M. nasutus* (syn. *Erythranthe guttata*, *Erythranthe laciniata*, and *Erythranthe nasuta*) across Stanislaus National Forest (SNF), Sierra National Forest (SINF) and Yosemite National Park (YNP), CA, USA (@site_map). <!-- You should create a table of each location and description of every population that you sampled for this paper. That table should be cited here. -->  We haphazardly selected sites close to the main roads based on the presence of a viable population with at least \~ 50 individuals per species. <!-- How many populations did you sample from of each species? You need that level of detail in this section.  --> Samples collected from YNP were collected from non-wilderness areas on the side of the road. We determined population viability ensuring that they had individuals flowering or close to flowering stage. We collected between 6 - 12 individuals per species per site. We selected individuals that possessed healthy looking leaves and no visible signs of pathogen damage or senescence. At sites where two species were present, we collected individuals that were at least \~ 25 meters apart. We collected sample specimens by carefully uprooting the plant and placing into individual plastic bags (e.g., Ziploc®) and preserving in an ice chest until return to the field laboratory at the UC Merced Yosemite Field Station, YNP, CA, USA. Plant specimens were processed within 8 hrs of collection.
+We collected plant specimens during April-July 2021 and 2022 from populations of *M. guttatus*, *M. laciniatus*, and *M. nasutus* (syn. *Erythranthe guttata*, *Erythranthe laciniata*, and *Erythranthe nasuta*) across Stanislaus National Forest (SNF), Sierra National Forest (SINF) and Yosemite National Park (YNP), CA, USA. <!-- You should create a table of each location and description of every population that you sampled for this paper. That table should be cited here. -->  We haphazardly selected sites close to the main roads based on the presence of a viable population with at least \~ 50 individuals per species. Samples collected from YNP were collected from non-wilderness areas on the side of the road. We determined population viability ensuring that they had individuals flowering or close to flowering stage. We collected between 5 - 20 individuals per species from a total of 25 sites (Table 1). We selected individuals that possessed healthy looking leaves and no visible signs of pathogen damage or senescence. At sites where two species were present, we collected individuals that were at least \~ 25 meters apart. We collected sample specimens by carefully uprooting the plant and placing into individual plastic bags (e.g., Ziploc®) and preserving in an ice chest until return to the field laboratory at the UC Merced Yosemite Field Station, YNP, CA, USA. Plant specimens were processed within 8 hrs of collection.
 
 ## Leaf traits measurement
 
@@ -293,7 +293,7 @@ We used the `decontam` package [v1.20.0; @davis2018] to statistically determine 
 
 ### Community Diversity
 
-To account for uneven sampling effort and over-representation of sequences, we normalized libraries by repeated rarefying, following Cameron et al. [-@cameron2021]. We determined a sequence depth of 750 by calculating Good's coverage and qualitative evaluation of libraries to determine a balanced coverage and breadth of samples [@schloss2024]. This approach allowed for a proportionate representation of observed sequences from host species and a robust characterization of random variation inherent in rarefaction of small libraries [@cameron2021; @schloss2024]. First, we randomly selected 136 samples out of the 157 that resulted from the bioinformatic pipeline (refer to the Results section below). The sample pool was reduced to 136 to match the theoretical reduction of one sample per site (*n* = 21). We generated 50 rarefied abundance matrices without replacement by using the `mirl` function from the `mirlyn` package [@cameron2021]. After which, we calculated alpha diversity per sample as Hill orders, the observed richness (𝑞 = 0), the exponent of Shannon's entropy (𝑞 = 1), and the Inverse Simpson's Diversity (𝑞 = 2) by applying a modified version of the function `alphadivDF`[@cameron2021], which wraps the common diversity indices in `vegan` [@okasanen2022] (see custom script in Supplementary material). Finally, for beta diversity analyses, we performed a Hellinger transformation on the rarefied abundance matrices and calculated a Bray-Curtis dissimilarity matrix for each.
+To account for uneven sampling effort and over-representation of sequences, we normalized libraries by repeated rarefying, following Cameron et al. [-@cameron2021]. We determined a sequence depth of 750 by calculating Good's coverage and qualitative evaluation of libraries to determine a balanced coverage and breadth of samples [@schloss2024]. This approach allowed for a proportionate representation of observed sequences from host species and a robust characterization of random variation inherent in rarefaction of small libraries [@cameron2021; @schloss2024]. First, we randomly selected 136 samples out of the 157 that resulted from the bioinformatic pipeline (refer to the Results section below). The sample pool was reduced to 136 to match the theoretical reduction of one sample per site (*n* = 21). We generated 50 rarefied abundance matrices without replacement by using the `mirl` function from the `mirlyn` package [@cameron2021]. After which, we calculated alpha diversity per sample as Hill orders, the observed richness (𝑞 = 0), the exponent of Shannon's entropy (𝑞 = 1), and the Inverse Simpson's Diversity (𝑞 = 2) by applying a modified version of the function `alphadivDF`[@cameron2021], which wraps the common diversity indices in `vegan` [@oksanen2022] (see custom script in Supplementary material). Finally, for beta diversity analyses, we performed a Hellinger transformation on the rarefied abundance matrices and calculated a Bray-Curtis dissimilarity matrix for each.
 
  We calculated simple linear regressions understand how different measures of alpha diversity changed in response to elevation. To answer how FEF communities differ *among* host species (Q1) and *between* sites (Q2) and facilitate our understanding of the effects of elevation on FEF communities, we categorized elevation as "low" (\< 1219 m.a.s.l), "mid" (1220 - 1828 m.a.s.l.) and "high" (\> 1829 m.a.s.l.). Additionally, we applied a distance-based Redundancy Analysis (dbRDA) on the Bray-Curtis dissimilarities to statistically compare the FEF community similarities within each host species per site (Q3). Its visualizations effectively portray underlying patterns of compositional differences [@anderson2017; @legendre1999; @mcardle2001], akin to permutational analysis of variance. We calculated Spearman's rho for all leaf traits (see below and Fig. S1) and informed our selection of leaf traits with results from the PCA (see below and Fig. 1), and selected those with the lowest correlation coefficient per host species: logLBI. Our initial dbRDA model consisted of terms logLBI, sampling date, site, and elevation (m). The leaf functional trait data, as well as elevation, was not randomized or subsampled to match rarefied dataset, the same values applied to all 50 rarefied matrices. For our initial model, we determined the variance inflation factor (VIF) of each term with function `vif.cca` and eliminated redundant ones: site and sampling date. We performed manual model selection by evaluating the marginal significance of constraining variables after 999 permutations with function `anova.cca` [@legendre2011; @legendre2012; @oksanen2022]. We corroborated homogeneous dispersion of variances with a permutational analysis of multivariate dispersion (PERMDISP) using the `betadisper` with parameter `type = "median"`, and `permutest` functions from `vegan`, the latter with 999 permutations [@oksanen2022]. We used a post-hoc Tukey's test to compare the differences in the dispersion of the FEF communities among sites and elevation categories. We used the `simper` function from `vegan` to discriminate which species contribute the most to compositional differences between groups [@oksanen2022]. To determine if there is a core FEF community associated with host species or elevation categories, we conducted an indicators species analyses (ISA) using the `multipatt` function from the `indicspecies` package [@decaceres2009].
 
@@ -407,10 +407,11 @@ theme_lfdiv_continuous <- theme_classic(base_size = 16) +
 #| echo: false
 #| eval: true
 #| tidy: true
+#| message: false
 #| fig-width: 6
 #| fig-height: 8
 #| label: rabun_barplot
-#| fig-cap: "Bar plot of relative abundance of fungal phyla in un-rarefied data, by species and elevation category."
+#| fig-cap: "Relative abundance of fungal phyla in raw (A) and rarefied (B) data, by species and elevation category."
 
 
 #Barplots with microeco
@@ -1220,14 +1221,14 @@ ggsave(filename = file.path(path, "figures/figure6.png"), plot = pca_auto, dpi=3
 #| fig-width: 6
 #| fig-height: 6
 #| label: trait_correlation
-#| fig-cap: "Correlation matrix of log-transformed leaf functional traits by host species. The plot is based on the Spearman's rho."
+#| fig-cap: "Correlation matrix of log-transformed leaf functional traits by host species. The plot is based on the Spearman's rho. Significance levels are represented by ns (not significant) and asterisks [p < 0.05 (*), p < 0.01 (**), p < 0.001 (***), and p < 0.0001 (****)]."
 
 t4 <- trans_env$new(dataset = micro_psclean, env_cols = c(5,14:18))
 
 t4gg <- t4$cal_autocor(group = "Species", upper = list(continuous = GGally::wrap("cor", method= "spearman"))) + 
   theme(
     legend.title = element_text(face = "bold"),
-         strip.text = element_text(face = "bold", size = 12),
+         strip.text = element_text(face = "bold", size = 10),
          panel.border = element_rect(linetype = "blank", fill = NA)) +
   scale_fill_manual(values = met.brewer("Isfahan2", n = 3, type = "discrete", direction = c(-1))) +
   scale_color_manual(values = met.brewer("Isfahan2", n = 3, type = "discrete", direction = c(-1)))
@@ -1276,7 +1277,7 @@ heatplots <- ggarrange(t2gg, r2gg, ncol = 1, nrow = 2,
 heatplots
 
 # Save the plot
-ggplot2::ggsave(filename = file.path(path, "figures/supp_fig2.png"), plot = t2gg, dpi=300, units=c("mm"), width=300, height=250)
+ggplot2::ggsave(filename = file.path(path, "figures/supp_fig2.png"), plot = heatplots, dpi=300, units=c("mm"), width=300, height=250)
 ```
 
 
@@ -1821,8 +1822,18 @@ ggsave(filename = file.path(path, "figures/supp_fig7.png"), plot = lt_elevation,
 
 
 ## Table 1
-
 ```{r, supp_table1}
+# Sites and Species sampled
+leaf_traits_noB |>
+  group_by(Site,Species, Longitude, Latitude) |>
+  summarise(n = as.integer(n()/3))|> # Dividing by 3 due to replicate measurements of each sample
+  pivot_wider(names_from = Species, values_from = n)|>
+  knitr::kable(caption = "Table 1: Number of individuals collected per population/site and species.")
+```
+
+
+## Table 2
+```{r, supp_table}
 phyloseq_ntaxa_by_tax(
   ps_clean_3,
   TaxRank ="Phylum",
@@ -1830,9 +1841,11 @@ phyloseq_ntaxa_by_tax(
   add_meta_data = T
 ) |>
   as.data.frame() |>
-  mutate(sum = sum(N.OTU)) |>
+  mutate(sum = sum(N.OTU),
+          Phylum = str_remove(Phylum, "^.*?(_|-)")) |>
   group_by(Species, Phylum) |>
-  summarise(occurance_in_samples = n())
+  summarise(Ocurrance = n()) |>
+  knitr::kable(caption = "Table 2: Prevalence of phyla in samples per species.")
 ```
 
 ## Supplementary methods
