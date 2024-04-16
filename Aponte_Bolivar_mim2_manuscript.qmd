@@ -1964,6 +1964,7 @@ library("ggspatial")
 llave <- "AIzaSyAswWq3mkTVX2oCP1ObVl-Wz9jMcFrJiLg"
 register_google(key = llave, write = TRUE)
 
+
 map_latlong <- read_excel("field_data/Mimulus_CH2_Field_Survey.xlsx", sheet = "clean_site_lat_long")
 
 map_latlong <- plant_traits |>
@@ -1977,10 +1978,9 @@ mappops <- get_map(
       mean(map_latlong$Latitude)
   ),
   zoom = 9,
-  maptype = "satellite",
+  maptype = "terrain",
   scale = 4
 )
-
 map <- ggmap(mappops, extent = "panel") +
   geom_point(
     data = map_latlong,
@@ -1990,25 +1990,24 @@ map <- ggmap(mappops, extent = "panel") +
     size = 3,
     shape = 21,
   ) +
+   theme_classic(base_size = 16) +
+   theme(legend.title = element_text(face = "bold"),
+         panel.border = element_rect(linetype = "blank", fill = NA), 
+         axis.text.x = element_text(size = 10), 
+         axis.text.y = element_text(size = 10)) +
   ylab("Latitude") +
   xlab("Longitude") +
-    # spatial-aware automagic scale bar
-  layer_spatial(sf::st_bbox(map_latlong)) +
-  annotation_scale(location = "tl") +
-
-  # spatial-aware automagic north arrow
   annotation_north_arrow(location = "bl", which_north = "true")
 
 plot(map)
 ggsave(
-  "map.png",
+  "figures/map.png",
   plot = map,
   units = "in",
   width = 6,
   height = 6,
   dpi = 600
 )
-
 ```
 
 ## Table 1
