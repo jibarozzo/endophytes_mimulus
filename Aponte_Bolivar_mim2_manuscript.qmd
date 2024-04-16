@@ -1961,15 +1961,15 @@ ggsave(filename = file.path(path, "figures/supp_fig7.png"), plot = lt_elevation,
 library("ggmap")
 library("ggspatial")
 # Map of sampling sites
-llave <- "AIzaSyAswWq3mkTVX2oCP1ObVl-Wz9jMcFrJiLg"
-register_google(key = llave, write = TRUE)
 
+#register_google(key ='SECRET_KEY', write = TRUE)
 
 map_latlong <- read_excel("field_data/Mimulus_CH2_Field_Survey.xlsx", sheet = "clean_site_lat_long")
 
 map_latlong <- plant_traits |>
   select(Site, Species, Longitude, Latitude, Elevation_m) |>
   filter(!Site == "FVWB" & !Site == "LYFB" & !Site == "TRTB")
+
 mappops <- get_map(
   location = c(
     lon =
@@ -1992,12 +1992,18 @@ map <- ggmap(mappops, extent = "panel") +
   ) +
    theme_classic(base_size = 16) +
    theme(legend.title = element_text(face = "bold"),
+         legend.text = element_text(size = 10), 
          panel.border = element_rect(linetype = "blank", fill = NA), 
          axis.text.x = element_text(size = 10), 
          axis.text.y = element_text(size = 10)) +
   ylab("Latitude") +
   xlab("Longitude") +
-  annotation_north_arrow(location = "bl", which_north = "true")
+  annotation_north_arrow(
+    location = "bl",
+    which_north = "true",
+    height = unit(0.7, "cm"),
+    width = unit(0.7, "cm"),
+  )
 
 plot(map)
 ggsave(
