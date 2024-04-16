@@ -88,6 +88,7 @@ library("ggpmisc")
 library("broom")
 library("MetBrewer")
 library("rstatix")
+library("readxl")
 
 # Models
 library("car")
@@ -1382,9 +1383,6 @@ ggplot2::ggsave(filename = file.path(path, "figures/supp_fig2.png"), plot = heat
 ```
 
 
-
-
-
 ## Figure S3
 
 ```{r, supp_fig3}
@@ -1950,6 +1948,68 @@ lt_elevation
 ggsave(filename = file.path(path, "figures/supp_fig7.png"), plot = lt_elevation, dpi=300, units=c("mm"), width=300, height=250)
 ```
 
+
+## Figure S8
+```{r, supp_fig8}
+#| echo: false
+#| eval: true
+#| tidy: true
+#| fig-width: 6
+#| fig-height: 6
+#| fig-caption: "Maps of Mimulus spp. sampling sites in the Sierra Nevada, California, USA. A) Map of the Sierra Nevada region showing the location of the three species sampled. The color gradient represents the elevation gradient from low (yellow) to high (purple)."
+
+library("ggmap")
+library("ggspatial")
+# Map of sampling sites
+llave <- "AIzaSyAswWq3mkTVX2oCP1ObVl-Wz9jMcFrJiLg"
+register_google(key = llave, write = TRUE)
+
+map_latlong <- read_excel("field_data/Mimulus_CH2_Field_Survey.xlsx", sheet = "clean_site_lat_long")
+
+map_latlong <- plant_traits |>
+  select(Site, Species, Longitude, Latitude, Elevation_m) |>
+  filter(!Site == "FVWB" & !Site == "LYFB" & !Site == "TRTB")
+mappops <- get_map(
+  location = c(
+    lon =
+      mean(map_latlong$Longitude),
+    lat =
+      mean(map_latlong$Latitude)
+  ),
+  zoom = 9,
+  maptype = "satellite",
+  scale = 4
+)
+
+map <- ggmap(mappops, extent = "panel") +
+  geom_point(
+    data = map_latlong,
+    aes(x
+        = Longitude, y = Latitude, fill =
+          Site),
+    size = 3,
+    shape = 21,
+  ) +
+  ylab("Latitude") +
+  xlab("Longitude") +
+    # spatial-aware automagic scale bar
+  layer_spatial(sf::st_bbox(map_latlong)) +
+  annotation_scale(location = "tl") +
+
+  # spatial-aware automagic north arrow
+  annotation_north_arrow(location = "bl", which_north = "true")
+
+plot(map)
+ggsave(
+  "map.png",
+  plot = map,
+  units = "in",
+  width = 6,
+  height = 6,
+  dpi = 600
+)
+
+```
 
 ## Table 1
 ```{r, supp_table1}
