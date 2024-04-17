@@ -258,9 +258,17 @@ Overall, our findings offer valuable insights into the intricate interactions be
 
 # Introduction
 
-Phenotypic plasticity and genetic adaptation are key drivers of evolution, and both processes may aid in plant adaptation to a warming climate [@jump2005]. Plant’s colonization of land across multiples climates has been aided by their parallel evolution with fungi and bacteria; however, little is known about how plant microbiomes influence or are influenced by local adaptation or phenotypic plasticity of plants. Lack of knowledge about this is a problem because ecology aims to predict how plant distribution may change as the climate becomes further altered. Previous studies have suggested that foliar endophytic fungi (FEF) can alter plant traits under stressful conditions such as drought [@song2016]. FEF live in plant leaves and they may contribute to local adaptation and/or phenotypic plasticity. Host genetics may shape the foliar microbiomes of plants. For example, a study on the classical plant model, *Arabidopsis thaliana*, revealed that bacterial and fungal communities in leaves are shaped by host genotype, at least for the most common OTUs [@horton2014]. Another ideal model system to explore the interactions between leaf traits and FEF are the yellow monkeyflowers in the *Mimulus guttatus* species complex. Over the last 2 decades, the *M. guttatus* species complex has become a model system for answering questions about local adaptation and phenotypic plasticity [@wu2008; @yuan2019]. Experimental manipulation is relatively easy due to its small genome (about 430 Mb), short generation time, high fecundity, self-compatibility, and ease of greenhouse propagation [@society2019; @wu2008] Currently, studies of the *M. guttatus* species complex focus on the genetic and environmental factors driving local adaptation and phenotypic plasticity. The evolution of leaf shape for 3 edaphic species in the *M. guttatus* complex is controlled by overlapping genetic regions [@ferris2015]. Ferris et al., [-@ferris2015] points to multiple events of leaf shape evolution in the *M. guttatus* species complex and their associated habitats. Recent work has narrowed the genetic architecture at play in incomplete reproductively isolated sympatric populations of *Mimulus laciniatus* and *Mimulus guttatus*, shedding light on the location of quantitative trait loci (QTL) for the first flower node, flowering time, corolla width, corolla length, and leaf shape and suggesting that large-effect loci underlie these traits [@ferris2017]. There is scarce research that focuses on the symbionts of *Mimulus* spp. Beslile et al. [-@beslile2012] reported on the distribution of diverse fungal communities in the flower nectar of *Mimulus aurantiacus*. The authors considered flowers as islands in a metapopulation system and found that the frequency of micro fungi (i.e., yeasts) was significantly correlated to the location of the plant and marginally correlated with the density of the flowers in the plant [@beslile2012]. To our knowledge, no previous studies have considered symbionts in leaf tissue of *Mimulus* spp. and how leaf functional traits influence symbiont community composition. Given the potential benefits FEF can provide their hosts under stressful conditions (CITE) and the wide range of habitats the *M. guttatus* species complex occupies, it is important to understand the role of FEF communities play in *Mimulus* spp. The aim of this study was to explore some baseline questions about the FEF communities in sympatric populations of *Mimulus* spp.along an elevation gradient. We formulated the following questions: Q1) Are FEF community patterns correlated with leaf functional traits and/or elevation gradient? Q2) How does FEF community composition differs in response to geographic distance at the genus and host species level? Q3) Are there differences in leaf functional traits and FEF communities *among* sympatric *Mimulus* spp. populations? Q4) Do leaf functional traits and FEF communities differ *between* species along an elevational gradient?  We expected the abundance, diversity, richness, and community composition of FEF would be more similar among the same sites (alpha diversity) than between sites (beta diversity) regardless of host species.
+Phenotypic plasticity and genetic adaptation are key drivers of evolution, and both processes may aid in plant adaptation to a warming climate [@jump2005]. Plant’s colonization of land across multiples climates has been aided by their parallel evolution with fungi and bacteria; however, little is known about how plant microbiomes influence or are influenced by local adaptation or phenotypic plasticity of plants. Lack of knowledge about this is a problem because ecology aims to predict how plant distribution may change as the climate becomes further altered. Previous studies have suggested that foliar endophytic fungi (FEF) can alter plant traits under stressful conditions such as drought [@song2016]. FEF live in plant leaves and they may contribute to local adaptation and/or phenotypic plasticity. Host genetics may shape the foliar microbiomes of plants. For example, a study on the classical plant model, *Arabidopsis thaliana*, revealed that bacterial and fungal communities in leaves are shaped by host genotype, at least for the most common OTUs [@horton2014]. Another ideal model system to explore the interactions between leaf traits and FEF are the yellow monkeyflowers in the *Mimulus guttatus* species complex. Over the last 2 decades, the *M. guttatus* species complex has become a model system for answering questions about local adaptation and phenotypic plasticity [@wu2008; @yuan2019]. Experimental manipulation is relatively easy due to its small genome (about 430 Mb), short generation time, high fecundity, self-compatibility, and ease of greenhouse propagation [@society2019; @wu2008] Currently, studies of the *M. guttatus* species complex focus on the genetic and environmental factors driving local adaptation and phenotypic plasticity. The evolution of leaf shape for 3 edaphic species in the *M. guttatus* complex is controlled by overlapping genetic regions [@ferris2015]. Ferris et al., [-@ferris2015] points to multiple events of leaf shape evolution in the *M. guttatus* species complex and their associated habitats. Recent work has narrowed the genetic architecture at play in incomplete reproductively isolated sympatric populations of *Mimulus laciniatus* and *Mimulus guttatus*, shedding light on the location of quantitative trait loci (QTL) for the first flower node, flowering time, corolla width, corolla length, and leaf shape and suggesting that large-effect loci underlie these traits [@ferris2017]. There is scarce research that focuses on the symbionts of *Mimulus* spp. Beslile et al. [-@beslile2012] reported on the distribution of diverse fungal communities in the flower nectar of *Mimulus aurantiacus*. The authors considered flowers as islands in a metapopulation system and found that the frequency of micro fungi (i.e., yeasts) was significantly correlated to the location of the plant and marginally correlated with the density of the flowers in the plant [@beslile2012]. To our knowledge, no previous studies have considered symbionts in leaf tissue of *Mimulus* spp. and how leaf functional traits influence symbiont community composition. Given the potential benefits FEF can provide their hosts under stressful conditions (CITE) and the wide range of habitats the *M. guttatus* species complex occupies, it is important to understand the role of FEF communities play in *Mimulus* spp. The aim of this study was to explore some baseline questions about the FEF communities in sympatric populations of *Mimulus* spp.along an elevation gradient. We formulated the following questions: 
+<!-- Q1) Are FEF community patterns correlated with leaf functional traits and/or elevation gradient? Q2) How does FEF community composition differs in response to geographic distance at the genus and host species level? Q3) Are there differences in leaf functional traits and FEF communities *among* sympatric *Mimulus* spp. populations? Q4) Do leaf functional traits and FEF communities differ *between* species along an elevational gradient?   -->
+We expected the abundance, diversity, richness, and community composition of FEF would be more similar among the same sites (alpha diversity) than between sites (beta diversity) regardless of host species.
 
 TALK ABOUT THE EXPANDED PHENOTYPE
+
+new order of questions 
+Q1) Are there differences in leaf functional traits and FEF communities *among* sympatric *Mimulus* spp. populations along an elevation gradient?
+Q2) Are FEF community patterns correlated with leaf functional traits and/or elevation gradient?
+Q3) How does FEF community composition differs in response to geographic distance at the genus and host species level?*
+
 
 # Materials and Methods
 
@@ -315,7 +323,7 @@ To test for differences in FEF community composition, we used a distance-based R
 
 Our PCA analysis showed how leaf functional traits were related (Q3-Q4). We plotted leaf functional traits according to species groups on the PCA axes to show how the variance in the complete data set is explained by PC1 (42.57%) and PC2 (23.27%) (Fig. 6). The PCA analyses showed correlations between ACI, LT, LPS, and LMA as loadings tracked along PC1 towards positive values (Fig. 6). We observed that LBI loading is orthogonal along PC2 to the other traits, indicative of low correlation. We note distinct groupings by species along PC2 such that *M. laciniatus*, the most lobed species, is distinct from *M.gutatus* and *M. nasutus*. The latter two overlap along PC1 and PC2 (Fig. 6).
 
-We found that leaf functional traits differed among and within *Mimulus* species across elevation (Fig. S3 - S7). For LMA, when we observed all host species, we saw a statistically significant positive correlation between LMA and elevation (R^2^-adjusted = .041, *p* \< .001, Fig. S3A). When we observed this relationship with categorical elevation, we found that species do not differ in LMA values at low elevations (Fig. S3B). At mid elevations, *M. laciniatus* and *M. guttatus* have statistically significant differences in LMA (*p* \< .001), while at high elevation this difference dissipates. At high elevation we saw that *M. nasutus* differs significantly from both *M. laciniatus* and *M. guttatus* (*p* \< .0001, Fig. S3B). For ACI, when we observed all species, we found no correlation with elevation (R^2^-adjusted \< -.000, *p* \< .0001, Fig. S4A). But when we observed the elevation categories we saw that *M. laciniatus* had statistically significant differences (*p* \< .0001) from *M. nasutus* and *M. guttatus*, while the latter two did not differ (Fig. S4B). At mid elevation we saw that *M. laciniatus* and *M. guttatus* had statistically significant differences (*p* \< .0001), while at high elevations *M. laciniatus* had significantly lower levels (*p* \< .0001) of ACI than *M. nasutus*, and *M. guttatus* (*p* \< .01, Fig. S4B). We also saw statistically significant differences between *M. nasutus* and *M. guttatus* at high elevations (*p* \< .0001)(Fig. S4B). The LBI trait is a measure of leaf "lobeness" and it is confounded with species, since not all host species exhibit the trait plasticity with elevation change. Regardless, our comparisons show that LBI is significantly correlated with elevation (Fig. S5A). Our categorical comparison shows that *M. laciniatus* had statistically significant greater values of LBI compared to *M. nasutus* and *M. guttatus* at all elevation categories (Fig. S5B). At low elevations, *M. nasutus* and *M. guttatus* did not differ, but they did have significant differences at high elevations (p \< .0001, Fig. S5B). Our measure of leaf toughness, LPS, was significantly positively correlated with elevation (R^2^-adjusted = .004, *p* = .032, Fig. S6A). At low elevations we saw a statistically significant difference in LPS between *M. nasutus* and *M. guttatus* (*p* \< .01), while at mid elevations *M. laciniatus* and *M. guttatus* showed a similar pattern (*p* \< .0001, Fig. S6B). At high elevations we only saw significant differences between *M. laciniatus* and *M. nasutus* (*p* \< .01, Fig. S6B). Finally, we saw a significant positive correlation between LT and elevation (R^2^-adjusted = .013, *p* \< .0001), when we observe all species together (Fig. S7A). We only see statistically significant differences between *M. laciniatus* and *M. nasutus* at low elevations(*p* \< .05), while at mid we see significant differences between *M. laciniatus* and *M. guttatus* (*p* \< .0001) and at high elevations as well (*p* \< .0001, Fig. S7B). At high elevations, *M. guttatus* and *M. nasutus* also show significant differences (*p* \< .0001, Fig. S7B).
+We found that leaf functional traits differed among and within *Mimulus* species across elevation (Fig. S4 - S8). For LMA, when we observed all host species, we saw a statistically significant positive correlation between LMA and elevation (R^2^-adjusted = .041, *p* \< .001, Fig. S4A). When we observed this relationship with categorical elevation, we found that species do not differ in LMA values at low elevations (Fig. S4B). At mid elevations, *M. laciniatus* and *M. guttatus* have statistically significant differences in LMA (*p* \< .001), while at high elevation this difference dissipates. At high elevation we saw that *M. nasutus* differs significantly from both *M. laciniatus* and *M. guttatus* (*p* \< .0001, Fig. S4B). For ACI, when we observed all species, we found no correlation with elevation (R^2^-adjusted \< -.000, *p* \< .0001, Fig. S5A). But when we observed the elevation categories we saw that *M. laciniatus* had statistically significant differences (*p* \< .0001) from *M. nasutus* and *M. guttatus*, while the latter two did not differ (Fig. S5B). At mid elevation we saw that *M. laciniatus* and *M. guttatus* had statistically significant differences (*p* \< .0001), while at high elevations *M. laciniatus* had significantly lower levels (*p* \< .0001) of ACI than *M. nasutus*, and *M. guttatus* (*p* \< .01, Fig. S5B). We also saw statistically significant differences between *M. nasutus* and *M. guttatus* at high elevations (*p* \< .0001)(Fig. S4B). The LBI trait is a measure of leaf "lobeness" and it is confounded with species, since not all host species exhibit the trait plasticity with elevation change. Regardless, our comparisons show that LBI is significantly correlated with elevation (Fig. S6A). Our categorical comparison shows that *M. laciniatus* had statistically significant greater values of LBI compared to *M. nasutus* and *M. guttatus* at all elevation categories (Fig. S6B). At low elevations, *M. nasutus* and *M. guttatus* did not differ, but they did have significant differences at high elevations (p \< .0001, Fig. S5B). Our measure of leaf toughness, LPS, was significantly positively correlated with elevation (R^2^-adjusted = .004, *p* = .032, Fig. S7A). At low elevations we saw a statistically significant difference in LPS between *M. nasutus* and *M. guttatus* (*p* \< .01), while at mid elevations *M. laciniatus* and *M. guttatus* showed a similar pattern (*p* \< .0001, Fig. S7B). At high elevations we only saw significant differences between *M. laciniatus* and *M. nasutus* (*p* \< .01, Fig. S7B). Finally, we saw a significant positive correlation between LT and elevation (R^2^-adjusted = .013, *p* \< .0001), when we observe all species together (Fig. S8A). We only see statistically significant differences between *M. laciniatus* and *M. nasutus* at low elevations(*p* \< .05), while at mid we see significant differences between *M. laciniatus* and *M. guttatus* (*p* \< .0001) and at high elevations as well (*p* \< .0001, Fig. S8B). At high elevations, *M. guttatus* and *M. nasutus* also show significant differences (*p* \< .0001, Fig. S8B).
 
 
 
@@ -452,6 +460,7 @@ r1gg <- r1gg +
          panel.border = element_rect(linetype = "blank", fill = NA),
          axis.text.x = element_blank()) 
 #r1gg
+ggsave(filename = file.path(path, "figures/figure1b.png"), plot = r1gg, dpi=300, units=c("mm"), width=300, height=200)
 
 # Arrange plots
 ra_plots <- ggarrange(t1gg, r1gg,
@@ -1369,6 +1378,7 @@ r2gg <-
   )
 
 #r2gg
+ggsave(filename = file.path(path, "figures/supp_fig2b.png"), plot = r2gg, dpi=300, units=c("mm"), width=300, height=200)
 
 # Joined heatplots
 heatplots <- ggarrange(t2gg, r2gg, ncol = 1, nrow = 2, 
@@ -1384,8 +1394,98 @@ ggplot2::ggsave(filename = file.path(path, "figures/supp_fig2.png"), plot = heat
 
 
 ## Figure S3
-
 ```{r, supp_fig3}
+#| echo: false
+#| eval: true
+#| tidy: true
+#| message: false
+#| fig-height: 6
+#| fig-width: 6
+#| label: venn_diagrams
+#| fig-cap: "Venn diagrams of present and absense of ASVs among species and elevation categories un-rarified data and rarified data. A-B) Represent the overlap of ASVs habitat types and C-D) in gentoypes. Number of ASVs are represented the count and in parentheses as a ratio shared between genotype and habitat type."
+
+# un-rarified data
+# Per Species
+dataset1 <- micro_psclean$merge_samples(use_group = "Species")
+# create trans_venn object
+v1 <-
+  trans_venn$new(dataset1, ratio = "numratio") # Percentage represent ratio of shared ASVs
+v1gg <-
+  v1$plot_venn() + #https://r-charts.com/color-palettes/#discrete
+  ggtitle("Un-rarified data") +
+  theme(plot.title = element_text(
+    face = "bold",
+    size = 16,
+    hjust = 0.5,
+    vjust = 0.5
+  ))
+
+
+# Per Elevations
+dataset2 <- micro_psclean$merge_samples(use_group = "Elevation_cat")
+v2 <- trans_venn$new(dataset2, ratio = "numratio") 
+#v2$plot_venn()
+
+# rarified data
+#micro_rarefied_ps <- phyloseq2meco(rarefied_phyloseq) # First convert phyloseq to meco
+# Per Species
+dataset3 <- micro_rarefied_ps$merge_samples(use_group = "Species") 
+# create trans_venn object
+v3 <- trans_venn$new(dataset3, ratio = "numratio")
+v3gg <- v3$plot_venn() +
+  #ggtitle("Rarified data") +
+  theme(plot.title = element_text(
+    face = "bold",
+    size = 16,
+    hjust = 0.5,
+    vjust = 0.5
+  ))
+
+# Per Elevations
+dataset4 <- micro_rarefied_ps$merge_samples(use_group = "Elevation_cat")
+v4 <- trans_venn$new(dataset4, ratio = "numratio")
+#v4$plot_venn()
+
+                                        
+# joined plots
+venn_plots <-
+  ggarrange(
+    v1gg,
+    v3gg,
+    "", # Fake plot to create space
+    "",
+    v2$plot_venn(),
+    v4$plot_venn(),
+    ncol = 2,
+    nrow = 3,
+    common.legend = TRUE,
+    heights = c(1, 0.1, 1),
+    legend = "bottom",
+    labels = c("A", "B","", "", "C", "D")
+  )
+
+venn_plots
+
+rrfy_venn <-
+  ggarrange(
+    v3gg,
+    v4$plot_venn(),
+    ncol = 2,
+    nrow = 1,
+    common.legend = TRUE,
+    legend = "bottom",
+    labels = c("Species", "Elevation")
+  ) + ggtitle("Rarified data")
+
+ggsave(filename = file.path(path, "figures/supp_fig3b.png"), plot = rrfy_venn, dpi=300, units=c("mm"), width=250, height=150)
+
+# Save
+ggsave(filename = file.path(path, "figures/supp_fig3.png"), plot = venn_plots, dpi=300, units=c("mm"), width=300, height=300)
+
+```
+## Figure S4
+
+```{r, supp_fig4}
 #| echo: false
 #| eval: true
 #| tidy: true
@@ -1494,12 +1594,12 @@ lma_elevation <- ggarrange(lma_cont, lma, ncol = 1, nrow = 2,
 
 lma_elevation
 
-ggsave(filename = file.path(path, "figures/supp_fig3.png"), plot = lma_elevation, dpi=300, units=c("mm"), width=300, height=250)
+ggsave(filename = file.path(path, "figures/supp_fig4.png"), plot = lma_elevation, dpi=300, units=c("mm"), width=300, height=250)
 ```
 
-## Figure S4
+## Figure S5
 
-```{r, supp_fig4}
+```{r, supp_fig5}
 #| echo: false
 #| eval: true
 #| tidy: true
@@ -1605,12 +1705,12 @@ aci_elevation <- ggarrange("", aci_cont, "", aci,
                            )
 
 aci_elevation
-ggsave(filename = file.path(path, "figures/supp_fig4.png"), plot = aci_elevation, dpi=300, units=c("mm"), width=300, height=250)
+ggsave(filename = file.path(path, "figures/supp_fig5.png"), plot = aci_elevation, dpi=300, units=c("mm"), width=300, height=250)
 ```
 
-## Figure S5
+## Figure S6
 
-```{r, supp_fig5}
+```{r, supp_fig6}
 #| echo: false
 #| eval: true
 #| tidy: true
@@ -1716,12 +1816,12 @@ lbi_elevation <- ggarrange(lbi_cont, lbi, ncol = 1, nrow = 2,
 
 lbi_elevation
 
-ggsave(filename = file.path(path, "figures/supp_fig5.png"), plot = lbi_elevation, dpi=300, units=c("mm"), width=300, height=250)
+ggsave(filename = file.path(path, "figures/supp_fig6.png"), plot = lbi_elevation, dpi=300, units=c("mm"), width=300, height=250)
 ```
 
-## Figure S6
+## Figure S7
 
-```{r, supp_fig6}
+```{r, supp_fig7}
 #| echo: false
 #| eval: true
 #| tidy: true
@@ -1843,12 +1943,12 @@ lps_elevation <- ggarrange("", lps_cont, "", lps, ncol = 1, nrow = 4,
 
 lps_elevation
 
-ggsave(filename = file.path(path, "figures/supp_fig6.png"), plot = lps_elevation, dpi=300, units=c("mm"), width=300, height=250)
+ggsave(filename = file.path(path, "figures/supp_fig7.png"), plot = lps_elevation, dpi=300, units=c("mm"), width=300, height=250)
 ```
 
-## Figure S7
+## Figure S8
 
-```{r, supp_fig6}
+```{r, supp_fig8}
 #| echo: false
 #| eval: true
 #| tidy: true
@@ -1945,12 +2045,12 @@ lt_elevation <- ggarrange(lt_cont, lt, ncol = 1, nrow = 2,
                            labels = c("A", "B"),
                            heights = c(1, 1))
 lt_elevation
-ggsave(filename = file.path(path, "figures/supp_fig7.png"), plot = lt_elevation, dpi=300, units=c("mm"), width=300, height=250)
+ggsave(filename = file.path(path, "figures/supp_fig8.png"), plot = lt_elevation, dpi=300, units=c("mm"), width=300, height=250)
 ```
 
 
-## Figure S8
-```{r, supp_fig8}
+## Figure S9
+```{r, supp_fig9}
 #| echo: false
 #| eval: true
 #| tidy: true
@@ -1981,13 +2081,13 @@ mappops <- get_map(
   maptype = "terrain",
   scale = 4
 )
-map <- ggmap(mappops, extent = "panel") +
+map <- ggmap(mappops, extent = "device", darken = 0) +
   geom_point(
     data = map_latlong,
     aes(x
         = Longitude, y = Latitude, fill =
           Site),
-    size = 3,
+    size = 2,
     shape = 21,
   ) +
    theme_classic(base_size = 16) +
