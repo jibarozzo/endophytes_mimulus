@@ -319,6 +319,7 @@ We obtained 5,082,229 reads representing 726 ASVs from 174 samples after process
 
 To determine the correlation between FEF diversity and elevation, we calculated simple linear regressions between elevation and alpha diversity (Q1). At the genus levels, we observed the complete data set we did see a statistically significant negative correlation between elevation and observed richness (𝑞 = 0) (R^2^-adjusted \< .01, *F*~1,4198~= 16.69, *p* \< .001), the exponent of Shannon's entropy (𝑞 = 1) (R^2^-adjusted \< .01, *F*~1,4198~= 37.91, *p* \< .001), and the Inverse Simpson's Diversity (𝑞 = 2) (R^2^-adjusted \< .01, *F*~1,4198~= 23.73, *p* \< .001). At the species level, we observed a significant decrease as elevation increased in all alpha diversity measures (Fig. S2A - S2C), with the exception of *M. guttatus* which had no significant change in Hill orders 1 and 2 (Fig. 2B - 2C). The alpha diversity measures from rarefied data showed significant differences between all host species, except *M. laciniatus* and *M. nasutus* in Hill order 1 (𝑞 = 1, *p* \> .05, Fig. 3B). We observed a similar pattern in beta diversity between elevation sites (Fig. 3D -3C). We saw no differences in beta diversity between low and mid elevation sites for Hill order 2 (𝑞 = 2, *p* \> 0.05, Fig. 3F).
 
+**New model m5 has 22% of the overall variance** 
 To test for differences in FEF community composition, we used a distance-based Redundancy Analysis (dbRDA) to model the relationship between FEF communities, leaf functional traits and elevation (Q3). The best fit model revealed that 17% of the overall variance in FEF communities was accounted for by log-transformed LBI, host species, and elevation, the constraining variables. We saw that the first axis (dbRDA1) explained 65.8% and the second axis (dbRDA2) explained 15.3% of the constrained variance (Fig. 4). We observed a distinct, yet overlapping, grouping of FEF communities by species (Fig. 4A), as well as when visualized by elevation category (Fig. 4B). Elevation tracks along the dbRDA1 axis while logLBI is diagonal to the axes (Fig. 5). We found that LBI and elevation are significantly correlated with FEF communities (PERMANOVA TABLE COMMING SOON). To corroborate our findings, we used a permutational analysis of multivariate dispersion (PERMDISP) to test for homogeneity of variances in FEF communities. We found that FEF communities were homogeneous across all species (*F*~2,4197~= 320.3, *p* < .001). The post-hoc Tukey's test revealed that all species comparison differences were statistically significant at ⍺ = 0.05. We detected significant differences in the dispersion of FEF communities by elevation category (*F*~2,4197~= 228.1, *p* \< .001). The post-hoc Tukey's test showed that all elevation categories had significant differences in the dispersion of FEF communities at ⍺ = 0.05. Finally, we tested for FEF community dissimilarity by geographical distance and found a statistically significant positive correlation when we observed all host species (*r* = .07, *p* \< .05, Fig. 5A). At the host species level, we saw a significant correlation between FEF community and geographical distance for *M. laciniatus* (*r* = 0.27, *p* \= .01, Fig. 5A) and *M. nasutus* (*r* = .29, *p* \< .01, Fig. 5B) . For *M. guttatus* we saw a negative correlation between FEF communities and geographic distance (*r* = -.004, *p* = .48, Fig. 5B).
 
 Our PCA analysis showed how leaf functional traits were related (Q3-Q4). We plotted leaf functional traits according to species groups on the PCA axes to show how the variance in the complete data set is explained by PC1 (42.57%) and PC2 (23.27%) (Fig. 6). The PCA analyses showed correlations between ACI, LT, LPS, and LMA as loadings tracked along PC1 towards positive values (Fig. 6). We observed that LBI loading is orthogonal along PC2 to the other traits, indicative of low correlation. We note distinct groupings by species along PC2 such that *M. laciniatus*, the most lobed species, is distinct from *M.gutatus* and *M. nasutus*. The latter two overlap along PC1 and PC2 (Fig. 6).
@@ -933,17 +934,17 @@ ggsave(filename = file.path(path, "figures/figure3.png"), plot = alpha_beta_dive
 #| echo: false
 #| eval: true
 #| tidy: true
-#| fig-width: 6
-#| fig-height: 7
+| fig-width: 6
+| fig-height: 7
 #| label: dbrda_plot
-#| fig-cap: "FEF community composition association with leaf functional traits and elevation per host species. Distance-based Redundancy Analysis (dbRDA) plot of rarefied FEF community and leaf functional traits by species. A) Each cluster of points represents a rarefied FEF community sample from one host species; blue filled squares correspond to *M. laciniatus*, green circles to *M. nasutus*, and yellow triangles to *M. guttatus*. B) Purple filled shapes correspond to LOW elevation, pink chapes to MID elevation and light maroon shapes to HIGH elevation. Point shapes correspond to host species. Solid arrow lines represent significant associations (*p* <0.01), while dashed lines represent non-significant associations. The length and direction of the arrows indicate the strength and direction of the association between the traits and the FEF community composition. The labels on the arrows correspond to the leaf functional traits. Ellipses represent 95% confidence intervals. The plot is based on the Bray-Curtis dissimilarity matrix."
+#| fig-cap: "FEF community composition association with leaf functional traits and elevation per host species. Distance-based Redundancy Analysis (dbRDA) plot of rarefied FEF community and leaf functional traits by species. A) Each cluster of points represents a rarefied FEF community sample from one host species; blue filled squares correspond to *M. laciniatus*, green circles to *M. nasutus*, and yellow triangles to *M. guttatus*. B) Purple filled shapes correspond to LOW elevation, pink chapes to MID elevation and light maroon shapes to HIGH elevation. Point shapes correspond to host species. Solid arrow lines represent significant associations (*p* < .01), while dashed lines represent non-significant associations. The length and direction of the arrows indicate the strength and direction of the association between the traits and the FEF community composition. The labels on the arrows correspond to the leaf functional traits. Ellipses represent 95% confidence intervals. The plot is based on the Bray-Curtis dissimilarity matrix."
 
 # dbRDA using Elevation as continuous variable
 #logACI + logLT + logLPS + logLMA +
 load(file = "clean_data/statistics/m4_hell.rda")
 
 # Final model
-final_model <- m4_hell
+final_model <- m5_hell # Previously m4_hell was the best
 
 B <- summary(final_model)
 
@@ -978,14 +979,14 @@ A4 <- lapply(1:6, function(i) arrow_scores[i, ])
 # dbRDA plot based on species
 p_final_model <- ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
   geom_point(data = merged_data, aes(color = Species, shape = Site), size = rel(4), alpha = 0.7, stroke = 1) +
-  geom_segment(arrow_map, size = rel(.8), data = arrow_scores[1:2, ], color = "black", arrow = arrowhead) +
+  geom_segment(arrow_map, linewidth = rel(.8), data = arrow_scores[1:2, ], color = "black", arrow = arrowhead) +
   geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") + # plot vertical line
   geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") + # plot horizontal line
-  geom_text(label_map, size = rel(4), data = A4[[1]], fontface = "bold", show.legend = FALSE, label = c("Elev."), nudge_x = 0.25) +
+  geom_text(label_map, size = rel(4), data = A4[[1]], fontface = "bold", show.legend = FALSE, label = c("Elev."), nudge_x = 0.65) +
   geom_text(label_map, size = rel(4), data = A4[[2]], fontface = "bold", show.legend = FALSE, label = c("logLBI"), nudge_y = 0.2) +
   xlab(label = paste("dbRDA1 (", round(B$concont$importance[2,1]*100, digits = 1), "%)", sep="")) +
   ylab(label = paste("dbRDA2 (", round(B$concont$importance[2,2]*100, digits = 1), "%)", sep="")) + 
-  scale_color_manual(values= met.brewer("Isfahan2", n = 3, type = "discrete", direction = -1)) +
+  scale_color_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), values= met.brewer("Isfahan2", n = 3, type = "discrete", direction = -1)) +
   scale_shape_manual(values=c(1:22)) +
   stat_ellipse(aes(color = Species),
                geom = "path",
@@ -998,16 +999,20 @@ p_final_model <- ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
                show.legend = NA, inherit.aes = TRUE) +
   theme_classic(base_size = 16) +
   theme(legend.title = element_text(face = "bold"),
-        legend.text = element_text(face = "italic")) +
+        legend.text = element_markdown(),
+        plot.caption = element_markdown(),
+        strip.text = element_text(face = "bold")) +
+  labs(caption = "*F*<sub>7,4192</sub> =268.1, *p* = .001") + #Results from beta_perm3
+  facet_wrap(~ Elevation_cat) +
   guides(shape = guide_legend(ncol=2))
 
      
 # Rearranging the order of layers so arrows are above the points.
 #p_final_model$layers
 p_final_model$layers <- c(p_final_model$layers, p_final_model$layers[[2]], p_final_model$layers[[5]], p_final_model$layers[[6]])
-#p_final_model
+p_final_model
 
-#ggsave(filename=file.path(path, "figures/dbRDA_species.png"), plot = p_m2dbrda, dpi=300, units=c("mm"), width=150, height=150)
+ggsave(filename=file.path(path, "figures/dbRDA_elevation_species.png"), plot = p_final_model, dpi=300, units=c("mm"), width=250, height=150)
 
 #####################################
 # dbRDA using Elevation 
@@ -1019,7 +1024,7 @@ elev_cat_dbrda <-  ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
   geom_segment(arrow_map, size = rel(.8), data = arrow_scores[1:2, ], color = "black", arrow = arrowhead) +
   geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") + # plot vertical line
   geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") + # plot horizontal line
-  geom_text(label_map, size = rel(4), data = A4[[1]], fontface = "bold", show.legend = FALSE, label = c("Elev."), nudge_x = 0.25) +
+  geom_text(label_map, size = rel(4), data = A4[[1]], fontface = "bold", show.legend = FALSE, label = c("Elev."), nudge_x = 0.55) +
   geom_text(label_map, size = rel(4), data = A4[[2]], fontface = "bold", show.legend = FALSE, label = c("logLBI"), nudge_y = 0.2) +
   xlab(label = paste("dbRDA1 (", round(B$concont$importance[2,1]*100, digits = 1), "%)", sep="")) +
   ylab(label = paste("dbRDA2 (", round(B$concont$importance[2,2]*100, digits = 1), "%)", sep="")) + 
