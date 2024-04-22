@@ -996,7 +996,7 @@ p_final_model <-
         data = merged_data,
         aes(color = Species),
         size = rel(4),
-        alpha = 0.05,
+        alpha = 0.2,
         stroke = 1
     ) +
     stat_ellipse(
@@ -1072,7 +1072,7 @@ p_final_model <-
         plot.caption = element_markdown(),
         strip.text = element_text(face = "bold")
     )+
-  labs(caption = "*F*<sub>7,4192</sub> =268.1, *p* = .001") + #Results from beta_perm3
+  labs(caption = "PERMDISP: *F*<sub>7,4192</sub> =268.1, *p* = .001") + #Results from beta_perm3
   facet_wrap(~ Elevation_cat) +
   guides(shape = guide_legend(ncol=2))
      
@@ -1081,7 +1081,7 @@ p_final_model <-
 # p_final_model$layers <- c(p_final_model$layers, p_final_model$layers[[2]], p_final_model$layers[[5]], p_final_model$layers[[6]])
 p_final_model
 
-ggsave(filename=file.path(path, "figures/dbRDA_elevation_labels.svg"), plot = p_final_model, dpi=300, units=c("mm"), width=250, height=150)
+#ggsave(filename=file.path(path, "figures/dbRDA_elevation_labels.svg"), plot = p_final_model, dpi=300, units=c("mm"), width=250, height=150)
 
 #####################################
 # dbRDA using Elevation 
