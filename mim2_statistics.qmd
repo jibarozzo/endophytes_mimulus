@@ -2689,7 +2689,7 @@ anova_m5hell_margin <-
             permutations = 999,
             parallel = 8)
 save(anova_m5hell, file = "clean_data/statistics/anova_m5hell_margin.rda")
-load("clean_data/statistics/anova_m5hell.rda")
+load("clean_data/statistics/anova_m5hell_margin.rda")
 
 # Terms (results are the same as adonis2 but without R2)
 set.seed(123)
@@ -2699,6 +2699,8 @@ anova_m5hell_term <-
         permutations = 999,
         parallel = 8)
 save(anova_m5hell_term, file = "clean_data/statistics/anova_m5hell_term.rda")
+load("clean_data/statistics/anova_m5hell_term.rda")
+
 
 ###################################
 ### PERMDISP ######################
@@ -2717,6 +2719,7 @@ beta_dis1 <-
     sqrt.dist = FALSE
   )
 save(beta_dis1, file = "clean_data/statistics/beta_dis1.rda")
+load(file = "clean_data/statistics/beta_dis1.rda")
 anova(beta_dis1)
 
 set.seed(123)
@@ -2724,8 +2727,10 @@ beta_perm1 <-
   permutest(beta_dis1,
             parallel = 8,
             permutations = 999,
-            by = "margin")
+            by = "term")
 save(beta_perm1, file = "clean_data/statistics/beta_perm1.rda")
+load("clean_data/statistics/beta_perm1.rda")
+beta_perm1
 
 TukeyHSD(beta_dis1, conf.level = 0.95)
 
@@ -2747,7 +2752,7 @@ beta_perm2 <-
   permutest(beta_dis2,
             parallel = 8,
             permutations = 999,
-            by = "margin")
+            by = "term")
 save(beta_perm2, file = "clean_data/statistics/beta_perm2.rda")
 load(file = "clean_data/statistics/beta_perm2.rda")
 
@@ -2763,14 +2768,14 @@ beta_dis3 <- betadisper(
   sqrt.dist = FALSE
 )
 save(beta_dis3, file = "clean_data/statistics/beta_dis3.rda")
-#load(file = "clean_data/statistics/beta_dis3.rda")
+load(file = "clean_data/statistics/beta_dis3.rda")
 
 set.seed(123)
 beta_perm3 <-
   permutest(beta_dis3,
             parallel = 8,
             permutations = 999,
-            by = "margin")
+            by = "term")
 save(beta_perm3, file = "clean_data/statistics/beta_perm3.rda")
 
 TukeyHSD(beta_dis3, conf.level = 0.95)
