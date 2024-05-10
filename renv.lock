@@ -29,7 +29,7 @@
     ]
   },
   "Bioconductor": {
-    "Version": "3.17"
+    "Version": "TRUE"
   },
   "Packages": {
     "BH": {
