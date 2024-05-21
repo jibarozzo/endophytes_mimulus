@@ -6,22 +6,16 @@ execute:
   echo: false
 warning: false
 
-format: 
-  pdf:
-    documentclass: scrartcl
-    include-in-header:
-        text: '\usepackage{lineno}\linenumbers'
-    linestretch: 2.0
-    margin-left: 1in
-    margin-right: 1in
-    margin-top: 1in
-    margin-bottom: 1in
-    mainfont: TeX Gyre Termes #Alternative to Times New Roman
-    sansfont: TeX Gyre Termes #Another option is Liberation Serif
-    number-sections: true
-    citation-package: biblatex
+format:
+  # wiley-njd-pdf:
+  #   keep-tex: true
+  #   keep-md: true
+  #   article-type: "Article Type"
+  #   classoption: [As in Manuscript, 2COL]
+  #   journal: "Journal"
+  #   author-mark: "Aponte Rolón \\textsc{et al.}"
   docx:
     reference-doc: custom-reference-doc.docx
     number-sections: true
-   #linestretch: 2.0
+    tbl-colwidths: true
     citation-package: biblatex

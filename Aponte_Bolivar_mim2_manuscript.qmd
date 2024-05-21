@@ -3,13 +3,15 @@ title: "[Working title]: Foliar fungal symbionts in sympatric yellow monkeyflowe
 date: last-modified
 date-format: "MMMM D, YYYY"
 bibliography: references.bib
-csl: apa.csl
+#csl: apa.csl
+csl: american-journal-of-botany.csl
+
 author:
   - name: Bolívar Aponte Rolón
     orcid: 0000-0002-2544-4551
     email: baponterolon AT tulane DOT edu
     corresponding: true
-    affiliations: 
+    affiliations:
       - ref: tu
         name: Tulane University
         department: Ecology and Evolutionary Biology
@@ -20,43 +22,37 @@ author:
   - name: Kathleen G. Ferris
     email: kferris@tulane.edu
     corresponding: false
-    affiliations: 
+    affiliations:
       - ref: tu
   - name: Sunshine A. Van Bael
     orcid: 0000-0001-7317-3533
     email: svanbael@tulane.edu
     corresponding: false
-    affiliation: 
+    affiliation:
       - ref: tu
-      
+
 affiliations:
   - id: tu
     name: Department of Ecology and Evolutionary Biology, Tulane University, 6823 St. Charles Avenue, New Orleans, LA 70118
-
 filters:
   - authors-block
+ 
+# present-address: "This is sample for present address text this is sample for present address text."
+# abstract: |
+#   This is a generic template designed for use by multiple journals,
+#   which includes several options for customization. Please
+#   refer the author guidelines and author LaTeX manuscript preparation document for the journal to which you
+#   are submitting in order to confirm that your manuscript will
+#   comply with the journal’s requirements. Please replace this
+#   text with your abstract. This is sample abstract text just for the template display purpose.
+# keywords: [keyword1, keyword2, keyword3, keyword4]
+# abbreviations-note: "ANA, anti-nuclear antibodies; APC, antigen-presenting cells; IRF, interferon regulatory factor."
 
 format:
-  # pdf:
-  #   documentclass: scrartcl
-  #   include-in-header:
-  #       text: '\usepackage{lineno}\linenumbers'
-  #   linestretch: 2.0
-  #   margin-left: 1in
-  #   margin-right: 1in
-  #   margin-top: 1in
-  #   margin-bottom: 1in
-  #   mainfont: TeX Gyre Termes #Alternative to Times New Roman
-  #   sansfont: TeX Gyre Termes #Another option is Liberation Serif
-  #   number-sections: true
-  #   citation-package: biblatex
-  #   #keep_tex: true
-  #   keep_md: true
   docx:
     reference-doc: custom-reference-doc.docx
     number-sections: true
     tbl-colwidths: true
-    #linestretch: 2.0
     citation-package: biblatex
 crossref:
   custom:
@@ -66,11 +62,6 @@ crossref:
       reference-prefix: Fig. S
       space-before-numbering: false
       latex-list-of-description: Supplementary Figure
-    
-editor: source
-execute:
-  echo: false
-warning: false
 ---
 
 ```{r, cleaning_shaping_data}
