@@ -1735,11 +1735,11 @@ rel_abund_ps_clean <- prune_samples(sample_sums(rel_abund_ps_clean ) > 0, rel_ab
 # Result: 231 taxa in 160 samples.
 
 # Save file
-#saveRDS(ps_clean_3, file.path(out_dir, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons.rds"))
+#saveRDS(ps_clean_3, file.path(out_dir, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons.rds"))
 #saveRDS(rel_abund_ps_clean, file.path(out_dir, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.rds"))
 
 # Load file
-ps_clean_3 <- readRDS(file.path(out_dir, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons.rds"))
+ps_clean_3 <- readRDS(file.path(out_dir, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons.rds"))
 ```
 
 #### Phyloseq CLEANED summary statistics
@@ -1810,7 +1810,7 @@ downstream analyses.
 # Saving phyloseq with not relative abundance calculated
 ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
   rename(ASV = OTU)
-write.csv(ps_clean_3_df,file.path(out_dir, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons.csv"))
+write.csv(ps_clean_3_df,file.path(out_dir, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons.csv"))
 
 # Relative abundance calculated
 rel_ps_clean_df <- metagMisc::phyloseq_to_df(rel_abund_ps_clean, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
@@ -1832,8 +1832,8 @@ rel_abund_ps_clean <- subset_samples(rel_abund_ps_clean, !Sample %in% bicolor)
 ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
   rename(ASV = OTU)
 
-saveRDS(ps_clean_3, file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.rds"))
-write.csv(ps_clean_3_df, file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.csv"))
+saveRDS(ps_clean_3, file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.rds"))
+write.csv(ps_clean_3_df, file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.csv"))
 # 
 saveRDS(rel_abund_ps_clean, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
 write.csv(rel_ps_clean_df, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
@@ -1862,10 +1862,9 @@ plot_richness(ps_clean_3, x="Species", measures=c("Shannon", "Simpson"), color="
 
 # Important files resulting from the pipeline
 
--   ps_clean_3 == taxonomy/ASV_8450_assigned_nonsingletons.rds
--   ps_clean_3_df == taxonomy/ASV_8450_assigned_nonsingletons.csv
--   rel_abund_ps_clean == taxonomy/ASV_8450_relabun_nonsingletons.rds
--   rel_ps_clean_df == taxonomy/ASV_8450_relabun_nonsingletons.csv
+-   asv_10 == clean_data/ASV_tables/ASVs_8450_cleaned_10_percent.rds
+-   ps_clean_3 == clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons.rds
+-   ps_clean_3_df == clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons.csv
 
 All of these files and objects underwent the complete pipeline and have
 been removed of contaminant ASVs, sample cross-contamination and cut-off
@@ -1908,7 +1907,7 @@ Result
 
 [baponterolon@cypress01-033 svanbael]$source activate virtual_env #Activate environment
 
-(virtual_env) [baponterolon@cypress01-033 svanbael]$  
+(virtual_env) [baponterolon@cypress01-033 svanbael]$  #You are now in the virtual environment
 ```
 
 Notice the change in the username of your session indicating that you
