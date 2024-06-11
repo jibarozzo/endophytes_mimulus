@@ -151,7 +151,7 @@ plant_traits <- plant_traits |>
 #Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data. These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
 
 # Load Phyloseq object cleaned of singletons (231 ASVs)
-ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.rds"))
+ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.rds"))
 #ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.csv"))
 pseq_rrfb <- readRDS(file.path(path, "clean_data/statistics/pseq_rrfb.rds")) #Mirlyn object from Method B
 rarefied_phyloseq <- readRDS(file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
@@ -1668,7 +1668,7 @@ rrfy_hell_matrix <- as.data.frame(rrfy_hell_matrix) |>
          Unique_ID =  str_remove(Unique_ID, "^.*?(_|-)")) |>
   relocate(Unique_ID, .after = X) |>
   left_join(plant_traits, by = "Unique_ID")
-  t() # Transpose due to duplicate row names not allowed
+  #t() # Transpose due to duplicate row names not allowed
 
 # Save
 saveRDS(rrfy_hell_matrix, file = "clean_data/statistics/rrfy_hell_matrix.rds") 
@@ -2553,7 +2553,7 @@ m2_hell <- dbrda(dbrda_hell_matrix ~ logLBI + Elevation_m + Sample_Date + Site +
 
 #Anovas for m2
 set.seed(123)
-anova.cca(m2_hell, by = "margin", permutations = 999, parallel = 8)
+anova.cca(m2_hell, by = "margin", permutations = 999, parallel = 8) # .cca adds Distance based CCA functionality
 anova(m2_hell, by = "axis")
 anova(m2_hell, by = "axis", perm.max=500)
 ```
@@ -2914,6 +2914,77 @@ save(perma3, file = "clean_data/statistics/perma3.rda")
 print(perma3)
 
 ```
+
+
+
+
+### PCA for community data
+
+
+```{r, comm_pca}
+  #| echo: false
+#| eval: true
+#| tidy: true
+#| fig-width: 5
+#| fig-height: 5
+#| label: pca
+#| fig-cap: "PCA of leaf traits by species."
+
+# PCA using covariates to explain species richness/abundance ####
+
+data.pca <- dbrda_hell_matrix # Renaming and using same data set as dbRDA
+
+leaf_traits.pca <- plant_traits_MB
+
+
+###Run this to create pca with prcomp function
+pca <- prcomp(data.pca, scale = FALSE) # Scaling is not necessary as the data is already Hellinger transformed
+pca$rotation=-pca$rotation
+pca$x=-pca$x
+
+#Checking the PCA
+plot(pca,type = "lines")
+biplot(pca) # Base type PCA
+
+# PCA using autoplot() and prcomp()and modifying with ggplot syntax ####
+pca_auto <- autoplot((pca), data = data.frame(leaf_traits.pca), # For some reason this functions require data to be data= data.frame()
+         alpha = 0, #Setting alpha to zero render the automatic circle point null.Manipulate shapes with geom_point(). 
+         loadings = TRUE,loadings.colour = "black",
+         loadings.label = TRUE, loadings.label.colour="black",
+         loadings.label.size = 4, size = 7, 
+         loadings.label.vjust = 0, 
+         loadings.label.hjust = -0.15) + 
+  geom_point(aes(fill = Species, color = Species), alpha = 0.5, size = 3) +
+  geom_hline(yintercept = 0, colour = "gray45") +
+  geom_vline(xintercept = 0, colour = "gray45") +
+    scale_fill_manual(labels=c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
+                    values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
+  scale_color_manual(labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+                     values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
+  stat_ellipse(aes(color = Species), 
+               geom = "path", 
+               size = 1.3, 
+               position = "identity", 
+               type = "t", 
+               linetype = 1, 
+               level = 0.95, 
+               segments = 51, na.rm = TRUE, show.legend = NA, inherit.aes = TRUE) +
+  #scale_x_continuous(expand = c(0.0, -0.09)) +
+  theme_classic(base_size = 12) +
+  theme(legend.text = element_markdown(),
+        legend.position = "bottom",
+        legend.title = element_text(face = "bold")) 
+  # labs(caption = expression("ACI = anthocyanins, LPS = leaf punch strength, LMA = leaf mass per area, LT = leaf thickness. LBI = Leaf lobe index. All leaf replicates per species ("~ italic("n") ~ "= 501)."))
+
+
+pca_auto$layers <- c(pca_auto$layers, pca_auto$layers[[2]], pca_auto$layers[[3]]) # This adds/copies layers 2-3 and overlays them. It makes the arrows be on top of the points. There must be a better ways of doing this.
+
+pca_auto
+```
+
+This is an interesting analysis. A PCA of the fungal communities is not that different from the dbRDA, qualitatively. But we appreciate the ASVs driving the patterns. We observed that the most abundant and prevalent ASV have the longest/strongest vectors. 
+
+
 
 
 Who contributes more to differences in the community composition?
