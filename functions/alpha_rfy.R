@@ -1,5 +1,5 @@
 # Modified functions from mirlyn package #
-# The objective of this script expands the the alphha diversity metrics to include shannon, simpson and invsimpson indices. Poteially observed richness.
+# The objective of this script expands the the alpha diversity metrics to include shannon, simpson and invsimpson indices. Potentially observed richness.
 
 #Renaming the function to avoid conflicts with the original function
 rep_otu_df <- function(x) {

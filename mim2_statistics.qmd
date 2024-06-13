@@ -12,25 +12,30 @@ knitr::opts_chunk$set(out.width ='70%', fig_align = 'center', echo = TRUE, colla
 ##Potential Packages
 
 ```{r}
+
+# Core packages
 library("tidyverse")
 library("data.table")
 library("ggpubr")
 library("ggfortify")
-library("ggtext")
-library("ggpmisc")
-library("broom")
-library("MetBrewer")
 library("rstatix")
+library("broom")
 
-# Models
+
+# Linear Models
 library("car")
 library("nlme")
 
-# Diversity
+# Community Diversity
 library("vegan")
 library("hillR")
 library("geosphere")
 library("indicspecies")
+
+# ggplot2 extensions
+library("ggtext")
+library("ggpmisc")
+library("MetBrewer")
 
 # Phyloseq friendly
 #Some of these are redundant and have conflicts, but have functions that I like better than others or compliment each other.
@@ -41,7 +46,10 @@ library("metagMisc") # Miscellaneous functions
 library("microbiome") # Expands phyloseq 
 library("mirlyn")
 
+# Parallel processing
 library("parallelly")
+
+# Misc
 library("conflicted")
 conflict_prefer("select", "dplyr")
 conflict_prefer("filter", "dplyr")
@@ -2925,8 +2933,6 @@ print(perma3)
   #| echo: false
 #| eval: true
 #| tidy: true
-#| fig-width: 5
-#| fig-height: 5
 #| label: pca
 #| fig-cap: "PCA of leaf traits by species."
 
@@ -2982,8 +2988,68 @@ pca_auto$layers <- c(pca_auto$layers, pca_auto$layers[[2]], pca_auto$layers[[3]]
 pca_auto
 ```
 
-This is an interesting analysis. A PCA of the fungal communities is not that different from the dbRDA, qualitatively. But we appreciate the ASVs driving the patterns. We observed that the most abundant and prevalent ASV have the longest/strongest vectors. 
+This is an interesting analysis. A PCA of the fungal communities is not that different from the dbRDA, qualitatively. But we appreciate the ASVs driving the patterns. We observed that the most abundant and prevalent ASV have the longest/strongest vectors. From [@armstrong2022]: "(Morton et al., 2019) and neither rarefaction nor relative abundance sampling solve this issue. Due to this effect, many dimensionality reduction methods, such as PCA, will emphasize false correlations in the data"
 
+See paper for discussion on appropriate dimensionality reduction methods fro microbial data. 
+
+### PCoA
+
+```{r, pcoa}
+
+repotu_df <- function(x) {
+
+  newdat <- lapply(x, otu_table)
+
+  finaldat <- matrix(ncol = ncol(newdat[[1]]) * length(newdat), nrow = nrow(newdat[[1]]),
+    dimnames = list(rownames(newdat[[1]]),
+      paste0(rep(seq_len(length(newdat)), each = ncol(newdat[[1]])), "-",
+        rep(colnames(newdat[[1]]), times = length(newdat)))))
+
+  for (i in seq_along(newdat)) {
+    finaldat[, (1 + (i - 1) * ncol(newdat[[1]])):(i * ncol(newdat[[1]]))] <- newdat[[i]]
+  }
+
+  finaldat
+
+}
+
+betamatPCoA <- function(x, transformation="hellinger", dsim="bray", md= c("pca", "pcoa"), ...){
+  if (is.null(transformation)){
+    dist <- vegdist(as.matrix(t(repotu_df(x))), method=dsim)
+  } else {
+    transform <- decostand(as.matrix(t(repotu_df(x))), transformation)
+    dist <- vegdist(transform, method=dsim)
+  }
+  if (is.null(md)){
+    pca <- prcomp(dist)
+  } else {
+    pcoa <- wcmdscale(dist, eig = TRUE)
+  }
+}
+
+
+pcoa_object <- betamatPCoA(pseq_rrfb, transformation = "hellinger", dsim = "bray", md = "pcoa")
+
+pcoa_df <- data.frame(pcoa_object$points) |>
+rownames_to_column(var = "Unique_ID")
+
+# Merge scores with trait data
+merged_data <- right_join(pcoa_df, plant_traits_MB, by = c("Unique_ID" = "X"))
+
+ggplot() +
+geom_point(data = merged_data, aes(x = Dim1, y = Dim2, color = Species)) +
+# stat_ellipse(aes(color = Species),
+#                geom = "path",
+#                linewidth = 1.7,
+#                position = "identity",
+#                type = "t", linetype = 1,
+#                level = 0.95,
+#                segments = 51,
+#                na.rm = FALSE,
+#                show.legend = NA, inherit.aes = TRUE) +
+theme_bw()
+
+```
 
 
 
