@@ -1,13 +1,13 @@
 ---
-title: "Insights on Foliar fungal symbionts in sympatric yellow monkeyflowers"
-format: 
-  dashboard:
-    #orientation: columns
-    scrolling: true
-    theme: 
-      - minty
-
-editor: source
+# title: "Insights on Foliar fungal symbionts in sympatric yellow monkeyflowers"
+# format: 
+#   dashboard:
+#     #orientation: columns
+#     scrolling: true
+#     theme: 
+#       - minty
+# 
+# editor: source
 
 ---
 

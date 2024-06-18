@@ -36,18 +36,6 @@ affiliations:
     name: Department of Ecology and Evolutionary Biology, Tulane University, 6823 St. Charles Avenue, New Orleans, LA 70118
 filters:
   - authors-block
- 
-# present-address: "This is sample for present address text this is sample for present address text."
-# abstract: |
-#   This is a generic template designed for use by multiple journals,
-#   which includes several options for customization. Please
-#   refer the author guidelines and author LaTeX manuscript preparation document for the journal to which you
-#   are submitting in order to confirm that your manuscript will
-#   comply with the journal’s requirements. Please replace this
-#   text with your abstract. This is sample abstract text just for the template display purpose.
-# keywords: [keyword1, keyword2, keyword3, keyword4]
-# abbreviations-note: "ANA, anti-nuclear antibodies; APC, antigen-presenting cells; IRF, interferon regulatory factor."
-
 format:
   docx:
     reference-doc: custom-reference-doc.docx
@@ -62,6 +50,11 @@ crossref:
       reference-prefix: Fig. S
       space-before-numbering: false
       latex-list-of-description: Supplementary Figure
+
+editor: source
+execute:
+  echo: false
+warning: false
 ---
 
 ```{r, cleaning_shaping_data}
@@ -139,8 +132,8 @@ leaf_traits_noB <- leaf_traits |>
 #These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
 
 #Load Phyloseq object cleaned of singletons (231 ASVs)
-ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.rds"))
-#ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.csv"))
+ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.rds"))
+#ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.csv"))
 pseq_rrfb <- readRDS(file.path(path, "clean_data/statistics/pseq_rrfb.rds")) #Mirlyn object from Method B
 rarefied_phyloseq <- readRDS(file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
 
@@ -305,9 +298,7 @@ Our PCA analysis showed how leaf functional traits were related (Q1). We plotted
 
 We found that leaf functional traits differed among and within *Mimulus* species across elevation (Fig. S5 - S9). For LMA, when we observed all host species, we saw a statistically significant positive correlation between LMA and elevation (R^2^-adjusted = .041, *p* \< .001, Fig. S5A). When we observed this relationship with categorical elevation, we found that species do not differ in LMA values at low elevations (Fig. S5B). At mid elevations, *M. laciniatus* and *M. guttatus* have statistically significant differences in LMA (*p* \< .001), while at high elevation this difference dissipates. At high elevation we saw that *M. nasutus* differs significantly from both *M. laciniatus* and *M. guttatus* (*p* \< .0001, Fig. S5B). For ACI, when we observed all species, we found no correlation with elevation (R^2^-adjusted \< -.000, *p* \< .0001, Fig. S6A). But when we observed the elevation categories we saw that *M. laciniatus* had statistically significant differences (*p* \< .0001) from *M. nasutus* and *M. guttatus*, while the latter two did not differ (Fig. S6B). At mid elevation we saw that *M. laciniatus* and *M. guttatus* had statistically significant differences (*p* \< .0001), while at high elevations *M. laciniatus* had significantly lower levels (*p* \< .0001) of ACI than *M. nasutus*, and *M. guttatus* (*p* \< .01, Fig. S6B). We also saw statistically significant differences between *M. nasutus* and *M. guttatus* at high elevations (*p* \< .0001)(Fig. S6B). The LBI trait is a measure of leaf "lobeness" and it is confounded with species, since not all host species exhibit the trait plasticity with elevation change. Regardless, our comparisons show that LBI is significantly correlated with elevation (Fig. S7A). Our categorical comparison shows that *M. laciniatus* had statistically significant greater values of LBI compared to *M. nasutus* and *M. guttatus* at all elevation categories (Fig. S7B). At low elevations, *M. nasutus* and *M. guttatus* did not differ, but they did have significant differences at high elevations (p \< .0001, Fig. S7B). Our measure of leaf toughness, LPS, was significantly positively correlated with elevation (R^2^-adjusted = .004, *p* = .032, Fig. S8A). At low elevations we saw a statistically significant difference in LPS between *M. nasutus* and *M. guttatus* (*p* \< .01), while at mid elevations *M. laciniatus* and *M. guttatus* showed a similar pattern (*p* \< .0001, Fig. S8B). At high elevations we only saw significant differences between *M. laciniatus* and *M. nasutus* (*p* \< .01, Fig. S8B). Finally, we saw a significant positive correlation between LT and elevation (R^2^-adjusted = .013, *p* \< .0001), when we observe all species together (Fig. S9A). We only see statistically significant differences between *M. laciniatus* and *M. nasutus* at low elevations(*p* \< .05), while at mid we see significant differences between *M. laciniatus* and *M. guttatus* (*p* \< .0001) and at high elevations as well (*p* \< .0001, Fig. S9B). At high elevations, *M. guttatus* and *M. nasutus* also show significant differences (*p* \< .0001, Fig. S9B).
 
-We obtained 5,082,229 reads representing 726 ASVs from 174 samples after processing samples through the DADA2 pipeline. The raw reads obtained were composed of 26.81% Ascomycota, 71.53% Basidiomycota, \<0.05% Chytridiomycota, \<0.5% Mortierellomycota, \<0.03% Olpidiomycota, 0.01% Rozellomycota, \<0.001% Aphelidiomycota, and 1.19% missed hits. After decontamination, and removal of singletons we obtained 4,856,220 reads representing 231 ASVs from 157 samples composed of 26% Ascomycota, 73% Basidiomycota, 0.01% Chytridiomycota, \<0.1% Mortierellomycota, 0.03% Olpidiomycota, \<0.002% Rozellomycota and \<1.0% unknown reads (Fig. 2 and Fig. S2). 
-
-<!-- The presence of Ascomycota (92%) and Basidiomycota (97%) was consistent in samples across all sites and host species in the un-rarefied data (Table ??). Three core taxa members were detected in the un-rarefied data: *Vishniacozyma victoriae* (Basidiomycota, ASV_1), *Cladosporium herbanum* (Ascomycota, ASV_2) and *Cladosporium* spp. (Ascomycota, ASV_7). The rarefied data contained three more core taxa: Dyszogia patagonica (ASV_3), *Filobasidium chernovii* (Basidiomycota, ASV_5), and *Alternaria tenuissima* (Ascomycota, ASV_8) (Fig. S2). The following section reports on results from the rarefied data sets. -->
+We obtained 5,082,229 reads representing 726 ASVs from 174 samples after processing samples through the DADA2 pipeline. The raw reads obtained were composed of 26.81% Ascomycota, 71.53% Basidiomycota, \<0.05% Chytridiomycota, \<0.5% Mortierellomycota, \<0.03% Olpidiomycota, 0.01% Rozellomycota, \<0.001% Aphelidiomycota, and 1.19% missed hits. After decontamination, and removal of singletons we obtained 4,856,220 reads representing 231 ASVs from 157 samples composed of 26% Ascomycota, 73% Basidiomycota, 0.01% Chytridiomycota, \<0.1% Mortierellomycota, 0.03% Olpidiomycota, \<0.002% Rozellomycota and \<1.0% unknown reads (Fig. 2 and Fig. S2). After rarefaction of sequences, we were left with 84 samples were we found the most prevalent taxa: *Vishniacozyma victoriae* (Basidiomycota, ASV_1), *Cladosporium herbanum* (Ascomycota, ASV_2) and *Cladosporium* spp. (Ascomycota, ASV_7), Dyszogia patagonica (ASV_3), *Filobasidium chernovii* (Basidiomycota, ASV_5), and *Alternaria tenuissima* (Ascomycota, ASV_8) (Fig. S2).
 
 To test for differences in FEF community composition, we used a distance-based Redundancy Analysis (dbRDA) to model the relationship between FEF communities, leaf functional traits and elevation (Q3). The best fit model revealed that 22% of the overall variance in FEF communities was accounted for by log-transformed LBI, host species, elevation, and their interaction, the constraining variables. Each of these variables was significantly correlated  (*p* \< .001) with FEF communities in their host species (Fig. 3). We saw that the first axis (dbRDA1) explained 51.7% and the second axis (dbRDA2) explained 15.9% of the constrained variance (Fig. 3). We observed high overlap in the groupings of FEF communities by host species at LOW elevations and greater clusterring at HIGH elevations sites (Fig. 3). To corroborate our findings, we used a permutational analysis of multivariate dispersion (PERMDISP) to test for homogeneity of variances in FEF communities. We found that FEF communities were not homogeneous across all species (*F*~2,4197~= 320.3, *p* < .001). The post-hoc Tukey's test revealed that all species comparison differences were statistically significant at ⍺ = 0.05. We detected significant differences in the dispersion of FEF communities by elevation category (*F*~2,4197~= 228.1, *p* \< .001). The post-hoc Tukey's test showed that all elevation categories had significant differences in the dispersion of FEF communities at ⍺ = 0.05. The interaction between logLBI and elevation category also showed differences in group dispersion (*F*~2,4192~= 268.1, *p* < .001). Only  *M. guttatus* across all elevations, *M laciniatus* at LOW and MID elevations compared to *M. guttatus* at HIGH elevations, *M. nasutus* at MID and HIGH elevations compared to *M. laciniatus* at MID elevation was not different at ⍺ = 0.05 in post-hoc Tukey's tests. Due to the significant differences between host species and elevation categories in PERMDISP tests we cannot rule out that the observed differences FEF communities are due to dispersion. 
 
@@ -685,8 +676,8 @@ legend.position = "bottom",
 plot.caption = element_markdown(),
 strip.text = element_text(face = "bold")
 ) +
-labs(caption = "PERMDISP: *F*<sub>7,4192</sub> = 268.1, *p* = .001") + #Results from beta_perm3
-facet_wrap( ~ Elevation_cat) 
+labs(caption = "PERMDISP: *F*<sub>7,4192</sub> = 268.1, *p* = .001")  #Results from beta_perm3
+#facet_wrap( ~ Elevation_cat) 
      
 # Rearranging the order of layers so arrows are above the points.
 #p_final_model$layers
@@ -697,7 +688,7 @@ p_final_model
 
 
 #Save the plot
-ggsave(file.path(path, "figures/figure3.png"), plot = p_final_model, dpi=300, units=c("mm"), width=300, height=200)
+#ggsave(file.path(path, "figures/figure3.png"), plot = p_final_model, dpi=300, units=c("mm"), width=300, height=200)
 ```
 
 ## Figure 4

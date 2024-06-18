@@ -160,7 +160,7 @@ plant_traits <- plant_traits |>
 
 # Load Phyloseq object cleaned of singletons (231 ASVs)
 ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.rds"))
-#ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/ASV_8450_phyloseq_nonsingletons_noB.csv"))
+ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.csv"))
 pseq_rrfb <- readRDS(file.path(path, "clean_data/statistics/pseq_rrfb.rds")) #Mirlyn object from Method B
 rarefied_phyloseq <- readRDS(file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
 ```
@@ -198,7 +198,7 @@ ps_melt <- ps_clean_3 |>
   #        sample_Species = factor(sample_Species)) |>
   # ungroup() |>
   rename(Unique_ID = Sample, ASV = OTU) |> #Renaming OTU column
-  dplyr::select(!c(4, 6:15))  #Reordering columns 
+  dplyr::select(!c(11:17))  #Reordering columns 
 #This data frame is useful for barplots and other visualizations.
 
 
@@ -1076,7 +1076,7 @@ leaf_traits.pca <- na.omit(leaf_traits_noB)
 
 ###Run this to create pca with prcomp function
 pca <- prcomp(data.pca, scale = TRUE)
-pca$rotation=-pca$rotation
+pca$rotation=-pca$rotation #  Flips the directions of the principal components and the scores for interpretative consistency.
 pca$x=-pca$x
 
 #Checking the PCA
@@ -2919,18 +2919,16 @@ perma3 <- adonis2(
   strata = NULL
 )
 save(perma3, file = "clean_data/statistics/perma3.rda")
+load("clean_data/statistics/perma3.rda")
 print(perma3)
-
 ```
 
 
 
 
 ### PCA for community data
-
-
 ```{r, comm_pca}
-  #| echo: false
+#| echo: false
 #| eval: true
 #| tidy: true
 #| label: pca
@@ -2995,65 +2993,160 @@ See paper for discussion on appropriate dimensionality reduction methods fro mic
 ### PCoA
 
 ```{r, pcoa}
+# Custom function to run PCoA
+# OTU matrix must be transformed already (e.g. Hellinger). See Matrices section.
 
-repotu_df <- function(x) {
-
-  newdat <- lapply(x, otu_table)
-
-  finaldat <- matrix(ncol = ncol(newdat[[1]]) * length(newdat), nrow = nrow(newdat[[1]]),
-    dimnames = list(rownames(newdat[[1]]),
-      paste0(rep(seq_len(length(newdat)), each = ncol(newdat[[1]])), "-",
-        rep(colnames(newdat[[1]]), times = length(newdat)))))
-
-  for (i in seq_along(newdat)) {
-    finaldat[, (1 + (i - 1) * ncol(newdat[[1]])):(i * ncol(newdat[[1]]))] <- newdat[[i]]
-  }
-
-  finaldat
-
+matx_ordi <- function(x, dsim = "bray", md = c("pca", "pcoa"), ...){ 
+dist <- vegdist(x, method = dsim)
+  switch(md,
+         pca = pca <- prcomp(dist),
+         pcoa = pcoa <- wcmdscale(dist, eig = TRUE))
 }
 
-betamatPCoA <- function(x, transformation="hellinger", dsim="bray", md= c("pca", "pcoa"), ...){
-  if (is.null(transformation)){
-    dist <- vegdist(as.matrix(t(repotu_df(x))), method=dsim)
-  } else {
-    transform <- decostand(as.matrix(t(repotu_df(x))), transformation)
-    dist <- vegdist(transform, method=dsim)
-  }
-  if (is.null(md)){
-    pca <- prcomp(dist)
-  } else {
-    pcoa <- wcmdscale(dist, eig = TRUE)
-  }
-}
-
-
-pcoa_object <- betamatPCoA(pseq_rrfb, transformation = "hellinger", dsim = "bray", md = "pcoa")
+# PCoA
+pcoa_object <- matx_ordi(dbrda_hell_matrix, md = "pcoa", k =3)
 
 pcoa_df <- data.frame(pcoa_object$points) |>
-rownames_to_column(var = "Unique_ID")
+rownames_to_column(var = "Unique_ID") 
+
 
 # Merge scores with trait data
-merged_data <- right_join(pcoa_df, plant_traits_MB, by = c("Unique_ID" = "X"))
+pcoa_merged_data <- right_join(pcoa_df, plant_traits_MB, by = c("Unique_ID" = "X")) |>
+subset(select = -c(Unique_ID.y))
 
-ggplot() +
-geom_point(data = merged_data, aes(x = Dim1, y = Dim2, color = Species)) +
-# stat_ellipse(aes(color = Species),
-#                geom = "path",
-#                linewidth = 1.7,
-#                position = "identity",
-#                type = "t", linetype = 1,
-#                level = 0.95,
-#                segments = 51,
-#                na.rm = FALSE,
-#                show.legend = NA, inherit.aes = TRUE) +
-theme_bw()
+# Extract eigenvalues and calculate the percentage of variance explained by each axis
+explained_variance <- pcoa_object$eig / sum(pcoa_object$eig) * 100
+pretty_percent <- format(round(explained_variance, digits = 1), nsma = 1, trim = TRUE)
 
+# PCoA plot based on species
+# Remember, a dbRDA is an RDA run on a PCoA. So, the PCoA is the first step in the analysis.
+pcoa_plot <- ggplot(data = pcoa_merged_data, aes(x = Dim1, y = Dim2)) +
+  geom_point(aes(color = Species), size = rel(4), alpha = 0.2, stroke = 1) +
+  geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") + # plot vertical line
+  geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") + # plot horizontal line
+  xlab(label = paste("PCoA1 (", pretty_percent[1], "%)", sep="")) +
+  ylab(label = paste("PCoA2 (", pretty_percent[2], "%)", sep="")) +
+  scale_color_manual(
+    labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+    values = met.brewer("Isfahan2", n = 3, type = "discrete",
+    direction = -1)) +
+  scale_shape_manual(values=c(1:22)) +
+  stat_ellipse(aes(color = Species),
+               geom = "path",
+               linewidth = 1.7,
+               position = "identity",
+               type = "t", linetype = 1,
+               level = 0.95,
+               segments = 51,
+               na.rm = FALSE,
+               show.legend = NA, inherit.aes = TRUE) +
+theme_classic(base_size = 16) +
+theme(legend.title = element_text(face = "bold"),
+legend.text = element_markdown(),
+legend.position = "bottom",
+plot.caption = element_markdown(),
+strip.text = element_text(face = "bold"))
+
+pcoa_plot
+```
+
+### PCoA and dbRDA comparison
+
+```{r, pcoa_dbrda}
+# PCoA and dbRDA comparison
+joined <- ggarrange(
+pcoa_plot,
+p_final_model,
+nrow = 1,
+ncol = 2,
+common.legend = TRUE,
+legend = "bottom",
+labels = c("PCoA", "dbRDA")
+) #, widths = c(1, 1))
+joined
+```
+
+
+### PCoA Linear regressions
+
+```{r}
+# PCoA regressions
+# PCoA1
+
+alpha_pcoa1 <- lm(hill_1 ~ Dim2, data = pcoa_merged_data)
+plot(alpha_pcoa1)
+
+
+alpha_pcoa <- ggplot(data = pcoa_merged_data, aes(y= hill_1, x =Dim1, color = Species)) +
+geom_point(aes(color = Species), size = rel(4), alpha = 0.2, stroke = 1) +
+geom_smooth(method = "lm", se = FALSE) +
+labs(y =  "Alpha diversity (\U1D492 = 1)", x = paste("PCoA1 (",pretty_percent[1], "%)", sep = "")) +
+scale_color_manual(
+    labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+    values = met.brewer("Isfahan2", n = 3, type = "discrete",
+    direction = -1)) +
+theme_classic(base_size = 16) +
+theme(legend.title = element_text(face = "bold"),
+legend.text = element_markdown(),
+legend.position = "bottom",
+plot.caption = element_markdown(),
+strip.text = element_text(face = "bold"))
+
+
+# Joining plots
+
+pcao_dbrda_joined <- ggarrange(
+pcoa_plot,
+alpha_pcoa,
+p_final_model,
+nrow = 1,
+ncol = 3,
+common.legend = TRUE,
+legend = "bottom",
+labels = c("PCoA", "Alpha diversity", "dbRDA"),
+widths = c(1,1,1)
+)
+
+pcao_dbrda_joined
+```
+
+The simple linear model does not bode well. When we plot the residuals, fitted values and Cook's distance we see it suffers from heteroscedasticity and outliers. The PCoA and dbRDa are qualitatively very similar. We observed overlapped of fungal communitites in *Mimulus* spp. A lot of the microbial literature presents PCoA, alphadiversity measures and PERMANOVA table. My issue with PCoA and doing a PCR with a measure of alpha diversity or similar is that the model fit is not good at all. Visually it represents how at higher elevation we have lower alpha diversity levels. But this is information that is already present in the "boxplot_hill_orders" plots. I don't think the PCoA adds more information.
+
+
+## Linear regressions with Taxa of interest
+
+```{r, linear_regression}
+# Exploring PCoA with taxa of interest.
+
+test <- data.frame(t(rep_otu_df(pseq_rrfb))) |>
+rownames_to_column(var = "X") |>
+  mutate(Unique_ID =  X, # Copyin column to new column 
+         Unique_ID =  str_remove(Unique_ID, "^.*?(_|-)")) |>
+  relocate(Unique_ID, .after = X) |>
+  left_join(plant_traits, by = "Unique_ID")
+
+
+ggplot(test, aes(y= ASV_7, x = Elevation_m)) +
+geom_point(color = "black", size = rel(4), alpha = 0.2, stroke = 1) +
+geom_smooth(method = "lm", se = FALSE) +
+labs(y =  "A", x = paste("X", sep = "")) +
+# scale_color_manual(
+#     labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+#     values = met.brewer("Isfahan2", n = 3, type = "discrete",
+#     direction = -1)) +
+theme_classic(base_size = 16) +
+theme(legend.title = element_text(face = "bold"),
+legend.text = element_markdown(),
+legend.position = "bottom",
+plot.caption = element_markdown(),
+strip.text = element_text(face = "bold"))
 ```
 
 
 
-Who contributes more to differences in the community composition?
+
+
+# Who contributes more to differences in the community composition?
 
 ```{r, SIMPER}
 (sim <- with(dbrda_traits, simper(dbrda_hell_matrix, Species, permutations = 9999, parallel = 8)))
@@ -3065,7 +3158,6 @@ summary(sim)
 This analysis allows us to determine what endophytes are associated with particular groups (e.g. tree species). According to this vignette from Cáceres ([2022](https://cran.r-project.org/web/packages/indicspecies/vignettes/IndicatorSpeciesAnalysis.html)) `multipatt` function can provides us with Indicators Value Index and correlation index. Both are similar, but the differences lies in the question they help answer. Indicator value index "\[...\]are used for assessing the predictive values of species as indicators of the conditions prevailing in site groups, e.g. for field determination of community types or ecological monitoring." While the correlation index can be used for "\[...\] determining the ecological preferences of species among a set of alternative site groups or site group combinations."
 
 ```{r, indicspp}
-
 #Subset data frame for indicator species analysis
 #Community Data
 test <- as.matrix(t(rep_otu_df(pseq_rrfb)))

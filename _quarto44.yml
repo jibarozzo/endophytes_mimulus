@@ -1,0 +1,26 @@
+project:
+  execute-dir: project
+  output-dir: manuscript
+editor: source
+execute:
+  echo: false
+warning: false
+
+format:
+#   pdf:
+#     documentclass: scrartcl
+#     include-in-header:
+#         text: '\usepackage{lineno}\linenumbers'
+#     linestretch: 2.0
+#     margin-left: 1in
+#     margin-right: 1in
+#     margin-top: 1in
+#     margin-bottom: 1in
+#     mainfont: TeX Gyre Termes #Alternative to Times New Roman
+#     sansfont: TeX Gyre Termes #Another option is Liberation Serif
+#     number-sections: true
+#     citation-package: biblatex
+  docx:
+    reference-doc: custom-reference-doc.docx
+    number-sections: true
+    citation-package: biblatex
