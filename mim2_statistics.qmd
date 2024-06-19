@@ -3005,6 +3005,7 @@ dist <- vegdist(x, method = dsim)
 
 # PCoA
 pcoa_object <- matx_ordi(dbrda_hell_matrix, md = "pcoa", k =3)
+save(pcoa_object, file = "clean_data/statistics/pcoa_object.rda")
 
 pcoa_df <- data.frame(pcoa_object$points) |>
 rownames_to_column(var = "Unique_ID") 
@@ -3063,7 +3064,10 @@ common.legend = TRUE,
 legend = "bottom",
 labels = c("PCoA", "dbRDA")
 ) #, widths = c(1, 1))
+
 joined
+
+ggsave(file.path(path, "figures/pcoa_dbrda.png"), plot = joined, dpi=300, units=c("mm"), width=300, height=300)
 ```
 
 
@@ -3095,7 +3099,7 @@ strip.text = element_text(face = "bold"))
 
 # Joining plots
 
-pcao_dbrda_joined <- ggarrange(
+pcoa_pcr_dbrda_joined <- ggarrange(
 pcoa_plot,
 alpha_pcoa,
 p_final_model,
@@ -3107,7 +3111,9 @@ labels = c("PCoA", "Alpha diversity", "dbRDA"),
 widths = c(1,1,1)
 )
 
-pcao_dbrda_joined
+pcoa_pcr_dbrda_joined
+
+ggsave(file.path(path, "figures/pcoa_pcr_dbrda.png") , plot = pcoa_pcr_dbrda_joined, dpi=300, units=c("mm"), width=350, height=300)
 ```
 
 The simple linear model does not bode well. When we plot the residuals, fitted values and Cook's distance we see it suffers from heteroscedasticity and outliers. The PCoA and dbRDa are qualitatively very similar. We observed overlapped of fungal communitites in *Mimulus* spp. A lot of the microbial literature presents PCoA, alphadiversity measures and PERMANOVA table. My issue with PCoA and doing a PCR with a measure of alpha diversity or similar is that the model fit is not good at all. Visually it represents how at higher elevation we have lower alpha diversity levels. But this is information that is already present in the "boxplot_hill_orders" plots. I don't think the PCoA adds more information.
@@ -3126,10 +3132,10 @@ rownames_to_column(var = "X") |>
   left_join(plant_traits, by = "Unique_ID")
 
 
-ggplot(test, aes(y= ASV_7, x = Elevation_m)) +
+test <- ggplot(test, aes(y= ASV_1, x = Elevation_m)) +
 geom_point(color = "black", size = rel(4), alpha = 0.2, stroke = 1) +
 geom_smooth(method = "lm", se = FALSE) +
-labs(y =  "A", x = paste("X", sep = "")) +
+labs(y =  "Cold-tolerant fungus (ASV_1)", x = paste("Elevation (m)", sep = "")) +
 # scale_color_manual(
 #     labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
 #     values = met.brewer("Isfahan2", n = 3, type = "discrete",
@@ -3140,6 +3146,9 @@ legend.text = element_markdown(),
 legend.position = "bottom",
 plot.caption = element_markdown(),
 strip.text = element_text(face = "bold"))
+
+
+ggsave(file.path(path, "figures/cold-tolerant_asv1.png") , plot = test, dpi=300, units=c("mm"), width=250, height=250)
 ```
 
 

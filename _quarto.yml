@@ -1,0 +1,13 @@
+project:
+  execute-dir: project
+  output-dir: manuscript
+editor: source
+execute:
+  echo: false
+warning: false
+
+format:
+  docx:
+    reference-doc: custom-reference-doc.docx
+    number-sections: true
+    citation-package: biblatex
