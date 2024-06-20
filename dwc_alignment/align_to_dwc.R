@@ -21,7 +21,7 @@ tax_tab <- read_csv(file = "clean_data/taxonomy/TAXA_8450_cleaned_10_percent.csv
 
 ASV_tab <- ASV_tab %>% 
     dplyr::rename(ASV_name = ...1) %>% 
-    pivot_longer(names_to = "Leaf_Sample", values_to = "organismQuantity", cols = -ASV_name) %>% 
+    pivot_longer(names_to = "Plant_Sample", values_to = "organismQuantity", cols = -ASV_name) %>% 
     group_by(Leaf_Sample) %>% 
     mutate("sampleSizeValue" = sum(organismQuantity))
 
@@ -95,8 +95,15 @@ occ_tab_ASV <- df %>%
         decimalLongitude = Longitude,
         coordinatePrecision = NA,
         coordinateUncertaintyInMeters = NA,
-        locationID = NA,
-        locality = "Yosemite National Park, CA, USA",
+        geodeticDatum = 'WGS84', #double check this
+        locationID = Site,
+        locality = NA,  # Must be derived from lat/lon, could just say Sierra Nevada, CA
+        
+        # 3 Locations
+        # Yosemite National Park, CA, USA
+        # Stanislaus National Forest, CA, USA
+        # Sierra National Forest, CA, USA
+        
         countryCode = "US",
         continent = "North America",
         minimumElevationInMeters = Elevation_m,
@@ -106,7 +113,7 @@ occ_tab_ASV <- df %>%
         materialSampleID = NA,
         associatedSequences = NA,
         identificationRemarks = NA,
-        identificationReferences = NA,
+        identificationReferences = NA, #Jepsen guide
         verbatimIdentification = paste0(Kingdom, Phylum, Class, Order, Family, Genus, Fungal_Species),
         
         #Will need to be aligned with GBIF taxonomic backbone
@@ -174,8 +181,9 @@ all_occ <- rbind(occ_tab_plant, occ_tab_ASV)
            eMOF <- samples_tab_with_traits %>%
                pivot_longer(names_to = "measurementType",
                             values_to = "measurementValue",
-                            cols = c("Leaf_thickness","ACI","Leaf_toughness", "Leaf_lobe_index")) %>%
-               mutate(.keep = "none",
+                            cols = c("Leaf_thickness","ACI","Leaf_toughness", "Leaf_lobe_index")) %>% #Look for LMA
+
+                   mutate(.keep = "none",
                       occurrenceID = Leaf_Sample,
                       measurementType,
                       measurementValue,
@@ -196,26 +204,27 @@ all_occ <- rbind(occ_tab_plant, occ_tab_ASV)
                mutate(.keep = "none",
                       occurrenceID = paste(Leaf_Sample, ASV_name, sep = ":"),
                       DNA_sequence,
-                      env_broad_scale = NA,
-                      env_medium = NA,
-                      pcr_primer_forward = NA,
-                      pcr_primer_reverse = NA,
-                      pcr_primer_name_forward = NA,
-                      pcr_primer_name_reverse = NA,
-                      pcr_primer_reference = NA,
-                      target_gene = NA,
-                      target_subfragment = NA)
+                      env_broad_scale = 'alpine biome[ENVO:01001835]',
+                      env_medium = 'meadow soil[ENVO:00005761] | granite ENVO_01000356', #make this ASV specific
+                      env_local_scale = 'plant-associated environment[ENVO:01001001]', #check if there is something more specific
+                      pcr_primer_forward = 'CACTCTTTCCCTACACGACGCTCTTCCGATCTCTTGGTCATTTAGAGGAAGTAA',
+                      pcr_primer_reverse = 'GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCTGCTGCGTTCTTCATCGATGC',
+                      pcr_primer_name_forward = 'ITS1F',
+                      pcr_primer_name_reverse = 'ITS2',
+                      pcr_primer_reference = NA, #insert DOIs for references, pipe-delimited e.g. DOI#1|DOI#2
+                      target_gene = 'ITS',
+                      target_subfragment = 'ITS1',
+                      lib_layout = 'paired',
+                      nucl_acid_ext = NA, # extraction protocol,
+                      nucl_acid_amp = NA, # amplification protocol 
+                      samp_size = NA, #mass of sample that was collected
+                      seq_meth = 'Illumina MiSeq...', #DOuble check this
+                      mid = NA,
+                      adapters = NA,
+                      neg_cont_type = NA, #negative control
+                      pos_cont_type = NA # positive control
+                      )
 
 # Information to fill NA values -------------------------------------------
 
-# DNA
-#The modified primers for the first PCR (adapter ligation and ITS1 amplification) were as follows: 
-#5’-CAC TCT TTC CCT ACA CGA CGC TCT TCC GAT CTC TTG GTC ATT TAG AGG AAG TAA-3’ (forward)
-#5’-GTG ACT GGA GTT CAG ACG TGT GCT CTT CCG ATC TGC TGC GTT CTT CAT CGA TGC-3’ (reverse)
-
-# Location ----------------------------------------------------------------
-# 3 Locations
-# Yosemite National Park, CA, USA
-# Stanislaus National Forest, CA, USA
-# Sierra National Forest, CA, USA
            
