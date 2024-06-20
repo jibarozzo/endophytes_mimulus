@@ -205,4 +205,17 @@ all_occ <- rbind(occ_tab_plant, occ_tab_ASV)
                       pcr_primer_reference = NA,
                       target_gene = NA,
                       target_subfragment = NA)
+
+# Information to fill NA values -------------------------------------------
+
+# DNA
+#The modified primers for the first PCR (adapter ligation and ITS1 amplification) were as follows: 
+#5’-CAC TCT TTC CCT ACA CGA CGC TCT TCC GAT CTC TTG GTC ATT TAG AGG AAG TAA-3’ (forward)
+#5’-GTG ACT GGA GTT CAG ACG TGT GCT CTT CCG ATC TGC TGC GTT CTT CAT CGA TGC-3’ (reverse)
+
+# Location ----------------------------------------------------------------
+# 3 Locations
+# Yosemite National Park, CA, USA
+# Stanislaus National Forest, CA, USA
+# Sierra National Forest, CA, USA
            

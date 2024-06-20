@@ -34,14 +34,17 @@ author:
 affiliations:
   - id: tu
     name: Department of Ecology and Evolutionary Biology, Tulane University, 6823 St. Charles Avenue, New Orleans, LA 70118
+    
 filters:
   - authors-block
+
 format:
   docx:
     reference-doc: custom-reference-doc.docx
     number-sections: true
     tbl-colwidths: true
     citation-package: biblatex
+    
 crossref:
   custom:
     - kind: float
