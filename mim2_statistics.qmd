@@ -3006,6 +3006,7 @@ dist <- vegdist(x, method = dsim)
 # PCoA
 pcoa_object <- matx_ordi(dbrda_hell_matrix, md = "pcoa", k =3)
 save(pcoa_object, file = "clean_data/statistics/pcoa_object.rda")
+load("clean_data/statistics/pcoa_object.rda")
 
 pcoa_df <- data.frame(pcoa_object$points) |>
 rownames_to_column(var = "Unique_ID") 
@@ -3075,9 +3076,9 @@ ggsave(file.path(path, "figures/pcoa_dbrda.png"), plot = joined, dpi=300, units=
 
 ```{r}
 # PCoA regressions
-# PCoA1
+# PCoA1 vs alpha diversity
 
-alpha_pcoa1 <- lm(hill_1 ~ Dim2, data = pcoa_merged_data)
+alpha_pcoa1 <- lm(hill_1 ~ Dim1, data = pcoa_merged_data)
 plot(alpha_pcoa1)
 
 
@@ -3096,6 +3097,92 @@ legend.position = "bottom",
 plot.caption = element_markdown(),
 strip.text = element_text(face = "bold"))
 
+alpha_pcoa
+
+# Formula
+formula <- y ~ poly(x, 3, raw = TRUE)
+
+# PC1 and Elevation
+
+elevation_pcoa1 <- ggplot(data = pcoa_merged_data, aes(x = Elevation_m, y =Dim1, color = Species)) +
+geom_point(aes(color = Species), size = rel(4), alpha = 0.2, stroke = 1) +
+geom_smooth(method = "loess", se = FALSE) +
+labs(x =  "Elevation (m)", y = paste("PCoA1 (",pretty_percent[1], "%)", sep = "")) +
+    stat_poly_eq(formula = formula, 
+                 color = "black",
+               aes(label = paste(#..eq.label.., 
+                 ..adj.rr.label.., #"~italic(p) ==",
+                 ..p.value.label.., 
+                 #signif(..p.value.., digits = 4),
+                 sep = "*`,`~~")),
+               rr.digits = 2,
+               p.digits = 3 ,
+               parse = TRUE,
+               label.x = "right",
+               label.y= "top",
+               vstep = 0.08) +
+scale_color_manual(
+    labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+    values = met.brewer("Isfahan2", n = 3, type = "discrete",
+    direction = -1)) +
+theme_classic(base_size = 16) +
+theme(legend.title = element_text(face = "bold"),
+legend.text = element_markdown(),
+legend.position = "bottom",
+plot.caption = element_markdown(),
+strip.text = element_text(face = "bold")) +
+  facet_wrap(~Species)
+
+elevation_pcoa1
+
+# PC2 and Elevation
+
+elevation_pcoa2 <- ggplot(data = pcoa_merged_data, aes(x = Elevation_m, y = Dim2, color = Species)) +
+geom_point(aes(color = Species), size = rel(4), alpha = 0.2, stroke = 1) +
+geom_smooth(method = "loess", se = FALSE) +
+labs(x =  "Elevation (m)", y = paste("PCoA2 (",pretty_percent[2], "%)", sep = "")) +
+    stat_poly_eq(formula = formula, 
+                 color = "black",
+               aes(label = paste(#..eq.label.., 
+                 ..adj.rr.label.., #"~italic(p) ==",
+                 ..p.value.label.., 
+                 #signif(..p.value.., digits = 4),
+                 sep = "*`,`~~")),
+               #method = "loess",
+               rr.digits = 2,
+               p.digits = 3 ,
+               parse = TRUE,
+               label.x = "right",
+               label.y= "top",
+               vstep = 0.08) +
+scale_color_manual(
+    labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+    values = met.brewer("Isfahan2", n = 3, type = "discrete",
+    direction = -1)) +
+theme_classic(base_size = 16) +
+theme(legend.title = element_text(face = "bold"),
+legend.text = element_markdown(),
+legend.position = "bottom",
+plot.caption = element_markdown(),
+strip.text = element_text(face = "bold")) +
+  facet_wrap(~Species)
+
+elevation_pcoa2
+
+# Joining plots
+
+pcoa_elevations <- ggarrange(
+elevation_pcoa1,
+elevation_pcoa2,
+nrow = 2,
+ncol = 1,
+common.legend = TRUE,
+legend = "bottom",
+labels = c("A", "B"),
+widths = c(1,1)
+)
+
+pcoa_elevations
 
 # Joining plots
 
