@@ -1121,6 +1121,153 @@ pca_auto
 #ggsave(filename = file.path(path, "figures/pca.png"), plot = pca_auto, dpi=300, units=c("mm"), width=150, height=150)
 ```
 
+#### Leaf traits Simple Linear model
+
+Regressions presented at Evo 2023.
+
+```{r}
+# Regressions
+# Elevation_m and Thicknes
+  
+t <-ggplot(data = leaf_traits, aes(y= Thickness, x = Elevation_m, color = Species)) +
+   geom_jitter(aes(color = Species,), size = 2, alpha = 0.5, na.rm = TRUE)+
+#scale_shape_manual(values=c(1:24)) +
+  scale_color_manual(values= met.brewer("Isfahan2", n = 4, type = "discrete"))+
+  geom_smooth(method=lm, se = F) +
+ # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
+  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
+  stat_regline_equation(label.y = 700, label.x = 6000, aes(label = ..eq.label..), sep = "~~~~", size = rel(3), color= "black") +
+  stat_regline_equation(label.y = 650 , label.x = 6000, aes(label = ..adj.rr.label..), size = rel(3),color = "black") +
+  labs(y="Leaf thickness (/u03BCm)", x = "Elevation_m (f.a.s.l.)") +
+  theme_minimal(base_size = 10) +
+  theme(legend.position="right", legend.title = element_blank(),
+        legend.text = element_text(size = 8),
+        axis.text.x=element_text(size = 7),
+        axis.text.y=element_text(size = 7)) +
+  guides(color = "none")  +      #To turn off color legend
+  guides(fill = "none") + #To turn off fill legend
+  guides(shape = "none") #To turn off shape legend
+#caption = "**All replicate leaves from tree species included  (n = 210)", col = "Treatment"
+t
+```
+
+```{r}
+# fit <- lm(logit_herbivory ~ Thickness, data = masterant2)
+# 
+# rSquared <- summary(fit)$r.squared
+# rSquared
+# anova(fit)
+# pVal <- anova(fit)$'Pr(>F)'[1]
+# pVal
+
+# Elevation_m and Anthocyanins
+
+a <- ggplot(data = leaf_traits, aes(y= ACI, x= Elevation_m, color = Species))+
+   geom_jitter(aes(color = Species), size = 2, alpha = 0.5) +
+  #scale_shape_manual(values=c(15:22)) +
+  scale_color_manual(values= met.brewer("Isfahan2", n = 4, type = "discrete")) +
+  geom_smooth(method=lm, se=F) +
+  #stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
+  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
+  stat_regline_equation(label.y = 30, label.x = 6000, aes(label = ..eq.label..), size = rel(3), color= "black") +
+  stat_regline_equation(label.y = 25 , label.x = 6000, aes(label = ..adj.rr.label..), size = rel(3), color = "black") +
+  labs(y="Anthocyanins (ACI)", x="Elevation_m (f.a.s.l.)") +
+  theme_minimal(base_size = 10) +
+  theme(legend.position="right", legend.title =element_blank(),
+        legend.text = element_text(size = 8),
+        axis.text.x=element_text(size = 7),
+        axis.text.y=element_text(size = 7)) +
+  guides(color = "none")  +      #To turn off color legend
+  guides(fill = "none") + #To turn off fill legend
+  guides(shape = "none") #To turn off shape legend
+ 
+a
+#scale_shape_manual(values = c(1:7))
+```
+
+```{r}
+# Herbivory and leaf thickness
+
+tt <- ggplot(data = masterant2, aes(y= logit_herbivory, x= Thickness, color = E_load))+
+   geom_jitter(aes(color = E_load, shape = Species), size = 1.5, alpha = 0.7) +
+  scale_shape_manual(values=c(15:22)) +
+  geom_smooth(method=lm, se=F) +
+  #stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
+  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
+  stat_regline_equation(label.y = 2.5, label.x = 200, aes(label = ..eq.label..), size = rel(3), color= "black") +
+  stat_regline_equation(label.y = 2 , label.x = 200, aes(label = ..adj.rr.label..), size = rel(3), color = "black") +
+  labs(x="Leaf thickness (/u03BCm)", y = "logit(Leaf herbivory) (%)") +
+ theme_minimal(base_size = 10) +
+  theme(legend.position="right", legend.title = element_blank(),
+        legend.text = element_text(size = 8),
+        axis.text.x=element_text(size = 7),
+        axis.text.y=element_text(size = 7)) +
+  guides(color = "none")  +      #To turn off color legend
+  guides(fill = "none") + #To turn off fill legend
+  guides(shape = "none")
+tt
+
+# Herbivory and LMA
+
+lma <- ggplot(data = masterant2, aes(y= logit_herbivory, x= LMA, color = E_load))+
+  geom_jitter(aes(color = E_load, shape = Species), size = 1.5, alpha = 0.7) +
+  scale_shape_manual(values=c(15:22)) +
+  geom_smooth(method=lm, se=F) +
+  #stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
+  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
+  stat_regline_equation(label.y = 2.5, label.x = 0.001, aes(label = ..eq.label..), size = rel(3), color= "black") +
+  stat_regline_equation(label.y = 2 , label.x = 0.001, aes(label = ..adj.rr.label..), size = rel(3), color = "black") +
+  labs(x="Leaf mass per area (LMA)", y = "logit(Leaf herbivory) (%)") +
+  theme_minimal(base_size = 10) +
+  theme(legend.position="right", legend.title = element_blank(),
+        legend.text = element_text(size = 8),
+        axis.text.x=element_text(size = 7),
+        axis.text.y=element_text(size = 7)) +
+  guides(color = "none")  +      #To turn off color legend
+  guides(fill = "none") + #To turn off fill legend
+  guides(shape = "none") #To turn off shape legend
+ 
+lma
+
+# Herbivory and FEF Shannon Diversity
+# Extracting effect size of model to plot
+ dv <- ggplot(data = masterant2, aes(y= logit_herbivory, x= Shannon, color = E_load))+
+  geom_jitter(aes(color = E_load, color = Species), size = 1.5, alpha = 0.7) +
+  scale_shape_manual(values=c(15:22)) +
+  geom_smooth(method=lm, se=F) +
+ # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
+  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
+  #scale_fill_manual(values= met.brewer("Cross", n = 8, type = "discrete")) +
+  #scale_color_manual(values= met.brewer("Cross", n = 8, type = "discrete")) +
+  stat_regline_equation(label.y = 2.5, label.x = 1.5, aes(label = ..eq.label..),size = rel(3), color= "black") +
+  stat_regline_equation(label.y = 2 , label.x = 1.5, aes(label = ..adj.rr.label..), size = rel(3),color = "black") +
+  labs(x="Shannon diversity index", y="logit(Leaf herbivory) (%)") +
+  theme_minimal(base_size = 10) +
+ theme(legend.position="right",
+        legend.text = element_text(size = 12),
+        axis.text.x=element_text(size = 7),
+        axis.text.y=element_text(size = 7))
+  # guides(color = "none")  +      #To turn off color legend
+  # guides(fill = "none") + #To turn off fill legend
+  # guides(shape = "none") #To turn off shape legend
+ 
+ dv
+
+ # Multiples plots together
+
+ant_arranged <- ggarrange(t, tt, a, lma, dv, nrow = 2, ncol=3, common.legend = TRUE, legend="right")
+
+
+# Adding caption
+ant_caption <- "*All individuals per tree species included (n = 210)"
+ant_arranged_with_caption <- annotate_figure(ant_arranged, bottom = text_grob(ant_caption), fig.lab.pos = "bottom.right", fig.lab.size = 6)
+
+ant_arranged_with_caption
+
+#ggsave(filename = "./Plots/Aim3_ant_regression_06042023.png", plot = ant_arranged_with_caption, dpi=600, units=c("mm"), width=180, height=140, bg = "white")
+
+```
+
 # Community Diversity
 
 Here we are going to explore the relationship between elevation and FEF community composition through richness and species diversity. I have already calculated Hill numbers in \[Cleaning and Shaping data\]. He we create a dissimilarity matrix and calculate the distance between samples. I remove *M. bicolor* (species "B") from the analysis (see \[Cleaning and Shaping data\] for more details). Here we used a classic data frame that stems from `ps_clean_3` object. The matrix calculations can also be achieved using the phyloseq friendly packages: `microbiome`, `metagMisc` and `mirlyn`. First let's look as summary information from our phyloseq object (see also `mim2_bioinformatics.qmd`).
@@ -1198,7 +1345,7 @@ rare_tax <- rare_members(ps_clean_3, detection = 0.1/100, prevalence = 50/100, i
 
 The core taxa members are *Vishniacozyma victoriae* (ASV_1), *Cladosporium herbanum* (ASV_2) and *Cladosporium* spp. (ASV_7). The rest of the ASVs (228) are rare. Now that we have a better idea of what is present in samples we can move on to the next steps.
 
-# Sampling depth and effort
+## Sampling depth and effort
 
 How to decide sampling depth for rarefaction?
 
@@ -1653,7 +1800,7 @@ rare_tax <- rare_members(rarefied_phyloseq, detection = 0.1/100, prevalence = 50
     2.  @legendre2001
 3.  Bray-Curtis dissimilarity matrix of mean from rarefied datasets.
 
-##### Matrices
+#### Matrices
 
 ```{r, diss_matrix}
 #| echo: false
@@ -1672,7 +1819,8 @@ rrfy_hell_matrix <- decostand(as.matrix(t(rep_otu_df(pseq_rrfb))), MARGIN = 1, m
 # Cleaning row names
 rrfy_hell_matrix <- as.data.frame(rrfy_hell_matrix) |>
   rownames_to_column(var = "X") |>
-  mutate(Unique_ID =  X, # Copyin column to new column 
+  mutate(Unique_ID =  X,
+         # Copying column to new column
          Unique_ID =  str_remove(Unique_ID, "^.*?(_|-)")) |>
   relocate(Unique_ID, .after = X) |>
   left_join(plant_traits, by = "Unique_ID")
@@ -1736,7 +1884,7 @@ geo_distm <- readRDS("clean_data/statistics/geo_distm.rds")
 ```
 
 
-#### Hill number plots
+### Hill number plots
 
 ```{r, hill_numbers}
 # Shannon Diversity or hill number 1
@@ -1765,37 +1913,60 @@ labels_list <- c("M. laciniatus", "M. nasutus", "M. guttatus")
 names(labels_list) <- c("L", "N", "G")
 
 # Plot
-hill0_diversity <- ggplot(data = plant_traits_MB, 
-                          aes(x = Elevation_m, y = Observed, color = Species)) +
-   geom_jitter(aes(color = Species), 
-               #stat = "summary",
-               #fun = mean,
-               size = 3, alpha = 0.3) + 
-   #geom_smooth(method = lm, se = F) +
-  geom_smooth(method = lm, se = T, level = 0.95, na.rm = F, color = "black") +
-  stat_poly_eq(formula = y ~ x, color = "black",
-               aes(label = paste(#..eq.label.., 
-                 ..adj.rr.label.., #"~italic(p) ==",
-                 ..p.value.label.., 
-                 #signif(..p.value.., digits = 4),
-                 sep = "*`,`~~")), 
-               rr.digits = 2,
-               p.digits = 3 ,
-               parse = TRUE,
-               label.x = "left",
-               label.y= "top",
-               vstep = 0.08) +
-   scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
-                     values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
-   scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
-                      values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
-   theme_lfdiv_continuous +
-   labs(y =  "\U1D492 = 0", x = "", col = "") + 
-   scale_y_continuous(expand = c(0.05, 0.05)) +
+hill0_diversity <- ggplot(data = plant_traits_MB, aes(x = Elevation_m, y = Observed, color = Species)) +
+  geom_jitter(aes(color = Species), #stat = "summary",
+              #fun = mean,
+              size = 3, alpha = 0.3) +
+  #geom_smooth(method = lm, se = F) +
+  geom_smooth(
+    method = lm,
+    se = T,
+    level = 0.95,
+    na.rm = F,
+    color = "black"
+  ) +
+  stat_poly_eq(
+    formula = y ~ x,
+    color = "black",
+    aes(label = paste(
+      #..eq.label..,
+      ..adj.rr.label.., #"~italic(p) ==",
+      ..p.value.label.., #signif(..p.value.., digits = 4),
+      sep = "*`,`~~"
+    )),
+    rr.digits = 2,
+    p.digits = 3 ,
+    parse = TRUE,
+    label.x = "left",
+    label.y = "top",
+    vstep = 0.08
+  ) +
+  scale_fill_manual(
+    labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+    values = met.brewer(
+      "Isfahan2",
+      n = 4,
+      type = "discrete",
+      direction = c(-1)
+    )
+  ) +
+  scale_color_manual(
+    legend_title,
+    labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+    values = met.brewer(
+      "Isfahan2",
+      n = 4,
+      type = "discrete",
+      direction = c(-1)
+    )
+  ) +
+  theme_lfdiv_continuous +
+  labs(y =  "\U1D492 = 0", x = "", col = "") +
+  scale_y_continuous(expand = c(0.05, 0.05)) +
   scale_x_continuous(expand = c(0.05, 0.05)) +
-  facet_wrap(~ Species) +
+  facet_wrap( ~ Species) +
   guides(color = "none")        #To turn off color legend
-  # annotate(geom = "text", x = 2100, y = 2.5, label = "p = 0.03", color = "black")
+# annotate(geom = "text", x = 2100, y = 2.5, label = "p = 0.03", color = "black")
 #annotate(geom="text", x=2100, y=50, label="p = 0.06", color = "black")
 
 #hill0_diversity
@@ -1823,37 +1994,49 @@ hill0_diversity <- ggplot(data = plant_traits_MB,
 #elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
 
 # Plot
-hill1_diversity <- ggplot(data = plant_traits_MB,
-                          aes(x = Elevation_m, y = hill_1, color = Species)) +
-   geom_jitter(aes(color = Species), 
-               #stat = "summary",
-               #fun = mean,
-               size = 3, alpha = 0.3) + 
-   geom_smooth(method = lm, se = F) + 
-   geom_smooth(method = lm, se = T, level = 0.95, na.rm = F, color = "black") + 
-  stat_poly_eq(formula = y ~ x, color = "black",
-               aes(label = paste(#..eq.label.., 
-                 ..adj.rr.label.., #"~italic(p) ==",
-                 ..p.value.label.., 
-                 #signif(..p.value.., digits = 4),
-                 sep = "*`,`~~")), 
-               rr.digits = 2,
-               p.digits = 3 ,
-               parse = TRUE,
-               label.x = "left",
-               label.y = "top",
-               vstep = 0.08) +
-   #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
-                     #values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
-   scale_color_manual(legend_title,
-                     values = met.brewer("Isfahan2", n = 4, type = "discrete", 
-                                          direction = c(-1))) + 
+hill1_diversity <- ggplot(data = plant_traits_MB, aes(x = Elevation_m, y = hill_1, color = Species)) +
+  geom_jitter(aes(color = Species), #stat = "summary",
+              #fun = mean,
+              size = 3, alpha = 0.3) +
+  geom_smooth(method = lm, se = F) +
+  geom_smooth(
+    method = lm,
+    se = T,
+    level = 0.95,
+    na.rm = F,
+    color = "black"
+  ) +
+  stat_poly_eq(
+    formula = y ~ x,
+    color = "black",
+    aes(label = paste(
+      #..eq.label..,
+      ..adj.rr.label.., #"~italic(p) ==",
+      ..p.value.label.., #signif(..p.value.., digits = 4),
+      sep = "*`,`~~"
+    )),
+    rr.digits = 2,
+    p.digits = 3 ,
+    parse = TRUE,
+    label.x = "left",
+    label.y = "top",
+    vstep = 0.08
+  ) +
+  #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"),
+  #values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
+  scale_color_manual(legend_title,
+                     values = met.brewer(
+                       "Isfahan2",
+                       n = 4,
+                       type = "discrete",
+                       direction = c(-1)
+                     )) +
   labs(y = "\U1D492 = 1", x = "", col = "") +
   scale_y_continuous(expand = c(0.05, 0.05)) +
   theme_lfdiv_continuous +
   theme(strip.text = element_blank()) +
   #facet_wrap(~ Species, labeller = labeller(Species = labels_list)) +
-  facet_wrap(~ Species) +
+  facet_wrap( ~ Species) +
   guides(color = "none")        #To turn off color legend
 
 #hill1_diversity
@@ -1881,37 +2064,52 @@ hill1_diversity <- ggplot(data = plant_traits_MB,
 #elev_div_p <- format.p(cor.test(plant_traits$Shannon, plant_traits$Elevation_m)$p.value) # This is just to make the p-value nicer. 
 
 # Plot
-hill2_diversity <- ggplot(data = plant_traits_MB, 
-  aes(x = Elevation_m, y = hill_2, color = Species)) +
-   geom_jitter(aes(color = Species), 
-               #stat = "summary",
-               #fun = mean,
-               size = 3, alpha = 0.3) + 
-   geom_smooth(method = lm, se = F) + 
-   # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~'))) 
-   geom_smooth(method = lm, se = T, level = 0.95, na.rm = F, color = "black") + 
-  stat_poly_eq(formula = y ~ x, color = "black",
-               aes(label = paste(#..eq.label.., 
-                 ..adj.rr.label.., #"~italic(p) ==",
-                 ..p.value.label.., 
-                 #signif(..p.value.., digits = 4),
-                 sep = "*`,`~~")), 
-               rr.digits = 2,
-               p.digits = 3 ,
-               parse = TRUE,
-               label.x = "left",
-               label.y = "top",
-               vstep = 0.08) +
-   #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"), 
-                     #values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) + 
-   scale_color_manual(legend_title, labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"), 
-                     values = met.brewer("Isfahan2", n = 4, type = "discrete", 
-                                          direction = c(-1))) + 
+hill2_diversity <- ggplot(data = plant_traits_MB, aes(x = Elevation_m, y = hill_2, color = Species)) +
+  geom_jitter(aes(color = Species), #stat = "summary",
+              #fun = mean,
+              size = 3, alpha = 0.3) +
+  geom_smooth(method = lm, se = F) +
+  # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = '~~~~')))
+  geom_smooth(
+    method = lm,
+    se = T,
+    level = 0.95,
+    na.rm = F,
+    color = "black"
+  ) +
+  stat_poly_eq(
+    formula = y ~ x,
+    color = "black",
+    aes(label = paste(
+      #..eq.label..,
+      ..adj.rr.label.., #"~italic(p) ==",
+      ..p.value.label.., #signif(..p.value.., digits = 4),
+      sep = "*`,`~~"
+    )),
+    rr.digits = 2,
+    p.digits = 3 ,
+    parse = TRUE,
+    label.x = "left",
+    label.y = "top",
+    vstep = 0.08
+  ) +
+  #scale_fill_manual(labels = c("*M. laciniatus*","*M. nasutus*", "*M. guttatus*"),
+  #values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
+  scale_color_manual(
+    legend_title,
+    labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+    values = met.brewer(
+      "Isfahan2",
+      n = 4,
+      type = "discrete",
+      direction = c(-1)
+    )
+  ) +
   labs(y = "\U1D492 = 2", x = "Elevation (m.a.s.l.)", col = "") +
   theme_lfdiv_continuous +
   theme(strip.text = element_blank()) +
   #facet_wrap(~ Species, labeller = labeller(Species = labels_list)) +
-  facet_wrap(~ Species) +
+  facet_wrap( ~ Species) +
   guides(color = "none")        #To turn off color legend
 
 #hill2_diversity
@@ -2152,7 +2350,7 @@ alpha_beta_diversity
 #ggsave(filename = file.path(path, "figures/figure3.png"), plot = alpha_beta_diversity, dpi=300, units=c("mm"), width=300, height=275)
 ```
 
-#### Mantel tests and correlations
+### Mantel tests and correlations
 
 ```{r, mantel}
 #| echo: false
@@ -2217,56 +2415,66 @@ lac_names_rfy <- plant_traits |>
   pull(Unique_ID) 
 
 # Subset the data
-lac_mantel  <- mantel(asv_long |> # Subset the data
-                       filter(A %in% lac_names_rfy, B %in% lac_names_rfy) |>
-                       pivot_wider(names_from = B, values_from = bray_diss) |>
-                       column_to_rownames(var = "A") |>
-                       as.matrix(),
-                     geo_long |> # Subset the data
-                       filter(A %in% lac_names_rfy, B %in% lac_names_rfy) |>
-                       pivot_wider(names_from = B, values_from = geo_dist) |>
-                       column_to_rownames(var = "A") |>
-                       as.matrix(),
-                      method = "spearman", permutations = 9999, na.rm = TRUE)
+lac_mantel  <- mantel(
+  asv_long |> # Subset the data
+    filter(A %in% lac_names_rfy, B %in% lac_names_rfy) |>
+    pivot_wider(names_from = B, values_from = bray_diss) |>
+    column_to_rownames(var = "A") |>
+    as.matrix(),
+  geo_long |> # Subset the data
+    filter(A %in% lac_names_rfy, B %in% lac_names_rfy) |>
+    pivot_wider(names_from = B, values_from = geo_dist) |>
+    column_to_rownames(var = "A") |>
+    as.matrix(),
+  method = "spearman",
+  permutations = 9999,
+  na.rm = TRUE
+)
 lac_mantel
 
 # M. nasutus
-nas_names_rfy <- plant_traits |> 
-  slice(1:157) |> # Only selecting observations with ASV data 
-  filter(Unique_ID %in% final_names_methodB,
-         Species == "M. nasutus") |>
+nas_names_rfy <- plant_traits |>
+  slice(1:157) |> # Only selecting observations with ASV data
+  filter(Unique_ID %in% final_names_methodB, Species == "M. nasutus") |>
   pull(Unique_ID)
-nas_mantel  <- mantel(asv_long |> # Subset the data
-                       filter(A %in% nas_names_rfy, B %in% nas_names_rfy) |>
-                       pivot_wider(names_from = B, values_from = bray_diss) |>
-                       column_to_rownames(var = "A") |>
-                       as.matrix(), 
-                      geo_long |> # Subset the data
-                       filter(A %in% nas_names_rfy, B %in% nas_names_rfy) |>
-                       pivot_wider(names_from = B, values_from = geo_dist) |>
-                       column_to_rownames(var = "A") |>
-                       as.matrix(), 
-                     method = "spearman", permutations = 9999, na.rm = TRUE)
+nas_mantel  <- mantel(
+  asv_long |> # Subset the data
+    filter(A %in% nas_names_rfy, B %in% nas_names_rfy) |>
+    pivot_wider(names_from = B, values_from = bray_diss) |>
+    column_to_rownames(var = "A") |>
+    as.matrix(),
+  geo_long |> # Subset the data
+    filter(A %in% nas_names_rfy, B %in% nas_names_rfy) |>
+    pivot_wider(names_from = B, values_from = geo_dist) |>
+    column_to_rownames(var = "A") |>
+    as.matrix(),
+  method = "spearman",
+  permutations = 9999,
+  na.rm = TRUE
+)
 nas_mantel
 
 # M. guttatus
-gut_names_rfy <- plant_traits |> 
-  slice(1:157) |> # Only selecting observations with ASV data 
-  filter(Unique_ID %in% final_names_methodB,
-         Species == "M. guttatus") |>
+gut_names_rfy <- plant_traits |>
+  slice(1:157) |> # Only selecting observations with ASV data
+  filter(Unique_ID %in% final_names_methodB, Species == "M. guttatus") |>
   pull(Unique_ID)
 # Subset the data
-gut_mantel  <- mantel(asv_long |> # Subset the data
-                       filter(A %in% gut_names_rfy, B %in% gut_names_rfy) |>
-                       pivot_wider(names_from = B, values_from = bray_diss) |>
-                       column_to_rownames(var = "A") |>
-                       as.matrix(),
-                     geo_long |> # Subset the data
-                       filter(A %in% gut_names_rfy, B %in% gut_names_rfy) |>
-                       pivot_wider(names_from = B, values_from = geo_dist) |>
-                       column_to_rownames(var = "A") |>
-                       as.matrix(),
-                     method = "spearman", permutations = 9999, na.rm = TRUE)
+gut_mantel  <- mantel(
+  asv_long |> # Subset the data
+    filter(A %in% gut_names_rfy, B %in% gut_names_rfy) |>
+    pivot_wider(names_from = B, values_from = bray_diss) |>
+    column_to_rownames(var = "A") |>
+    as.matrix(),
+  geo_long |> # Subset the data
+    filter(A %in% gut_names_rfy, B %in% gut_names_rfy) |>
+    pivot_wider(names_from = B, values_from = geo_dist) |>
+    column_to_rownames(var = "A") |>
+    as.matrix(),
+  method = "spearman",
+  permutations = 9999,
+  na.rm = TRUE
+)
 gut_mantel
 ```
 
@@ -2328,152 +2536,7 @@ ggplot(ps_melt, aes(x = Abundance, y = hill_2)) +
 
 ```
 
-### Leaf traits Simple Linear model
 
-Regressions presented at Evo 2023.
-
-```{r}
-# Regressions
-# Elevation_m and Thicknes
-  
-t <-ggplot(data = leaf_traits, aes(y= Thickness, x = Elevation_m, color = Species)) +
-   geom_jitter(aes(color = Species,), size = 2, alpha = 0.5, na.rm = TRUE)+
-#scale_shape_manual(values=c(1:24)) +
-  scale_color_manual(values= met.brewer("Isfahan2", n = 4, type = "discrete"))+
-  geom_smooth(method=lm, se = F) +
- # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
-  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
-  stat_regline_equation(label.y = 700, label.x = 6000, aes(label = ..eq.label..), sep = "~~~~", size = rel(3), color= "black") +
-  stat_regline_equation(label.y = 650 , label.x = 6000, aes(label = ..adj.rr.label..), size = rel(3),color = "black") +
-  labs(y="Leaf thickness (/u03BCm)", x = "Elevation_m (f.a.s.l.)") +
-  theme_minimal(base_size = 10) +
-  theme(legend.position="right", legend.title = element_blank(),
-        legend.text = element_text(size = 8),
-        axis.text.x=element_text(size = 7),
-        axis.text.y=element_text(size = 7)) +
-  guides(color = "none")  +      #To turn off color legend
-  guides(fill = "none") + #To turn off fill legend
-  guides(shape = "none") #To turn off shape legend
-#caption = "**All replicate leaves from tree species included  (n = 210)", col = "Treatment"
-t
-```
-
-```{r}
-# fit <- lm(logit_herbivory ~ Thickness, data = masterant2)
-# 
-# rSquared <- summary(fit)$r.squared
-# rSquared
-# anova(fit)
-# pVal <- anova(fit)$'Pr(>F)'[1]
-# pVal
-
-# Elevation_m and Anthocyanins
-
-a <- ggplot(data = leaf_traits, aes(y= ACI, x= Elevation_m, color = Species))+
-   geom_jitter(aes(color = Species), size = 2, alpha = 0.5) +
-  #scale_shape_manual(values=c(15:22)) +
-  scale_color_manual(values= met.brewer("Isfahan2", n = 4, type = "discrete")) +
-  geom_smooth(method=lm, se=F) +
-  #stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
-  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
-  stat_regline_equation(label.y = 30, label.x = 6000, aes(label = ..eq.label..), size = rel(3), color= "black") +
-  stat_regline_equation(label.y = 25 , label.x = 6000, aes(label = ..adj.rr.label..), size = rel(3), color = "black") +
-  labs(y="Anthocyanins (ACI)", x="Elevation_m (f.a.s.l.)") +
-  theme_minimal(base_size = 10) +
-  theme(legend.position="right", legend.title =element_blank(),
-        legend.text = element_text(size = 8),
-        axis.text.x=element_text(size = 7),
-        axis.text.y=element_text(size = 7)) +
-  guides(color = "none")  +      #To turn off color legend
-  guides(fill = "none") + #To turn off fill legend
-  guides(shape = "none") #To turn off shape legend
- 
-a
-#scale_shape_manual(values = c(1:7))
-```
-
-```{r}
-# Herbivory and leaf thickness
-
-tt <- ggplot(data = masterant2, aes(y= logit_herbivory, x= Thickness, color = E_load))+
-   geom_jitter(aes(color = E_load, shape = Species), size = 1.5, alpha = 0.7) +
-  scale_shape_manual(values=c(15:22)) +
-  geom_smooth(method=lm, se=F) +
-  #stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
-  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
-  stat_regline_equation(label.y = 2.5, label.x = 200, aes(label = ..eq.label..), size = rel(3), color= "black") +
-  stat_regline_equation(label.y = 2 , label.x = 200, aes(label = ..adj.rr.label..), size = rel(3), color = "black") +
-  labs(x="Leaf thickness (/u03BCm)", y = "logit(Leaf herbivory) (%)") +
- theme_minimal(base_size = 10) +
-  theme(legend.position="right", legend.title = element_blank(),
-        legend.text = element_text(size = 8),
-        axis.text.x=element_text(size = 7),
-        axis.text.y=element_text(size = 7)) +
-  guides(color = "none")  +      #To turn off color legend
-  guides(fill = "none") + #To turn off fill legend
-  guides(shape = "none")
-tt
-
-# Herbivory and LMA
-
-lma <- ggplot(data = masterant2, aes(y= logit_herbivory, x= LMA, color = E_load))+
-  geom_jitter(aes(color = E_load, shape = Species), size = 1.5, alpha = 0.7) +
-  scale_shape_manual(values=c(15:22)) +
-  geom_smooth(method=lm, se=F) +
-  #stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
-  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
-  stat_regline_equation(label.y = 2.5, label.x = 0.001, aes(label = ..eq.label..), size = rel(3), color= "black") +
-  stat_regline_equation(label.y = 2 , label.x = 0.001, aes(label = ..adj.rr.label..), size = rel(3), color = "black") +
-  labs(x="Leaf mass per area (LMA)", y = "logit(Leaf herbivory) (%)") +
-  theme_minimal(base_size = 10) +
-  theme(legend.position="right", legend.title = element_blank(),
-        legend.text = element_text(size = 8),
-        axis.text.x=element_text(size = 7),
-        axis.text.y=element_text(size = 7)) +
-  guides(color = "none")  +      #To turn off color legend
-  guides(fill = "none") + #To turn off fill legend
-  guides(shape = "none") #To turn off shape legend
- 
-lma
-
-# Herbivory and FEF Shannon Diversity
-# Extracting effect size of model to plot
- dv <- ggplot(data = masterant2, aes(y= logit_herbivory, x= Shannon, color = E_load))+
-  geom_jitter(aes(color = E_load, color = Species), size = 1.5, alpha = 0.7) +
-  scale_shape_manual(values=c(15:22)) +
-  geom_smooth(method=lm, se=F) +
- # stat_regline_equation(aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~~"))) +
-  geom_smooth(method = lm, se = T , level = 0.95, na.rm = F, color = "black") +
-  #scale_fill_manual(values= met.brewer("Cross", n = 8, type = "discrete")) +
-  #scale_color_manual(values= met.brewer("Cross", n = 8, type = "discrete")) +
-  stat_regline_equation(label.y = 2.5, label.x = 1.5, aes(label = ..eq.label..),size = rel(3), color= "black") +
-  stat_regline_equation(label.y = 2 , label.x = 1.5, aes(label = ..adj.rr.label..), size = rel(3),color = "black") +
-  labs(x="Shannon diversity index", y="logit(Leaf herbivory) (%)") +
-  theme_minimal(base_size = 10) +
- theme(legend.position="right",
-        legend.text = element_text(size = 12),
-        axis.text.x=element_text(size = 7),
-        axis.text.y=element_text(size = 7))
-  # guides(color = "none")  +      #To turn off color legend
-  # guides(fill = "none") + #To turn off fill legend
-  # guides(shape = "none") #To turn off shape legend
- 
- dv
-
- # Multiples plots together
-
-ant_arranged <- ggarrange(t, tt, a, lma, dv, nrow = 2, ncol=3, common.legend = TRUE, legend="right")
-
-
-# Adding caption
-ant_caption <- "*All individuals per tree species included (n = 210)"
-ant_arranged_with_caption <- annotate_figure(ant_arranged, bottom = text_grob(ant_caption), fig.lab.pos = "bottom.right", fig.lab.size = 6)
-
-ant_arranged_with_caption
-
-#ggsave(filename = "./Plots/Aim3_ant_regression_06042023.png", plot = ant_arranged_with_caption, dpi=600, units=c("mm"), width=180, height=140, bg = "white")
-
-```
 
 #### ASV barplot
 
@@ -2822,8 +2885,23 @@ merged_data <- right_join(ordination_scores, dbrda_df, by = c("Unique_ID" = "X")
 arrow_scores <- as.data.frame(vegan::scores(final_model, display = "bp"))
 
 # Define the arrow aesthetic mapping
-arrow_map <- aes(xend = (dbRDA1*2), yend = (dbRDA2*2), x = 0, y = 0, shape = NULL, color = NULL, fill = NULL)
-label_map <- aes(x = 2*dbRDA1, y = 2*dbRDA2, label = row.names(arrow_scores), shape = NULL, color = NULL, fill = NULL)
+arrow_map <- aes(
+  xend = (dbRDA1 * 2),
+  yend = (dbRDA2 * 2),
+  x = 0,
+  y = 0,
+  shape = NULL,
+  color = NULL,
+  fill = NULL
+)
+label_map <- aes(
+  x = 2 * dbRDA1,
+  y = 2 * dbRDA2,
+  label = row.names(arrow_scores),
+  shape = NULL,
+  color = NULL,
+  fill = NULL
+)
 arrowhead = arrow(length = unit(0.02, "npc"))
 
 #subset A4 for labeling
@@ -2839,33 +2917,110 @@ A4.sub6 <- arrow_scores[6,] #LT.
 
 # dbRDA plot based on species
 p_final_model <- ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
-  geom_point(data = merged_data, aes(color = Species, shape = Site), size = rel(4), alpha = 0.7, stroke = 1) +
-  geom_segment(arrow_map, size = rel(.8), data = arrow_scores, color = "black", arrow = arrowhead) +
-  geom_vline(xintercept = 0, color = "grey30", linetype = "dashed") + # plot vertical line
-  geom_hline(yintercept = 0, color = "grey30", linetype = "dashed") + # plot horizontal line
-  geom_text(label_map, size = rel(4), data = A4[[1]], fontface = "bold", show.legend = FALSE, label = c("Elev.")) +
-  geom_text(label_map, size = rel(4), data = A4[[2]], fontface = "bold", show.legend = FALSE, label = c("logACI")) +
-  geom_text(label_map, size = rel(4), data = A4[[3]], fontface = "bold", show.legend = FALSE, label = c("logLBI")) +
-  geom_text(label_map, size = rel(4), data = A4[[4]], fontface = "bold", show.legend = FALSE, label = c("logLMA")) +
-  geom_text(label_map, size = rel(4), data = A4[[5]], fontface = "bold", show.legend = FALSE, label = c("logLPS")) +
-  geom_text(label_map, size = rel(4), data = A4[[6]], fontface = "bold", show.legend = FALSE, label = c("logLT")) +
-  xlab(label = paste("dbRDA1 (", round(B$concont$importance[2,1]*100, digits = 1), "%)", sep="")) +
-  ylab(label = paste("dbRDA2 (", round(B$concont$importance[2,2]*100, digits = 1), "%)", sep="")) + 
-  scale_color_manual(values= met.brewer("Isfahan2", n = 3, type = "discrete", direction = -1)) +
-  scale_shape_manual(values=c(1:22)) +
-  stat_ellipse(aes(color = Species),
-               geom = "path",
-               linewidth = 1.7,
-               position = "identity",
-               type = "t", linetype = 1,
-               level = 0.95,
-               segments = 51,
-               na.rm = FALSE,
-               show.legend = NA, inherit.aes = TRUE) +
+  geom_point(
+    data = merged_data,
+    aes(color = Species, shape = Site),
+    size = rel(4),
+    alpha = 0.7,
+    stroke = 1
+  ) +
+  geom_segment(
+    arrow_map,
+    size = rel(.8),
+    data = arrow_scores,
+    color = "black",
+    arrow = arrowhead
+  ) +
+  geom_vline(xintercept = 0,
+             color = "grey30",
+             linetype = "dashed") + # plot vertical line
+  geom_hline(yintercept = 0,
+             color = "grey30",
+             linetype = "dashed") + # plot horizontal line
+  geom_text(
+    label_map,
+    size = rel(4),
+    data = A4[[1]],
+    fontface = "bold",
+    show.legend = FALSE,
+    label = c("Elev.")
+  ) +
+  geom_text(
+    label_map,
+    size = rel(4),
+    data = A4[[2]],
+    fontface = "bold",
+    show.legend = FALSE,
+    label = c("logACI")
+  ) +
+  geom_text(
+    label_map,
+    size = rel(4),
+    data = A4[[3]],
+    fontface = "bold",
+    show.legend = FALSE,
+    label = c("logLBI")
+  ) +
+  geom_text(
+    label_map,
+    size = rel(4),
+    data = A4[[4]],
+    fontface = "bold",
+    show.legend = FALSE,
+    label = c("logLMA")
+  ) +
+  geom_text(
+    label_map,
+    size = rel(4),
+    data = A4[[5]],
+    fontface = "bold",
+    show.legend = FALSE,
+    label = c("logLPS")
+  ) +
+  geom_text(
+    label_map,
+    size = rel(4),
+    data = A4[[6]],
+    fontface = "bold",
+    show.legend = FALSE,
+    label = c("logLT")
+  ) +
+  xlab(label = paste(
+    "dbRDA1 (",
+    round(B$concont$importance[2, 1] * 100, digits = 1),
+    "%)",
+    sep = ""
+  )) +
+  ylab(label = paste(
+    "dbRDA2 (",
+    round(B$concont$importance[2, 2] * 100, digits = 1),
+    "%)",
+    sep = ""
+  )) +
+  scale_color_manual(values = met.brewer(
+    "Isfahan2",
+    n = 3,
+    type = "discrete",
+    direction = -1
+  )) +
+  scale_shape_manual(values = c(1:22)) +
+  stat_ellipse(
+    aes(color = Species),
+    geom = "path",
+    linewidth = 1.7,
+    position = "identity",
+    type = "t",
+    linetype = 1,
+    level = 0.95,
+    segments = 51,
+    na.rm = FALSE,
+    show.legend = NA,
+    inherit.aes = TRUE
+  ) +
   theme_classic(base_size = 16) +
   theme(legend.title = element_text(face = "bold"),
         legend.text = element_text(face = "italic")) +
-  guides(shape = guide_legend(ncol=2))
+  guides(shape = guide_legend(ncol = 2))
 
      
 # Rearranging the order of layers so arrows are above the points.
@@ -3072,7 +3227,7 @@ ggsave(file.path(path, "figures/pcoa_dbrda.png"), plot = joined, dpi=300, units=
 ```
 
 
-### PCoA Linear regressions
+### PCoA Simple Linear regressions
 
 ```{r}
 # PCoA regressions
@@ -3081,91 +3236,137 @@ ggsave(file.path(path, "figures/pcoa_dbrda.png"), plot = joined, dpi=300, units=
 alpha_pcoa1 <- lm(hill_1 ~ Dim1, data = pcoa_merged_data)
 plot(alpha_pcoa1)
 
+# Polynomial Formula
+formula <- y ~ poly(x, 3, raw = TRUE)
 
-alpha_pcoa <- ggplot(data = pcoa_merged_data, aes(y= hill_1, x =Dim1, color = Species)) +
-geom_point(aes(color = Species), size = rel(4), alpha = 0.2, stroke = 1) +
-geom_smooth(method = "lm", se = FALSE) +
-labs(y =  "Alpha diversity (\U1D492 = 1)", x = paste("PCoA1 (",pretty_percent[1], "%)", sep = "")) +
-scale_color_manual(
+
+alpha_pcoa <- ggplot(data = pcoa_merged_data, aes(y = hill_1, x = Dim1, color = Species)) +
+  geom_point(
+    aes(color = Species),
+    size = rel(4),
+    alpha = 0.2,
+    stroke = 1
+  ) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(y =  "Alpha diversity (\U1D492 = 1)",
+       x = paste("PCoA1 (", pretty_percent[1], "%)", sep = "")) +
+  scale_color_manual(
     labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
-    values = met.brewer("Isfahan2", n = 3, type = "discrete",
-    direction = -1)) +
-theme_classic(base_size = 16) +
-theme(legend.title = element_text(face = "bold"),
-legend.text = element_markdown(),
-legend.position = "bottom",
-plot.caption = element_markdown(),
-strip.text = element_text(face = "bold"))
+    values = met.brewer(
+      "Isfahan2",
+      n = 3,
+      type = "discrete",
+      direction = -1
+    )
+  ) +
+  theme_classic(base_size = 16) +
+  theme(
+    legend.title = element_text(face = "bold"),
+    legend.text = element_markdown(),
+    legend.position = "bottom",
+    plot.caption = element_markdown(),
+    strip.text = element_text(face = "bold")
+  )
 
 alpha_pcoa
 
-# Formula
-formula <- y ~ poly(x, 3, raw = TRUE)
 
 # PC1 and Elevation
 
-elevation_pcoa1 <- ggplot(data = pcoa_merged_data, aes(x = Elevation_m, y =Dim1, color = Species)) +
-geom_point(aes(color = Species), size = rel(4), alpha = 0.2, stroke = 1) +
-geom_smooth(method = "loess", se = FALSE) +
-labs(x =  "Elevation (m)", y = paste("PCoA1 (",pretty_percent[1], "%)", sep = "")) +
-    stat_poly_eq(formula = formula, 
-                 color = "black",
-               aes(label = paste(#..eq.label.., 
-                 ..adj.rr.label.., #"~italic(p) ==",
-                 ..p.value.label.., 
-                 #signif(..p.value.., digits = 4),
-                 sep = "*`,`~~")),
-               rr.digits = 2,
-               p.digits = 3 ,
-               parse = TRUE,
-               label.x = "right",
-               label.y= "top",
-               vstep = 0.08) +
-scale_color_manual(
+elevation_pcoa1 <- ggplot(data = pcoa_merged_data, aes(x = Elevation_m, y = Dim1, color = Species)) +
+  geom_point(
+    aes(color = Species),
+    size = rel(4),
+    alpha = 0.2,
+    stroke = 1
+  ) +
+  geom_smooth(method = "loess", se = FALSE) +
+  labs(x =  "Elevation (m)",
+       y = paste("PCoA1 (", pretty_percent[1], "%)", sep = "")) +
+  stat_poly_eq(
+    formula = formula,
+    color = "black",
+    aes(label = paste(
+      #..eq.label..,
+      ..adj.rr.label.., #"~italic(p) ==",
+      ..p.value.label.., #signif(..p.value.., digits = 4),
+      sep = "*`,`~~"
+    )),
+    rr.digits = 2,
+    p.digits = 3 ,
+    parse = TRUE,
+    label.x = "right",
+    label.y = "top",
+    vstep = 0.08
+  ) +
+  scale_color_manual(
     labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
-    values = met.brewer("Isfahan2", n = 3, type = "discrete",
-    direction = -1)) +
-theme_classic(base_size = 16) +
-theme(legend.title = element_text(face = "bold"),
-legend.text = element_markdown(),
-legend.position = "bottom",
-plot.caption = element_markdown(),
-strip.text = element_text(face = "bold")) +
-  facet_wrap(~Species)
+    values = met.brewer(
+      "Isfahan2",
+      n = 3,
+      type = "discrete",
+      direction = -1
+    )
+  ) +
+  theme_classic(base_size = 16) +
+  theme(
+    legend.title = element_text(face = "bold"),
+    legend.text = element_markdown(),
+    legend.position = "bottom",
+    plot.caption = element_markdown(),
+    strip.text = element_text(face = "bold")
+  ) +
+  facet_wrap( ~ Species)
 
 elevation_pcoa1
 
 # PC2 and Elevation
 
 elevation_pcoa2 <- ggplot(data = pcoa_merged_data, aes(x = Elevation_m, y = Dim2, color = Species)) +
-geom_point(aes(color = Species), size = rel(4), alpha = 0.2, stroke = 1) +
-geom_smooth(method = "loess", se = FALSE) +
-labs(x =  "Elevation (m)", y = paste("PCoA2 (",pretty_percent[2], "%)", sep = "")) +
-    stat_poly_eq(formula = formula, 
-                 color = "black",
-               aes(label = paste(#..eq.label.., 
-                 ..adj.rr.label.., #"~italic(p) ==",
-                 ..p.value.label.., 
-                 #signif(..p.value.., digits = 4),
-                 sep = "*`,`~~")),
-               #method = "loess",
-               rr.digits = 2,
-               p.digits = 3 ,
-               parse = TRUE,
-               label.x = "right",
-               label.y= "top",
-               vstep = 0.08) +
-scale_color_manual(
+  geom_point(
+    aes(color = Species),
+    size = rel(4),
+    alpha = 0.2,
+    stroke = 1
+  ) +
+  geom_smooth(method = "loess", se = FALSE) +
+  labs(x =  "Elevation (m)",
+       y = paste("PCoA2 (", pretty_percent[2], "%)", sep = "")) +
+  stat_poly_eq(
+    formula = formula,
+    color = "black",
+    aes(label = paste(
+      #..eq.label..,
+      ..adj.rr.label.., #"~italic(p) ==",
+      ..p.value.label.., #signif(..p.value.., digits = 4),
+      sep = "*`,`~~"
+    )),
+    #method = "loess",
+    rr.digits = 2,
+    p.digits = 3 ,
+    parse = TRUE,
+    label.x = "right",
+    label.y = "top",
+    vstep = 0.08
+  ) +
+  scale_color_manual(
     labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
-    values = met.brewer("Isfahan2", n = 3, type = "discrete",
-    direction = -1)) +
-theme_classic(base_size = 16) +
-theme(legend.title = element_text(face = "bold"),
-legend.text = element_markdown(),
-legend.position = "bottom",
-plot.caption = element_markdown(),
-strip.text = element_text(face = "bold")) +
-  facet_wrap(~Species)
+    values = met.brewer(
+      "Isfahan2",
+      n = 3,
+      type = "discrete",
+      direction = -1
+    )
+  ) +
+  theme_classic(base_size = 16) +
+  theme(
+    legend.title = element_text(face = "bold"),
+    legend.text = element_markdown(),
+    legend.position = "bottom",
+    plot.caption = element_markdown(),
+    strip.text = element_text(face = "bold")
+  ) +
+  facet_wrap( ~ Species)
 
 elevation_pcoa2
 
@@ -3200,11 +3401,128 @@ widths = c(1,1,1)
 
 pcoa_pcr_dbrda_joined
 
-ggsave(file.path(path, "figures/pcoa_pcr_dbrda.png") , plot = pcoa_pcr_dbrda_joined, dpi=300, units=c("mm"), width=350, height=300)
+#ggsave(file.path(path, "figures/pcoa_pcr_dbrda.png") , plot = pcoa_pcr_dbrda_joined, dpi=300, units=c("mm"), width=350, height=300)
 ```
 
-The simple linear model does not bode well. When we plot the residuals, fitted values and Cook's distance we see it suffers from heteroscedasticity and outliers. The PCoA and dbRDa are qualitatively very similar. We observed overlapped of fungal communitites in *Mimulus* spp. A lot of the microbial literature presents PCoA, alphadiversity measures and PERMANOVA table. My issue with PCoA and doing a PCR with a measure of alpha diversity or similar is that the model fit is not good at all. Visually it represents how at higher elevation we have lower alpha diversity levels. But this is information that is already present in the "boxplot_hill_orders" plots. I don't think the PCoA adds more information.
+The simple linear model of PCoA 1 vs. Alpha diversity does not look good. When we plot the residuals, fitted values and Cook's distance we see it suffers from heteroscedasticity and outliers. The PCoA and dbRDa are qualitatively very similar. We observed overlapped of fungal communitites in *Mimulus* spp. A lot of the microbial literature presents PCoA, alphadiversity measures and PERMANOVA table. My issue with PCoA and doing a PCoR with a measure of alpha diversity or similar is that the model fit is not good at all. Visually it represents how at higher elevation we have lower alpha diversity levels. But this is information that is already present in the "boxplot_hill_orders" plots and the facetted dbRDA. I don't think the PCoA adds more information.
 
+The PCoR of PCoA 1 vs. Elevation is a little bit more illustrative of the dynamics of the fungal communities. We see that the fungal communities are more similar at higher elevations. Maybe we can visualize this by plotting Bray-Curtis dissimilarity vs. Elevation. Similar to the Mantel tests.  
+
+### Bray-Curtis dissimilarity vs. Elevation
+
+```{r, bray_elevation}
+# Bray-Curtis dissimilarity vs. Elevation
+
+# Mean-Bray-Curtis dissimilarity
+mean_bray <- vegdist(dbrda_hell_matrix, method = "bray") |>
+  as.matrix() |>
+  as.data.frame()
+
+mean_bray <- rownames_to_column(mean_bray, var = "Unique_ID") |>
+  mutate(mean_bray = rowMeans(mean_bray)) |>
+  select(Unique_ID, mean_bray)
+
+# Joining to plant traits_MB to avoid duplicate DFs 
+plant_traits_MB <- left_join(plant_traits_MB, mean_bray, by = c("X"= "Unique_ID"))
+
+
+# GGplot
+bray_elevation <- ggplot(data = plant_traits_MB, aes(x = Elevation_m, y = mean_bray, color = Species)) +
+  geom_point(
+    aes(color = Species),
+    size = rel(4),
+    alpha = 0.2,
+    stroke = 1
+  ) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(x =  "Elevation (m)", y = "Mean Bray-Curtis dissimilarity") +
+  scale_color_manual(
+    labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+    values = met.brewer(
+      "Isfahan2",
+      n = 3,
+      type = "discrete",
+      direction = -1
+    )
+  ) +
+  stat_poly_eq(formula = formula,
+               color = "black",
+               aes(
+                   label = paste(#..eq.label.., 
+                 ..adj.rr.label.., #"~italic(p) ==",
+                 ..p.value.label.., 
+                 #signif(..p.value.., digits = 4),
+                 sep = "*`,`~~")),
+               #method = "loess",
+               rr.digits = 2,
+               p.digits = 3 ,
+               parse = TRUE,
+               label.x = "right",
+               label.y= "top",
+               vstep = 0.08) +
+  theme_classic(base_size = 16) +
+  theme(
+    legend.title = element_text(face = "bold"),
+    legend.text = element_markdown(),
+    legend.position = "bottom",
+    plot.caption = element_markdown(),
+    strip.text = element_text(face = "bold.italic", size = 14)
+  ) +
+  facet_wrap( ~ Species)
+
+bray_elevation
+```
+
+These regressions show that the mean bray-Curtis dissimilarity for each species decreases a elevation increases. FEF communities are more similar at higher elevations. It is a clearer way of visualizing the effects of elevation in the fungal communities.
+
+### GLMs with Beta Diversity
+
+```{r, glm}
+# GLMs with Beta Diversity
+
+m1 <- glm(mean_bray ~ Elevation_m + Species + Site, data = plant_traits_MB, family = gaussian) # Gaussian/Normal distribution
+plot(m1)
+anova(m1)
+
+# Model with intercept only
+M0 <- lm(mean_bray ~ 1, data = plant_traits_MB, na.action = na.exclude)
+anova(M0)
+AIC(M0)
+plot(M0)
+
+# Model with Elvation, Species and Site
+M1 <- lm(mean_bray ~ Elevation_m + Species + Site, data = plant_traits_MB, na.action = na.exclude)
+anova(M1)
+plot(M1)
+AIC(M1) # -14900.34
+
+# Residuals
+M1_resid <- resid(M1, type = "response")
+M1_fitted <- fitted(M1)
+
+#Histograms
+hist(M1_resid)
+hist(M1_fitted)
+
+# Plots
+plot(M1)
+plot_model(M1, type = "diag")
+
+#anova(M1,type="marginal") #What is a type III ANOVA?
+Anova(M1, type = 3)
+drop1(M1,test = "F", trace = TRUE)
+drop1(M1, .~., test="F", trace = TRUE)
+
+# Stepwise selection of linear model (lm())
+M1AIC <- stepAIC(update(M1, .~.), direction = "both", k = 2)
+M1AIC$anova
+AIC(M1AIC) #586.7715 #736.86 06/04/2023 -BAR
+plot(M1AIC)
+plot_model(M1AIC, type = "diag")
+#Final Model:
+#logit_herbivory ~ LMA + Species + Thickness + Shannon + E_load
+
+```
 
 ## Linear regressions with Taxa of interest
 

@@ -553,8 +553,8 @@ ggsave(filename = file.path(path, "figures/figure2.png"), plot = r1gg, dpi=300, 
 #| echo: false
 #| eval: true
 #| tidy: true
-#| fig-width: 5
-#| fig-height: 6
+ fig-width: 5
+ fig-height: 6
 #| label: dbrda_plot
 #| fig-cap: "FEF community composition association with leaf functional traits and elevation per host species. Distance-based Redundancy Analysis (dbRDA) plot of rarefied FEF community and leaf functional traits by species facetted by elevation category. Each cluster of points represents a rarefied FEF community sample from one host species; blue filled squares correspond to *M. laciniatus*, green circles to *M. nasutus*, and yellow triangles to *M. guttatus*. Solid arrow lines represent significant associations (*p* < .01), while dashed lines represent non-significant associations. The length and direction of the arrows indicate the strength and direction of the association between the traits and the FEF community composition. The labels on the arrows correspond to the leaf functional traits. Ellipses represent 95% confidence intervals. The plot is based on the Bray-Curtis dissimilarity matrix."
 
@@ -587,100 +587,116 @@ merged_data <- right_join(ordination_scores, dbrda_df, by = c("Unique_ID" = "X")
 arrow_scores <- as.data.frame(vegan::scores(final_model, display = "bp"))
 
 # Define the arrow aesthetic mapping
-arrow_map <- aes(xend = (dbRDA1*2), yend = (dbRDA2*2), x = 0, y = 0, shape = NULL, color = NULL, fill = NULL)
-label_map <- aes(x = 2*dbRDA1, y = 2*dbRDA2, label = row.names(arrow_scores), shape = NULL, color = NULL, fill = NULL)
+arrow_map <- aes(
+  xend = (dbRDA1 * 2),
+  yend = (dbRDA2 * 2),
+  x = 0,
+  y = 0,
+  shape = NULL,
+  color = NULL,
+  fill = NULL
+)
+label_map <- aes(
+  x = 2 * dbRDA1,
+  y = 2 * dbRDA2,
+  label = row.names(arrow_scores),
+  shape = NULL,
+  color = NULL,
+  fill = NULL
+)
 arrowhead = arrow(length = unit(0.02, "npc"))
 
 #subset A4 for labeling
 arrow_scores <- arrow_scores[order(rownames(arrow_scores)), ]
-A4 <- lapply(1:6, function(i) arrow_scores[i, ])
+A4 <- lapply(1:6, function(i)
+  arrow_scores[i, ])
 
 # dbRDA plot based on species
 p_final_model <-
-ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
-geom_point(
-data = merged_data,
-aes(color = Species),
-size = rel(4),
-alpha = 0.2,
-stroke = 1
-) +
-stat_ellipse(
-aes(color = Species),
-geom = "path",
-linewidth = 1.3,
-position = "identity",
-type = "t",
-linetype = 1,
-level = 0.95,
-segments = 51,
-na.rm = FALSE,
-show.legend = NA,
-inherit.aes = TRUE
-) +
-geom_segment(
-arrow_map,
-linewidth = rel(.8),
-data = arrow_scores[1:2, ],
-color = "black",
-arrow = arrowhead
-) +
-geom_vline(xintercept = 0,
-color = "grey30",
-linetype = "dashed") + # plot vertical line
-geom_hline(yintercept = 0,
-color = "grey30",
-linetype = "dashed") + # plot horizontal line
-geom_text(
-label_map,
-size = rel(4),
-data = A4[[1]],
-fontface = "bold",
-show.legend = FALSE,
-label = c("Elev."),
-nudge_x = 0.65
-) +
-geom_text(
-label_map,
-size = rel(4),
-data = A4[[2]],
-fontface = "bold",
-show.legend = FALSE,
-label = c("logLBI"),
-nudge_y = 0.2
-) +
-xlab(label = paste(
-"dbRDA1 (",
-round(B$concont$importance[2, 1] * 100, digits = 1),
-"%)",
-sep = ""
-)) +
-ylab(label = paste(
-"dbRDA2 (",
-round(B$concont$importance[2, 2] * 100, digits = 1),
-"%)",
-sep = ""
-)) +
-scale_color_manual(
-labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
-values = met.brewer(
-"Isfahan2",
-n = 3,
-type = "discrete",
-direction = -1
-)
-) +
-#scale_shape_manual(values = c(1:22)) +
-theme_classic(base_size = 16) +
-theme(
-legend.title = element_text(face = "bold"),
-legend.text = element_markdown(),
-legend.position = "bottom",
-plot.caption = element_markdown(),
-strip.text = element_text(face = "bold")
-) +
-labs(caption = "PERMDISP: *F*<sub>7,4192</sub> = 268.1, *p* = .001")  #Results from beta_perm3
-#facet_wrap( ~ Elevation_cat) 
+  ggplot(data = merged_data, aes(x = dbRDA1, y = dbRDA2)) +
+  geom_point(
+    data = merged_data,
+    aes(color = Species),
+    size = rel(4),
+    alpha = 0.2,
+    stroke = 1
+  ) +
+  stat_ellipse(
+    aes(color = Species),
+    geom = "path",
+    linewidth = 1.3,
+    position = "identity",
+    type = "t",
+    linetype = 1,
+    level = 0.95,
+    segments = 51,
+    na.rm = FALSE,
+    show.legend = NA,
+    inherit.aes = TRUE
+  ) +
+  geom_segment(
+    arrow_map,
+    linewidth = rel(.8),
+    data = arrow_scores[1:2, ],
+    color = "black",
+    arrow = arrowhead
+  ) +
+  geom_vline(xintercept = 0,
+             color = "grey30",
+             linetype = "dashed") + # plot vertical line
+  geom_hline(yintercept = 0,
+             color = "grey30",
+             linetype = "dashed") + # plot horizontal line
+  geom_text(
+    label_map,
+    size = rel(4),
+    data = A4[[1]],
+    fontface = "bold",
+    show.legend = FALSE,
+    label = c("Elev."),
+    nudge_x = 0.65
+  ) +
+  geom_text(
+    label_map,
+    size = rel(4),
+    data = A4[[2]],
+    fontface = "bold",
+    show.legend = FALSE,
+    label = c("logLBI"),
+    nudge_y = 0.2
+  ) +
+  xlab(label = paste(
+    "dbRDA1 (",
+    round(B$concont$importance[2, 1] * 100, digits = 1),
+    "%)",
+    sep = ""
+  )) +
+  ylab(label = paste(
+    "dbRDA2 (",
+    round(B$concont$importance[2, 2] * 100, digits = 1),
+    "%)",
+    sep = ""
+  )) +
+  scale_color_manual(
+    labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+    values = met.brewer(
+      "Isfahan2",
+      n = 3,
+      type = "discrete",
+      direction = -1
+    )
+  ) +
+  #scale_shape_manual(values = c(1:22)) +
+  theme_classic(base_size = 16) +
+  theme(
+    legend.title = element_text(face = "bold"),
+    legend.text = element_markdown(),
+    legend.position = "bottom",
+    plot.caption = element_markdown(),
+    strip.text = element_text(face = "bold")
+  ) +
+  labs(caption = "PERMDISP: *F*<sub>7,4192</sub> = 268.1, *p* = .001") + #Results from beta_perm3
+  facet_wrap(~ Elevation_cat) 
      
 # Rearranging the order of layers so arrows are above the points.
 #p_final_model$layers
