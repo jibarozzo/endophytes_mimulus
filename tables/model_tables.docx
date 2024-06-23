@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 24.2.4.2 (Linux)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changedby" content="Bolívar Aponte Rolón"/>
+	<meta name="changed" content="2024-06-23T16:59:40.736725619"/>
+	<style type="text/css">
+		@page { size: 11.69in 8.27in; margin-left: 0.5in; margin-right: 0.39in; margin-top: 0.39in; margin-bottom: 0.39in }
+		p { line-height: 115%; margin-bottom: 0.1in; background: transparent }
+		td p { orphans: 0; widows: 0; background: transparent }
+		th p { font-weight: bold; text-align: center; orphans: 0; widows: 0; background: transparent }
+		strong { font-weight: bold }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><p align="center" style="margin-bottom: 0in">
+Linear mixed effects models for predicting FEF mean Beta diversity</p>
+<center>
+	<table width="864" cellpadding="2" cellspacing="1">
+		<col width="83"/>
+		<col width="61"/>
+		<col width="75"/>
+		<col width="42"/>
+		<col width="61"/>
+		<col width="75"/>
+		<col width="42"/>
+		<col width="61"/>
+		<col width="75"/>
+		<col width="42"/>
+		<col width="61"/>
+		<col width="75"/>
+		<col width="44"/>
+		<tbody>
+			<tr>
+				<th width="83" style="border-top: 1px double #000000; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding: 0.08in 0in"><p align="center">
+					&nbsp;</p>
+				</th>
+				<th colspan="3" width="188" style="border-top: 1px double #000000; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding: 0.08in 0in"><p align="center" style="font-weight: normal">
+					<font size="2" style="font-size: 11pt"><i>mean_bray</i></font></p>
+				</th>
+				<th colspan="3" width="188" style="border-top: 1px double #000000; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding: 0.08in 0in"><p align="center" style="font-weight: normal">
+					<font size="2" style="font-size: 11pt"><i>mean_bray</i></font></p>
+				</th>
+				<th colspan="3" width="188" style="border-top: 1px double #000000; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding: 0.08in 0in"><p align="center" style="font-weight: normal">
+					<font size="2" style="font-size: 11pt"><i>mean_bray</i></font></p>
+				</th>
+				<th colspan="3" width="190" style="border-top: 1px double #000000; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding: 0.08in 0in"><p align="center" style="font-weight: normal">
+					<font size="2" style="font-size: 11pt"><i>mean_bray</i></font></p>
+				</th>
+			</tr>
+		</tbody>
+		<tbody>
+			<tr>
+				<td width="83" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>Predictors</b></font></p>
+				</td>
+				<td width="61" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>Estimates</b></font></p>
+				</td>
+				<td width="75" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>CI</b></font></p>
+				</td>
+				<td width="42" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>p</b></font></p>
+				</td>
+				<td width="61" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>Estimates</b></font></p>
+				</td>
+				<td width="75" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>CI</b></font></p>
+				</td>
+				<td width="42" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>p</b></font></p>
+				</td>
+				<td width="61" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>Estimates</b></font></p>
+				</td>
+				<td width="75" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>CI</b></font></p>
+				</td>
+				<td width="42" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>p</b></font></p>
+				</td>
+				<td width="61" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>Estimates</b></font></p>
+				</td>
+				<td width="75" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>CI</b></font></p>
+				</td>
+				<td width="44" style="border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>p</b></font></p>
+				</td>
+			</tr>
+		</tbody>
+		<tbody>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>(Intercept)</b></font></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">1.47</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">1.36&nbsp;–&nbsp;1.59</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.44</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.27&nbsp;–&nbsp;0.60</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.54</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.38&nbsp;–&nbsp;0.70</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.49</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.43&nbsp;–&nbsp;0.54</font></p>
+				</td>
+				<td width="44" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>Elevation m</b></font></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.00</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.00&nbsp;–&nbsp;0.00</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.398</font></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.00</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.00&nbsp;–&nbsp;0.00</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.594</font></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.00</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.00&nbsp;–&nbsp;0.00</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.503</font></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<br/>
+
+					</p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<br/>
+
+					</p>
+				</td>
+				<td width="44" style="border: none; padding: 0in"><p align="center">
+					<br/>
+
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>logACI</b></font></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.04</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.06&nbsp;–&nbsp;-0.03</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.13</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.12&nbsp;–&nbsp;0.14</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.14</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.14&nbsp;–&nbsp;0.15</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.14</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.14&nbsp;–&nbsp;0.15</font></p>
+				</td>
+				<td width="44" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>logLT</b></font></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.28</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.30&nbsp;–&nbsp;-0.25</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.05</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.03&nbsp;–&nbsp;0.07</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.02</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.00&nbsp;–&nbsp;0.03</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">0.006</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.02</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.00&nbsp;–&nbsp;0.03</font></p>
+				</td>
+				<td width="44" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">0.006</font></strong></p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>logLPS</b></font></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.10</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.07&nbsp;–&nbsp;0.12</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.00</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.02&nbsp;–&nbsp;0.02</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">0.757</font></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<br/>
+
+					</p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<br/>
+
+					</p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<br/>
+
+					</p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<br/>
+
+					</p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<br/>
+
+					</p>
+				</td>
+				<td width="44" style="border: none; padding: 0in"><p align="center">
+					<br/>
+
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>logLMA</b></font></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.02</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.04&nbsp;–&nbsp;-0.00</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">0.021</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.17</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.18&nbsp;–&nbsp;-0.16</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.14</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.15&nbsp;–&nbsp;-0.14</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.14</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.15&nbsp;–&nbsp;-0.14</font></p>
+				</td>
+				<td width="44" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>logLBI</b></font></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.05</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.06&nbsp;–&nbsp;-0.05</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.04</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.05&nbsp;–&nbsp;-0.03</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.02</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.02&nbsp;–&nbsp;-0.01</font></p>
+				</td>
+				<td width="42" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+				<td width="61" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.02</font></p>
+				</td>
+				<td width="75" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt">-0.02&nbsp;–&nbsp;-0.01</font></p>
+				</td>
+				<td width="44" style="border: none; padding: 0in"><p align="center">
+					<strong><font size="2" style="font-size: 11pt">&lt;0.001</font></strong></p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="13" width="858" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>Random Effects</b></font></p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>σ<sup>2</sup></b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.00</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.00</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.00</b></font></p>
+				</td>
+				<td colspan="3" width="190" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.00</b></font></p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>τ<sub>00</sub></b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.00 <sub>Site</sub></b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.02 <sub>Species</sub></b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.00 <sub>Species</sub></b></font></p>
+				</td>
+				<td colspan="3" width="190" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.00 <sub>Species</sub></b></font></p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<br/>
+
+					</p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					&nbsp;</p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.08 <sub>Site</sub></b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.08 <sub>Site</sub></b></font></p>
+				</td>
+				<td colspan="3" width="190" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.08 <sub>Site</sub></b></font></p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>ICC</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.57</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					&nbsp;</p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					&nbsp;</p>
+				</td>
+				<td colspan="3" width="190" style="border: none; padding: 0in"><p align="center">
+					&nbsp;</p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>N</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>11 <sub>Site</sub></b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>3 <sub>Species</sub></b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>3 <sub>Species</sub></b></font></p>
+				</td>
+				<td colspan="3" width="190" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>3 <sub>Species</sub></b></font></p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<br/>
+
+					</p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					&nbsp;</p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>11 <sub>Site</sub></b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>11 <sub>Site</sub></b></font></p>
+				</td>
+				<td colspan="3" width="190" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>11 <sub>Site</sub></b></font></p>
+				</td>
+			</tr>
+		</tbody>
+		<tbody>
+			<tr>
+				<td width="83" style="border-top: 1px solid #000000; border-bottom: none; border-left: none; border-right: none; padding-top: 0.08in; padding-bottom: 0in; padding-left: 0in; padding-right: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>Observations</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border-top: 1px solid #000000; border-bottom: none; border-left: none; border-right: none; padding-top: 0.08in; padding-bottom: 0in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>2250</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border-top: 1px solid #000000; border-bottom: none; border-left: none; border-right: none; padding-top: 0.08in; padding-bottom: 0in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>2250</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border-top: 1px solid #000000; border-bottom: none; border-left: none; border-right: none; padding-top: 0.08in; padding-bottom: 0in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>2400</b></font></p>
+				</td>
+				<td colspan="3" width="190" style="border-top: 1px solid #000000; border-bottom: none; border-left: none; border-right: none; padding-top: 0.08in; padding-bottom: 0in; padding-left: 0in; padding-right: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>2400</b></font></p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>Marginal R<sup>2</sup>
+					/ Conditional R<sup>2</sup></b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.290 / 0.694</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.305 / NA</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.368 / NA</b></font></p>
+				</td>
+				<td colspan="3" width="190" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>0.287 / NA</b></font></p>
+				</td>
+			</tr>
+			<tr>
+				<td width="83" height="1" style="border: none; padding: 0in"><p align="right">
+					<font size="2" style="font-size: 11pt"><b>AIC</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>-7894.297</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>-9574.760</b></font></p>
+				</td>
+				<td colspan="3" width="188" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>-10732.622</b></font></p>
+				</td>
+				<td colspan="3" width="190" style="border: none; padding: 0in"><p align="center">
+					<font size="2" style="font-size: 11pt"><b>-10734.181</b></font></p>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</center>
+<p><br/>
+<br/>
+
+</p>
+</body>
+</html>
