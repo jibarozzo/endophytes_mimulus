@@ -2599,8 +2599,10 @@ dbrda_traits <- rrfy_hell_matrix |>
   unite(Species_Elevation, Species, Elevation_cat, sep = "_", remove = FALSE) # To model interactions
 ```
 
+
+#### Models with only logLBI as leaf trait
 ```{r}
-# Model with intercept only ####
+# Model with intercept only 
 # Using rrfy_hell_matrix as the distance matrix
 m0_hell <- dbrda(dbrda_hell_matrix ~ 1,
             distance = "bray",
@@ -2705,8 +2707,7 @@ m4_hell <-
     distance = "bray",
     dfun = vegdist,
     data = dbrda_traits,
-    parallel = 8,
-    #Passes parallelization to metaMDS function
+    parallel = 8, #Passes parallelization to metaMDS function
     na.action = na.omit
   )
 
@@ -2852,9 +2853,20 @@ beta_perm3 <-
 save(beta_perm3, file = "clean_data/statistics/beta_perm3.rda")
 
 TukeyHSD(beta_dis3, conf.level = 0.95)
-
 ```
 
+#### Model with all leaf traits
+
+```{r}
+m1_lts <- dbrda(
+  dbrda_hell_matrix ~  logACI + logLT + logLPS + logLMA + logLBI + Elevation_m + Species,
+  distance = "bray",
+  dfun = vegdist,
+  data = dbrda_traits,
+  parallel = 8, #Passes parallelization to metaMDS function
+  na.action = na.omit
+)
+```
 
 
 #### Plot dbRDA
@@ -3223,55 +3235,21 @@ legend = "bottom",
 labels = c("PCoA", "dbRDA")
 ) #, widths = c(1, 1))
 
-joined
+pcoa_dbrda_joined
 
-ggsave(file.path(path, "figures/pcoa_dbrda.png"), plot = joined, dpi=300, units=c("mm"), width=300, height=300)
+#ggsave(file.path(path, "figures/pcoa_dbrda.png"), plot = pcoa_dbrda_joined, dpi=300, units=c("mm"), width=300, height=300)
 ```
 
 
-### PCoA Simple Linear regressions
+## Linear Regressions
+### PCoA vs. Elevation
 
 ```{r}
 # PCoA regressions
-# PCoA1 vs alpha diversity
-
-alpha_pcoa1 <- lm(hill_1 ~ Dim1, data = pcoa_merged_data)
-plot(alpha_pcoa1)
 
 # Polynomial Formula
-formula <- y ~ poly(x, 3, raw = TRUE)
-
-
-alpha_pcoa <- ggplot(data = pcoa_merged_data, aes(y = hill_1, x = Dim1, color = Species)) +
-  geom_point(
-    aes(color = Species),
-    size = rel(4),
-    alpha = 0.2,
-    stroke = 1
-  ) +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(y =  "Alpha diversity (\U1D492 = 1)",
-       x = paste("PCoA1 (", pretty_percent[1], "%)", sep = "")) +
-  scale_color_manual(
-    labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
-    values = met.brewer(
-      "Isfahan2",
-      n = 3,
-      type = "discrete",
-      direction = -1
-    )
-  ) +
-  theme_classic(base_size = 16) +
-  theme(
-    legend.title = element_text(face = "bold"),
-    legend.text = element_markdown(),
-    legend.position = "bottom",
-    plot.caption = element_markdown(),
-    strip.text = element_text(face = "bold")
-  )
-
-alpha_pcoa
-
+#formula <- y ~ poly(x, 3, raw = TRUE)
+formula <- y ~ x
 
 # PC1 and Elevation
 
@@ -3282,7 +3260,7 @@ elevation_pcoa1 <- ggplot(data = pcoa_merged_data, aes(x = Elevation_m, y = Dim1
     alpha = 0.2,
     stroke = 1
   ) +
-  geom_smooth(method = "loess", se = FALSE) +
+  geom_smooth(method = "lm", se = TRUE) +
   labs(x =  "Elevation (m)",
        y = paste("PCoA1 (", pretty_percent[1], "%)", sep = "")) +
   stat_poly_eq(
@@ -3316,7 +3294,7 @@ elevation_pcoa1 <- ggplot(data = pcoa_merged_data, aes(x = Elevation_m, y = Dim1
     legend.text = element_markdown(),
     legend.position = "bottom",
     plot.caption = element_markdown(),
-    strip.text = element_text(face = "bold")
+    strip.text = element_text(face = "bold.italic", size = 14)
   ) +
   facet_wrap( ~ Species)
 
@@ -3324,53 +3302,53 @@ elevation_pcoa1
 
 # PC2 and Elevation
 
-elevation_pcoa2 <- ggplot(data = pcoa_merged_data, aes(x = Elevation_m, y = Dim2, color = Species)) +
-  geom_point(
-    aes(color = Species),
-    size = rel(4),
-    alpha = 0.2,
-    stroke = 1
-  ) +
-  geom_smooth(method = "loess", se = FALSE) +
-  labs(x =  "Elevation (m)",
-       y = paste("PCoA2 (", pretty_percent[2], "%)", sep = "")) +
-  stat_poly_eq(
-    formula = formula,
-    color = "black",
-    aes(label = paste(
-      #..eq.label..,
-      ..adj.rr.label.., #"~italic(p) ==",
-      ..p.value.label.., #signif(..p.value.., digits = 4),
-      sep = "*`,`~~"
-    )),
-    #method = "loess",
-    rr.digits = 2,
-    p.digits = 3 ,
-    parse = TRUE,
-    label.x = "right",
-    label.y = "top",
-    vstep = 0.08
-  ) +
-  scale_color_manual(
-    labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
-    values = met.brewer(
-      "Isfahan2",
-      n = 3,
-      type = "discrete",
-      direction = -1
-    )
-  ) +
-  theme_classic(base_size = 16) +
-  theme(
-    legend.title = element_text(face = "bold"),
-    legend.text = element_markdown(),
-    legend.position = "bottom",
-    plot.caption = element_markdown(),
-    strip.text = element_text(face = "bold")
-  ) +
-  facet_wrap( ~ Species)
-
-elevation_pcoa2
+# elevation_pcoa2 <- ggplot(data = pcoa_merged_data, aes(x = Elevation_m, y = Dim2, color = Species)) +
+#   geom_point(
+#     aes(color = Species),
+#     size = rel(4),
+#     alpha = 0.2,
+#     stroke = 1
+#   ) +
+#   geom_smooth(method = "lm", se = FALSE) +
+#   labs(x =  "Elevation (m)",
+#        y = paste("PCoA2 (", pretty_percent[2], "%)", sep = "")) +
+#   stat_poly_eq(
+#     formula = formula,
+#     color = "black",
+#     aes(label = paste(
+#       #..eq.label..,
+#       ..adj.rr.label.., #"~italic(p) ==",
+#       ..p.value.label.., #signif(..p.value.., digits = 4),
+#       sep = "*`,`~~"
+#     )),
+#     #method = "loess",
+#     rr.digits = 2,
+#     p.digits = 3 ,
+#     parse = TRUE,
+#     label.x = "right",
+#     label.y = "top",
+#     vstep = 0.08
+#   ) +
+#   scale_color_manual(
+#     labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+#     values = met.brewer(
+#       "Isfahan2",
+#       n = 3,
+#       type = "discrete",
+#       direction = -1
+#     )
+#   ) +
+#   theme_classic(base_size = 16) +
+#   theme(
+#     legend.title = element_text(face = "bold"),
+#     legend.text = element_markdown(),
+#     legend.position = "bottom",
+#     plot.caption = element_markdown(),
+#     strip.text = element_text(face = "bold")
+#   ) +
+#   facet_wrap( ~ Species)
+# 
+# elevation_pcoa2
 
 # Joining plots
 
@@ -3387,30 +3365,14 @@ widths = c(1,1)
 
 pcoa_elevations
 
-# Joining plots
-
-pcoa_pcr_dbrda_joined <- ggarrange(
-pcoa_plot,
-alpha_pcoa,
-p_final_model,
-nrow = 1,
-ncol = 3,
-common.legend = TRUE,
-legend = "bottom",
-labels = c("PCoA", "Alpha diversity", "dbRDA"),
-widths = c(1,1,1)
-)
-
-pcoa_pcr_dbrda_joined
-
-#ggsave(file.path(path, "figures/pcoa_pcr_dbrda.png") , plot = pcoa_pcr_dbrda_joined, dpi=300, units=c("mm"), width=350, height=300)
+ggsave(file.path(path, "figures/pcoa_elevations.png"), plot = pcoa_elevations, dpi=300, units=c("mm"), width=300, height=300)
 ```
 
 The simple linear model of PCoA 1 vs. Alpha diversity does not look good. When we plot the residuals, fitted values and Cook's distance we see it suffers from heteroscedasticity and outliers. The PCoA and dbRDa are qualitatively very similar. We observed overlapped of fungal communitites in *Mimulus* spp. A lot of the microbial literature presents PCoA, alphadiversity measures and PERMANOVA table. My issue with PCoA and doing a PCoR with a measure of alpha diversity or similar is that the model fit is not good at all. Visually it represents how at higher elevation we have lower alpha diversity levels. But this is information that is already present in the "boxplot_hill_orders" plots and the facetted dbRDA. I don't think the PCoA adds more information.
 
 The PCoR of PCoA 1 vs. Elevation is a little bit more illustrative of the dynamics of the fungal communities. We see that the fungal communities are more similar at higher elevations. Maybe we can visualize this by plotting Bray-Curtis dissimilarity vs. Elevation. Similar to the Mantel tests.  
 
-### Bray-Curtis dissimilarity vs. Elevation
+### Bray-Curtis vs. Elevation
 
 ```{r, bray_elevation}
 # Bray-Curtis dissimilarity vs. Elevation
@@ -3473,105 +3435,134 @@ bray_elevation <- ggplot(data = plant_traits_MB, aes(x = Elevation_m, y = mean_b
   facet_wrap( ~ Species)
 
 bray_elevation
+
+ggsave(file.path(path, "figures/bray_elevation.png"), plot = bray_elevation, dpi=300, units=c("mm"), width=300, height=300)
+```
+
+
+#### Joined PCoA 1 and Bray dissimilarity
+```{r}
+# Joined PCoA 1 and Bray dissimilarity
+
+bray_pcoa_joined <- ggarrange(elevation_pcoa1, bray_elevation,
+nrow = 2,
+ncol = 1,
+common.legend = TRUE,
+legend = "bottom",
+
+labels = c("A", "B"),
+widths = c(1,1)
+)
+
+
+bray_pcoa_joined <- annotate_figure(
+  bray_pcoa_joined,
+  top = text_grob(
+    "Simple Linear Regressions",
+    color = "red",
+    face = "bold",
+    size = 14
+  )
+)
+
+bray_pcoa_joined
+
+ggsave(file.path(path, "figures/bray_pcoa_joined.png"), plot = bray_pcoa_joined, dpi=300, units=c("mm"), width=300, height=300)
 ```
 
 These regressions show that the mean bray-Curtis dissimilarity for each species decreases a elevation increases. FEF communities are more similar at higher elevations. It is a clearer way of visualizing the effects of elevation in the fungal communities.
 
-### GLMs with Beta Diversity
+## GLMs 
+
+### Beta Diversity
 
 #### Selecting fixed terms
 ```{r, glm}
 # GLMs with Beta Diversity
 library("sjPlot")
-m1 <- glm(
+b1 <- glm(
   mean_bray ~ Elevation_m + Species + Site + logACI + logLT + logLPS + logLMA + logLBI,
   data = plant_traits_MB,
   family = gaussian
 ) # Gaussian/Normal distribution
-plot(m1)
-anova(m1)
+plot(b1)
+anova(b1)
 
 # Model with intercept only
 M0 <- lm(mean_bray ~ 1, data = plant_traits_MB, na.action = na.exclude)
-anova(M0)
+anova(B0)
 AIC(M0)
 plot(M0)
 
 # Model with Elvation, Species and Site
-M1 <- lm(
+B1 <- lm(
   mean_bray ~ Elevation_m + Species + Site + logACI + logLT + logLPS + logLMA + logLBI,
   data = plant_traits_MB,
   na.action = na.exclude
 )
-anova(M1)
-plot(M1)
-AIC(M1) # -14900.34
+anova(B1)
+plot(B1)
+AIC(B1) # -14900.34
 
 # Residuals
-M1_resid <- resid(M1, type = "response")
-M1_fitted <- fitted(M1)
+B1_resid <- resid(B1, type = "response")
+B1_fitted <- fitted(B1)
 
 #Histograms
-hist(M1_resid)
-hist(M1_fitted)
+hist(B1_resid)
+hist(B1_fitted)
 
 # Plots
-plot(M1)
+plot(B1)
 
-#anova(M1,type="marginal") #What is a type III ANOVA?
-Anova(M1, type = 3)
-drop1(M1, test = "F", trace = TRUE)
-drop1(M1, . ~ ., test = "F", trace = TRUE)
+#anova(B1,type="marginal") #What is a type III ANOVA?
+Anova(B1, type = 3)
+drop1(B1, test = "F", trace = TRUE)
+drop1(B1, . ~ ., test = "F", trace = TRUE)
 
 # Stepwise selection of linear model (lm())
-M1AIC <- stepAIC(update(M1, . ~ .), direction = "both", k = 2)
-M1AIC$anova
+B1AIC <- stepAIC(update(B1, . ~ .), direction = "both", k = 2)
+B1AIC$anova
 
 #Final Model:
 #mean_bray ~ Species + Site + logACI + logLT + logLPS + logLMA + logLBI
 
-# M2
-M2 <- lm(
+# B2
+B2 <- lm(
   mean_bray ~ Species + Site + logACI + logLT + logLPS + logLMA + logLBI,
   data = plant_traits_MB,
   na.action = na.exclude
 )
 
-anova(M2)
-Anova(M2, type = 3)
-AIC(M2) 
+anova(B2)
+Anova(B2, type = 3)
+AIC(B2) 
 
 # Residuals
-M2_resid <- resid(M2, type = "response")
-M2_fitted <- fitted(M2)
+B2_resid <- resid(B2, type = "response")
+B2_fitted <- fitted(B2)
 
 #Histograms
-hist(M2_resid)
-hist(M2_fitted)
+hist(B2_resid)
+hist(B2_fitted)
 
 # Plots
-plot(M2)
+plot(B2)
 
 # Stepwise selection of linear model 
-M2AIC <- stepAIC(update(M2, . ~ .), direction = "both", k = 2)
-M2AIC$anova
+B2AIC <- stepAIC(update(B2, . ~ .), direction = "both", k = 2)
+B2AIC$anova
 
 # No fixed term removed.
 ```
-
-
-
-
-
-
 
 #### Modelling random effects with "ML" method
 
 Starting with fixed terms selected above.
 
 ```{r, random_effects}
-#M3
-M3 <- lm(
+#B3
+B3 <- lm(
   mean_bray ~ Species + logACI + logLT + logLPS + logLMA + logLBI,
   random = ~ 1 | Site,
   method = "ML",
@@ -3579,33 +3570,33 @@ M3 <- lm(
   na.action = na.exclude
 )
 
-anova(M3) #Adding Site as a random effect INCREASES AIC score.
-Anova(M3, type = 3)
-AIC(M3) # -14796.77
+anova(B3) #Adding Site as a random effect INCREASES AIC score.
+Anova(B3, type = 3)
+AIC(B3) # -14796.77
 
 # Residuals histograms and plots ####
-M2_resid <- resid(M3, type = "response")
-M2_fitted <- fitted(M3)
+M2_resid <- resid(B3, type = "response")
+M2_fitted <- fitted(B3)
 
 # Histograms
-hist(M3_resid)
-hist(M3_fitted)
+hist(B3_resid)
+hist(B3_fitted)
 
 # Plots
-plot(M3)
-plot_model(M3, type = "diag")
+plot(B3)
+plot_model(B3, type = "diag")
 
 # Stepwise selection of terms
 # ANOVAs
-Anova(M3, type = 3)
-drop <- drop1(M3, . ~ ., test = "Chisq", trace = TRUE)
+Anova(B3, type = 3)
+drop <- drop1(B3, . ~ ., test = "Chisq", trace = TRUE)
 ```
 
-The GLMMs with "ML" methods and "Site" as a random effects has a greater AIC value than M1 model. The stepwise selection eliminated "Elevation" as a fixed term in the model. The final model is `mean_bray ~ Species + Site`. There could be some variance structure that needs to be modeled. We will still keep "Elevation" while we focus in nestedness in the variance structure. Let's see. 
+The GLMMs with "ML" methods and "Site" as a random effects has a greater AIC value than B1 model. The stepwise selection eliminated "Elevation" as a fixed term in the model. The final model is `mean_bray ~ Species + Site`. There could be some variance structure that needs to be modeled. We will still keep "Elevation" while we focus in nestedness in the variance structure. Let's see. 
 
 ```{r, random_effects2}
-# M4 
-M4 <- lme(
+# B4 
+B4 <- lme(
   mean_bray ~ logACI + logLT + logLPS + logLMA + logLBI,
   random = ~ 1 |
     Site/Species,
@@ -3614,23 +3605,23 @@ M4 <- lme(
   na.action = na.exclude
 )
 
-anova(M4) # Nesting Species in Site DECREASES AIC score.
-AIC(M4) # -15633.11
+anova(B4) # Nesting Species in Site DECREASES AIC score.
+AIC(B4) # -15633.11
 
 # Residuals histograms and plots ####
-M4_resid <- resid(M4, type = "response")
-M4_fitted <- fitted(M4)
+B4_resid <- resid(B4, type = "response")
+B4_fitted <- fitted(B4)
 
 # Histograms
-hist(M4_resid)
-hist(M4_fitted)
+hist(B4_resid)
+hist(B4_fitted)
 
 # Plots
-plot(M4)
-plot_model(M4, type = "diag")
+plot(B4)
+plot_model(B4, type = "diag")
 
 # Stepwise selection of terms
-drop1(M4, . ~ ., test = "Chisq", trace = TRUE)
+drop1(B4, . ~ ., test = "Chisq", trace = TRUE)
 ```
 The M4 model has a lower AIC score. We seem to have hit a good model. The fixed terms are `mean_bray ~ logACI + logLT + logLPS + logLMA + logLBI`. Let's take that an model random effects taking into account variance structure. 
 
@@ -3641,8 +3632,8 @@ Using Restricted Maximum Likelihood (REML) to model. Maximum likelihood tends to
 
 ```{r, reml_models}
 # REML
-# M1REM All fixed terms
-M1REM <- lme(
+# B1REM All fixed terms
+B1REM <- lme(
   mean_bray ~ Elevation_m + logACI + logLT + logLPS + logLMA + logLBI,
   random = ~ 1 |
     Site,
@@ -3651,24 +3642,24 @@ M1REM <- lme(
   na.action = na.exclude
 )
 
-Anova(M1REM, type = 3)
-AIC(M1REM) # -7849.631 This is a higher score than M1.
+Anova(B1REM, type = 3)
+AIC(B1REM) # -7849.631 This is a higher score than B1.
 
 
-M1_gls <- gls(
+B1_gls <- gls(
   mean_bray ~ logACI + logLT + logLPS + logLMA + logLBI,
   method = "REML",
   data = plant_traits_MB,
   na.action = na.exclude
 )
 
-Anova(M1_gls, type = 3)
-AIC(M1_gls) # -6815.453 is a higher AIC score. Site as a random effect is important.
+Anova(B1_gls, type = 3)
+AIC(B1_gls) # -6815.453 is a higher AIC score. Site as a random effect is important.
 
-plot_model(M1REM, type = "diag")
+plot_model(B1REM, type = "diag")
 
 # Stepwise selection of terms
-M1REM_drop <- drop1(M1REM, . ~ ., test = "Chisq", trace = TRUE)
+B1REM_drop <- drop1(B1REM, . ~ ., test = "Chisq", trace = TRUE)
 ```
 
 The REML model with Elevation and Species as fixed terms has a higher AIC score than the `gls` model without random effects. Site as a random effect is important. Now, palying around with the method, I observed that "ML" models the data better than "REML". The AIC scores are lower. \
@@ -3684,8 +3675,8 @@ https://stats.stackexchange.com/questions/91652/when-no-model-comparison-should-
 ctrl <- lmeControl(opt='optim')
 ctrl2 <- lmeControl(opt = "nlminb")
 
-#M3REM
-M3REM <- lme(
+#B3REM
+B3REM <- lme(
   mean_bray ~ Elevation_m + logACI + logLT + logLPS + logLMA + logLBI,
   weights = varIdent(form = ~ 1 | Site),
   random = ~ 1 |
@@ -3696,32 +3687,32 @@ M3REM <- lme(
   na.action = na.exclude
 )
 
-Anova(M3REM, type = 3)
-AIC(M3REM) # -9527.507 is  a lower AIC score than M1REM
+Anova(B3REM, type = 3)
+AIC(B3REM) # -9527.507 is  a lower AIC score than M1REM
 
 # Residuals histograms and plots ####
-M3REM_resid <- resid(M3REM, type = "response")
-M3REM_fitted <- fitted(M3REM)
+B3REM_resid <- resid(B3REM, type = "response")
+B3REM_fitted <- fitted(B3REM)
 
 # Histograms
-hist(M3REM_resid)
-hist(M3REM_fitted)
+hist(B3REM_resid)
+hist(B3REM_fitted)
 
 # Plots
-plot(M3REM)
-plot_model(M3REM, type = "diag")
+plot(B3REM)
+plot_model(B3REM, type = "diag")
 
 # Stepwise selection of terms
-drop1(M3REM, . ~ ., test = "Chisq", trace = TRUE)
+drop1(B3REM, . ~ ., test = "Chisq", trace = TRUE)
 ```
 
-The M3REM model has the lowest AIC score yet. The the fixed terms are `mean_bray ~ logACI + logLT + logLPS + logLMA + logLBI,` with a variance structure `weights = varIdent(form = ~ 1 | Site)`. The random effects are nested `random = 1 | Site/Species`. It seems to be a good fit for the data. 
+The B3REM model has the lowest AIC score yet. The the fixed terms are `mean_bray ~ logACI + logLT + logLPS + logLMA + logLBI,` with a variance structure `weights = varIdent(form = ~ 1 | Site)`. The random effects are nested `random = 1 | Site/Species`. It seems to be a good fit for the data. 
 
 ```{r, reml_models3}
 # Modelling variance structure better
-# M4REM
+# B4REM
 
-M4REM <- lme(
+B4REM <- lme(
   mean_bray ~ Elevation_m + logACI + logLT + logLMA + logLBI,,
   weights = varComb(varIdent(form = ~ 1 | Site), varIdent(form = ~ 1 | Species)),
   random = ~ 1 |
@@ -3732,24 +3723,24 @@ M4REM <- lme(
   na.action = na.exclude
 )
 
-anova(M4REM) # Adding Species as a random effect DECREASES AIC score.
-Anova(M4REM, type = 3)
-AIC(M4REM) # -10690.23 the lowest AIC score
+anova(B4REM) # Adding Species as a random effect DECREASES AIC score.
+Anova(B4REM, type = 3)
+AIC(B4REM) # -10690.23 the lowest AIC score
 
 # Residuals histograms and plots ####
-M4REM_resid <- resid(M4REM, type = "response")
-M4REM_fitted <- fitted(M4REM)
+B4REM_resid <- resid(B4REM, type = "response")
+B4REM_fitted <- fitted(B4REM)
 
 # Histograms
-hist(M4REM_resid)
-hist(M4REM_fitted)
+hist(B4REM_resid)
+hist(B4REM_fitted)
 
 # Plots
-plot(M4REM)
-plot_models(M4REM, type = "diag")
+plot(B4REM)
+plot_models(B4REM, type = "diag")
 
-# M5REM
-M5REM <- lme(
+# B5REM
+B5REM <- lme(
   mean_bray ~ logACI + logLT + logLMA + logLBI,
   weights = varComb(varIdent(form = ~ 1 | Site), varIdent(form = ~ 1 | Species)),
   random = ~ 1 |
@@ -3759,8 +3750,6 @@ M5REM <- lme(
   data = plant_traits_MB,
   na.action = na.exclude
 )
-
-
 ```
 
 #### Model comparisons
@@ -3768,12 +3757,12 @@ M5REM <- lme(
 ```{r, reml_models4}
 # Model estimate plot
 model_plots <- plot_models(
-  #M1,
-  #M3,
-  M1REM,
-  M3REM,
-  M4REM,
-  M5REM,
+  B1,
+  B3,
+  B1REM,
+  B3REM,
+  B4REM,
+  B5REM,
   legend.title = "Models",
   show.values = FALSE,
   show.p = FALSE,
@@ -3792,10 +3781,10 @@ ggsave(file.path(path, "figures/model_plots.png"), plot = model_plots, dpi=300, 
 
 # Model table comparisons
 tab_model(
-  M1REM,
-  M3REM,
-  M4REM,
-  M5REM,
+  B1REM,
+  B3REM,
+  B4REM,
+  B5REM,
   show.aic = TRUE,
   show.intercept = TRUE,
   show.df = FALSE,
@@ -3815,7 +3804,7 @@ model_tables
 
 #Model comparison and selection
 library("MuMIn")
-model.sel(M1, M2, M3, M1REM, M3REM, M4REM, M5REM)[, c("df", "logLik", "AICc", "delta")]
+model.sel(B1, B2, B3, B1REM, B3REM, B4REM, B5REM)[, c("df", "logLik", "AICc", "delta")]
 ```
 
 
