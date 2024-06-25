@@ -1,0 +1,1261 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='607.88pt' height='541.41pt' viewBox='0 0 607.88 541.41'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: none;'/>
+<defs>
+  <clipPath id='cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE='>
+    <rect x='0.00' y='0.00' width='607.88' height='541.41' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3w1LjAwfDIyLjcy'>
+    <rect x='5.00' y='5.00' width='54.43' height='17.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3w1LjAwfDIyLjcy)'>
+<line x1='5.00' y1='5.00' x2='59.43' y2='5.00' style='stroke-width: 0.85;' />
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTk1LjA0fDUuMDB8MjIuNzI='>
+    <rect x='59.43' y='5.00' width='135.61' height='17.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTk1LjA0fDUuMDB8MjIuNzI=)'>
+<line x1='59.43' y1='5.00' x2='195.04' y2='5.00' style='stroke-width: 0.85;' />
+<line x1='59.43' y1='22.72' x2='195.04' y2='22.72' style='stroke-width: 2.13;' />
+<text x='127.24' y='12.58' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='38.19px' lengthAdjust='spacingAndGlyphs'>Model 1</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDMzMC42NXw1LjAwfDIyLjcy'>
+    <rect x='195.04' y='5.00' width='135.61' height='17.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDMzMC42NXw1LjAwfDIyLjcy)'>
+<line x1='195.04' y1='5.00' x2='330.65' y2='5.00' style='stroke-width: 0.85;' />
+<line x1='195.04' y1='22.72' x2='330.65' y2='22.72' style='stroke-width: 2.13;' />
+<text x='262.85' y='12.58' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='38.19px' lengthAdjust='spacingAndGlyphs'>Model 2</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQ3MS43N3w1LjAwfDIyLjcy'>
+    <rect x='330.65' y='5.00' width='141.11' height='17.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQ3MS43N3w1LjAwfDIyLjcy)'>
+<line x1='330.65' y1='5.00' x2='471.77' y2='5.00' style='stroke-width: 0.85;' />
+<line x1='330.65' y1='22.72' x2='471.77' y2='22.72' style='stroke-width: 2.13;' />
+<text x='401.21' y='12.58' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='38.19px' lengthAdjust='spacingAndGlyphs'>Model 3</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDYwMi44OHw1LjAwfDIyLjcy'>
+    <rect x='471.77' y='5.00' width='131.11' height='17.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDYwMi44OHw1LjAwfDIyLjcy)'>
+<line x1='471.77' y1='5.00' x2='602.88' y2='5.00' style='stroke-width: 0.85;' />
+<line x1='471.77' y1='22.72' x2='602.88' y2='22.72' style='stroke-width: 2.13;' />
+<text x='537.32' y='12.58' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='38.19px' lengthAdjust='spacingAndGlyphs'>Model 4</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3wyMi43Mnw1OS43Mw=='>
+    <rect x='5.00' y='22.72' width='54.43' height='37.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3wyMi43Mnw1OS43Mw==)'>
+<line x1='5.00' y1='59.73' x2='59.43' y2='59.73' style='stroke-width: 0.85;' />
+<text x='32.22' y='39.61' text-anchor='middle' style='font-size: 10.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='44.44px' lengthAdjust='spacingAndGlyphs'>Predictors</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTI0LjM0fDIyLjcyfDU5Ljcz'>
+    <rect x='59.43' y='22.72' width='64.91' height='37.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTI0LjM0fDIyLjcyfDU5Ljcz)'>
+<line x1='59.43' y1='59.73' x2='124.34' y2='59.73' style='stroke-width: 0.85;' />
+<text x='91.89' y='40.30' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.55px' lengthAdjust='spacingAndGlyphs'>Estimate</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTI0LjM0fDE5NS4wNHwyMi43Mnw1OS43Mw=='>
+    <rect x='124.34' y='22.72' width='70.70' height='37.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTI0LjM0fDE5NS4wNHwyMi43Mnw1OS43Mw==)'>
+<line x1='124.34' y1='59.73' x2='195.04' y2='59.73' style='stroke-width: 0.85;' />
+<text x='159.69' y='40.35' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='14.97px' lengthAdjust='spacingAndGlyphs'>CI </text>
+<text x='159.69' y='48.85' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='50.71px' lengthAdjust='spacingAndGlyphs'>[t-statistic]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDI1OS45NnwyMi43Mnw1OS43Mw=='>
+    <rect x='195.04' y='22.72' width='64.91' height='37.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDI1OS45NnwyMi43Mnw1OS43Mw==)'>
+<line x1='195.04' y1='59.73' x2='259.96' y2='59.73' style='stroke-width: 0.85;' />
+<text x='227.50' y='40.30' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.55px' lengthAdjust='spacingAndGlyphs'>Estimate</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMjU5Ljk2fDMzMC42NXwyMi43Mnw1OS43Mw=='>
+    <rect x='259.96' y='22.72' width='70.70' height='37.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjU5Ljk2fDMzMC42NXwyMi43Mnw1OS43Mw==)'>
+<line x1='259.96' y1='59.73' x2='330.65' y2='59.73' style='stroke-width: 0.85;' />
+<text x='295.30' y='40.35' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='14.97px' lengthAdjust='spacingAndGlyphs'>CI </text>
+<text x='295.30' y='48.85' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='50.71px' lengthAdjust='spacingAndGlyphs'>[t-statistic]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQwMS4wN3wyMi43Mnw1OS43Mw=='>
+    <rect x='330.65' y='22.72' width='70.41' height='37.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQwMS4wN3wyMi43Mnw1OS43Mw==)'>
+<line x1='330.65' y1='59.73' x2='401.07' y2='59.73' style='stroke-width: 0.85;' />
+<text x='365.86' y='40.30' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.55px' lengthAdjust='spacingAndGlyphs'>Estimate</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAxLjA3fDQ3MS43N3wyMi43Mnw1OS43Mw=='>
+    <rect x='401.07' y='22.72' width='70.70' height='37.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAxLjA3fDQ3MS43N3wyMi43Mnw1OS43Mw==)'>
+<line x1='401.07' y1='59.73' x2='471.77' y2='59.73' style='stroke-width: 0.85;' />
+<text x='436.42' y='40.35' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='14.97px' lengthAdjust='spacingAndGlyphs'>CI </text>
+<text x='436.42' y='48.85' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='50.71px' lengthAdjust='spacingAndGlyphs'>[t-statistic]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDU0Mi4xOHwyMi43Mnw1OS43Mw=='>
+    <rect x='471.77' y='22.72' width='70.41' height='37.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDU0Mi4xOHwyMi43Mnw1OS43Mw==)'>
+<line x1='471.77' y1='59.73' x2='542.18' y2='59.73' style='stroke-width: 0.85;' />
+<text x='506.97' y='40.30' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.55px' lengthAdjust='spacingAndGlyphs'>Estimate</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTQyLjE4fDYwMi44OHwyMi43Mnw1OS43Mw=='>
+    <rect x='542.18' y='22.72' width='60.70' height='37.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQyLjE4fDYwMi44OHwyMi43Mnw1OS43Mw==)'>
+<line x1='542.18' y1='59.73' x2='602.88' y2='59.73' style='stroke-width: 0.85;' />
+<text x='572.53' y='40.35' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='14.97px' lengthAdjust='spacingAndGlyphs'>CI </text>
+<text x='572.53' y='48.85' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='50.71px' lengthAdjust='spacingAndGlyphs'>[t-statistic]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3w1OS43M3wxMDcuOTA='>
+    <rect x='5.00' y='59.73' width='54.43' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3w1OS43M3wxMDcuOTA=)'>
+<text x='22.77' y='77.43' text-anchor='middle' style='font-size: 10.00px; font-family: "TeX Gyre Termes";' textLength='35.55px' lengthAdjust='spacingAndGlyphs'>Intercept</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTI0LjM0fDU5LjczfDEwNy45MA=='>
+    <rect x='59.43' y='59.73' width='64.91' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTI0LjM0fDU5LjczfDEwNy45MA==)'>
+<text x='91.89' y='77.32' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>1.472 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTI0LjM0fDE5NS4wNHw1OS43M3wxMDcuOTA='>
+    <rect x='124.34' y='59.73' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTI0LjM0fDE5NS4wNHw1OS43M3wxMDcuOTA=)'>
+<text x='159.69' y='78.19' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>(1.355 - </text>
+<text x='159.69' y='87.67' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>1.589 ) </text>
+<text x='159.69' y='97.01' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>[24.698]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDI1OS45Nnw1OS43M3wxMDcuOTA='>
+    <rect x='195.04' y='59.73' width='64.91' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDI1OS45Nnw1OS43M3wxMDcuOTA=)'>
+<text x='227.50' y='77.32' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>0.436 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMjU5Ljk2fDMzMC42NXw1OS43M3wxMDcuOTA='>
+    <rect x='259.96' y='59.73' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjU5Ljk2fDMzMC42NXw1OS43M3wxMDcuOTA=)'>
+<text x='295.30' y='78.19' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>(0.268 - </text>
+<text x='295.30' y='87.67' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.603 ) </text>
+<text x='295.30' y='97.01' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='32.08px' lengthAdjust='spacingAndGlyphs'>[5.106]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQwMS4wN3w1OS43M3wxMDcuOTA='>
+    <rect x='330.65' y='59.73' width='70.41' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQwMS4wN3w1OS43M3wxMDcuOTA=)'>
+<text x='365.86' y='77.32' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>0.541 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAxLjA3fDQ3MS43N3w1OS43M3wxMDcuOTA='>
+    <rect x='401.07' y='59.73' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAxLjA3fDQ3MS43N3w1OS43M3wxMDcuOTA=)'>
+<text x='436.42' y='78.19' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>(0.382 - </text>
+<text x='436.42' y='87.67' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.699 ) </text>
+<text x='436.42' y='97.01' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='32.08px' lengthAdjust='spacingAndGlyphs'>[6.699]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDU0Mi4xOHw1OS43M3wxMDcuOTA='>
+    <rect x='471.77' y='59.73' width='70.41' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDU0Mi4xOHw1OS43M3wxMDcuOTA=)'>
+<text x='506.97' y='77.32' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>0.488 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTQyLjE4fDYwMi44OHw1OS43M3wxMDcuOTA='>
+    <rect x='542.18' y='59.73' width='60.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQyLjE4fDYwMi44OHw1OS43M3wxMDcuOTA=)'>
+<text x='572.53' y='78.19' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>(0.434 - </text>
+<text x='572.53' y='87.67' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.541 ) </text>
+<text x='572.53' y='97.01' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>[17.832]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3wxMDcuOTB8MTU1Ljk1'>
+    <rect x='5.00' y='107.90' width='54.43' height='48.05' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3wxMDcuOTB8MTU1Ljk1)'>
+<text x='24.17' y='124.69' text-anchor='middle' style='font-size: 10.00px; font-family: "TeX Gyre Termes";' textLength='38.33px' lengthAdjust='spacingAndGlyphs'>Elevation</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTI0LjM0fDEwNy45MHwxNTUuOTU='>
+    <rect x='59.43' y='107.90' width='64.91' height='48.05' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTI0LjM0fDEwNy45MHwxNTUuOTU=)'>
+<text x='91.89' y='125.33' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='39.42px' lengthAdjust='spacingAndGlyphs'>-0.000    </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTI0LjM0fDE5NS4wNHwxMDcuOTB8MTU1Ljk1'>
+    <rect x='124.34' y='107.90' width='70.70' height='48.05' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTI0LjM0fDE5NS4wNHwxMDcuOTB8MTU1Ljk1)'>
+<text x='159.69' y='126.23' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.000 - </text>
+<text x='159.69' y='135.61' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.000 ) </text>
+<text x='159.69' y='144.88' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>[-0.887]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDI1OS45NnwxMDcuOTB8MTU1Ljk1'>
+    <rect x='195.04' y='107.90' width='64.91' height='48.05' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDI1OS45NnwxMDcuOTB8MTU1Ljk1)'>
+<text x='227.50' y='125.33' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='39.42px' lengthAdjust='spacingAndGlyphs'>-0.000    </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMjU5Ljk2fDMzMC42NXwxMDcuOTB8MTU1Ljk1'>
+    <rect x='259.96' y='107.90' width='70.70' height='48.05' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjU5Ljk2fDMzMC42NXwxMDcuOTB8MTU1Ljk1)'>
+<text x='295.30' y='126.23' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.000 - </text>
+<text x='295.30' y='135.61' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.000 ) </text>
+<text x='295.30' y='144.95' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>[-0.553]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQwMS4wN3wxMDcuOTB8MTU1Ljk1'>
+    <rect x='330.65' y='107.90' width='70.41' height='48.05' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQwMS4wN3wxMDcuOTB8MTU1Ljk1)'>
+<text x='365.86' y='125.33' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='39.42px' lengthAdjust='spacingAndGlyphs'>-0.000    </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAxLjA3fDQ3MS43N3wxMDcuOTB8MTU1Ljk1'>
+    <rect x='401.07' y='107.90' width='70.70' height='48.05' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAxLjA3fDQ3MS43N3wxMDcuOTB8MTU1Ljk1)'>
+<text x='436.42' y='126.23' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.000 - </text>
+<text x='436.42' y='135.61' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.000 ) </text>
+<text x='436.42' y='144.92' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>[-0.698]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDU0Mi4xOHwxMDcuOTB8MTU1Ljk1'>
+    <rect x='471.77' y='107.90' width='70.41' height='48.05' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDU0Mi4xOHwxMDcuOTB8MTU1Ljk1)'>
+<text x='506.97' y='121.54' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='22.00px' lengthAdjust='spacingAndGlyphs'>        </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTQyLjE4fDYwMi44OHwxMDcuOTB8MTU1Ljk1'>
+    <rect x='542.18' y='107.90' width='60.70' height='48.05' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQyLjE4fDYwMi44OHwxMDcuOTB8MTU1Ljk1)'>
+<text x='572.53' y='121.54' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3wxNTUuOTV8MjA0LjEy'>
+    <rect x='5.00' y='155.95' width='54.43' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3wxNTUuOTV8MjA0LjEy)'>
+<text x='13.61' y='172.71' text-anchor='middle' style='font-size: 10.00px; font-family: "TeX Gyre Termes";' textLength='17.22px' lengthAdjust='spacingAndGlyphs'>ACI</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTI0LjM0fDE1NS45NXwyMDQuMTI='>
+    <rect x='59.43' y='155.95' width='64.91' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTI0LjM0fDE1NS45NXwyMDQuMTI=)'>
+<text x='91.89' y='173.52' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='31.17px' lengthAdjust='spacingAndGlyphs'>-0.041 </text>
+<text x='91.89' y='179.78' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='16.50px' lengthAdjust='spacingAndGlyphs'>***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTI0LjM0fDE5NS4wNHwxNTUuOTV8MjA0LjEy'>
+    <rect x='124.34' y='155.95' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTI0LjM0fDE5NS4wNHwxNTUuOTV8MjA0LjEy)'>
+<text x='159.69' y='174.41' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.056 - </text>
+<text x='159.69' y='183.89' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>-0.026 ) </text>
+<text x='159.69' y='193.24' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>[-5.365]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDI1OS45NnwxNTUuOTV8MjA0LjEy'>
+    <rect x='195.04' y='155.95' width='64.91' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDI1OS45NnwxNTUuOTV8MjA0LjEy)'>
+<text x='227.50' y='173.54' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>0.129 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMjU5Ljk2fDMzMC42NXwxNTUuOTV8MjA0LjEy'>
+    <rect x='259.96' y='155.95' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjU5Ljk2fDMzMC42NXwxNTUuOTV8MjA0LjEy)'>
+<text x='295.30' y='174.41' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>(0.122 - </text>
+<text x='295.30' y='183.89' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.135 ) </text>
+<text x='295.30' y='193.24' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>[38.572]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQwMS4wN3wxNTUuOTV8MjA0LjEy'>
+    <rect x='330.65' y='155.95' width='70.41' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQwMS4wN3wxNTUuOTV8MjA0LjEy)'>
+<text x='365.86' y='173.54' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>0.140 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAxLjA3fDQ3MS43N3wxNTUuOTV8MjA0LjEy'>
+    <rect x='401.07' y='155.95' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAxLjA3fDQ3MS43N3wxNTUuOTV8MjA0LjEy)'>
+<text x='436.42' y='174.41' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>(0.135 - </text>
+<text x='436.42' y='183.89' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.146 ) </text>
+<text x='436.42' y='193.24' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>[53.140]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDU0Mi4xOHwxNTUuOTV8MjA0LjEy'>
+    <rect x='471.77' y='155.95' width='70.41' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDU0Mi4xOHwxNTUuOTV8MjA0LjEy)'>
+<text x='506.97' y='173.54' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>0.140 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTQyLjE4fDYwMi44OHwxNTUuOTV8MjA0LjEy'>
+    <rect x='542.18' y='155.95' width='60.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQyLjE4fDYwMi44OHwxNTUuOTV8MjA0LjEy)'>
+<text x='572.53' y='174.41' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>(0.135 - </text>
+<text x='572.53' y='183.89' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.146 ) </text>
+<text x='572.53' y='193.24' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>[53.143]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3wyMDQuMTJ8MjUyLjI5'>
+    <rect x='5.00' y='204.12' width='54.43' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3wyMDQuMTJ8MjUyLjI5)'>
+<text x='11.11' y='220.74' text-anchor='middle' style='font-size: 10.00px; font-family: "TeX Gyre Termes";' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>LT</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTI0LjM0fDIwNC4xMnwyNTIuMjk='>
+    <rect x='59.43' y='204.12' width='64.91' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTI0LjM0fDIwNC4xMnwyNTIuMjk=)'>
+<text x='91.89' y='221.69' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='31.17px' lengthAdjust='spacingAndGlyphs'>-0.275 </text>
+<text x='91.89' y='227.95' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='16.50px' lengthAdjust='spacingAndGlyphs'>***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTI0LjM0fDE5NS4wNHwyMDQuMTJ8MjUyLjI5'>
+    <rect x='124.34' y='204.12' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTI0LjM0fDE5NS4wNHwyMDQuMTJ8MjUyLjI5)'>
+<text x='159.69' y='222.58' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.302 - </text>
+<text x='159.69' y='232.06' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>-0.248 ) </text>
+<text x='159.69' y='241.41' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>[-20.004]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDI1OS45NnwyMDQuMTJ8MjUyLjI5'>
+    <rect x='195.04' y='204.12' width='64.91' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDI1OS45NnwyMDQuMTJ8MjUyLjI5)'>
+<text x='227.50' y='221.71' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>0.048 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMjU5Ljk2fDMzMC42NXwyMDQuMTJ8MjUyLjI5'>
+    <rect x='259.96' y='204.12' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjU5Ljk2fDMzMC42NXwyMDQuMTJ8MjUyLjI5)'>
+<text x='295.30' y='222.58' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>(0.027 - </text>
+<text x='295.30' y='232.06' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.070 ) </text>
+<text x='295.30' y='241.41' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='32.08px' lengthAdjust='spacingAndGlyphs'>[4.461]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQwMS4wN3wyMDQuMTJ8MjUyLjI5'>
+    <rect x='330.65' y='204.12' width='70.41' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQwMS4wN3wyMDQuMTJ8MjUyLjI5)'>
+<text x='365.86' y='221.71' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.26px' lengthAdjust='spacingAndGlyphs'>0.018 ** </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAxLjA3fDQ3MS43N3wyMDQuMTJ8MjUyLjI5'>
+    <rect x='401.07' y='204.12' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAxLjA3fDQ3MS43N3wyMDQuMTJ8MjUyLjI5)'>
+<text x='436.42' y='222.58' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>(0.005 - </text>
+<text x='436.42' y='232.06' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.030 ) </text>
+<text x='436.42' y='241.41' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='32.08px' lengthAdjust='spacingAndGlyphs'>[2.736]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDU0Mi4xOHwyMDQuMTJ8MjUyLjI5'>
+    <rect x='471.77' y='204.12' width='70.41' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDU0Mi4xOHwyMDQuMTJ8MjUyLjI5)'>
+<text x='506.97' y='221.71' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.26px' lengthAdjust='spacingAndGlyphs'>0.018 ** </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTQyLjE4fDYwMi44OHwyMDQuMTJ8MjUyLjI5'>
+    <rect x='542.18' y='204.12' width='60.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQyLjE4fDYwMi44OHwyMDQuMTJ8MjUyLjI5)'>
+<text x='572.53' y='222.58' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>(0.005 - </text>
+<text x='572.53' y='232.06' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.030 ) </text>
+<text x='572.53' y='241.41' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='32.08px' lengthAdjust='spacingAndGlyphs'>[2.735]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3wyNTIuMjl8MzAwLjQ2'>
+    <rect x='5.00' y='252.29' width='54.43' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3wyNTIuMjl8MzAwLjQ2)'>
+<text x='13.62' y='269.05' text-anchor='middle' style='font-size: 10.00px; font-family: "TeX Gyre Termes";' textLength='17.23px' lengthAdjust='spacingAndGlyphs'>LPS</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTI0LjM0fDI1Mi4yOXwzMDAuNDY='>
+    <rect x='59.43' y='252.29' width='64.91' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTI0LjM0fDI1Mi4yOXwzMDAuNDY=)'>
+<text x='91.89' y='269.88' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>0.095 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTI0LjM0fDE5NS4wNHwyNTIuMjl8MzAwLjQ2'>
+    <rect x='124.34' y='252.29' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTI0LjM0fDE5NS4wNHwyNTIuMjl8MzAwLjQ2)'>
+<text x='159.69' y='270.75' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>(0.071 - </text>
+<text x='159.69' y='280.23' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.119 ) </text>
+<text x='159.69' y='289.58' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='32.08px' lengthAdjust='spacingAndGlyphs'>[7.802]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDI1OS45NnwyNTIuMjl8MzAwLjQ2'>
+    <rect x='195.04' y='252.29' width='64.91' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDI1OS45NnwyNTIuMjl8MzAwLjQ2)'>
+<text x='227.50' y='269.73' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='39.42px' lengthAdjust='spacingAndGlyphs'>-0.003    </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMjU5Ljk2fDMzMC42NXwyNTIuMjl8MzAwLjQ2'>
+    <rect x='259.96' y='252.29' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjU5Ljk2fDMzMC42NXwyNTIuMjl8MzAwLjQ2)'>
+<text x='295.30' y='270.62' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.022 - </text>
+<text x='295.30' y='280.05' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='33.92px' lengthAdjust='spacingAndGlyphs'>0.016 ) </text>
+<text x='295.30' y='289.36' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>[-0.309]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQwMS4wN3wyNTIuMjl8MzAwLjQ2'>
+    <rect x='330.65' y='252.29' width='70.41' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQwMS4wN3wyNTIuMjl8MzAwLjQ2)'>
+<text x='365.86' y='265.93' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='22.00px' lengthAdjust='spacingAndGlyphs'>        </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAxLjA3fDQ3MS43N3wyNTIuMjl8MzAwLjQ2'>
+    <rect x='401.07' y='252.29' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAxLjA3fDQ3MS43N3wyNTIuMjl8MzAwLjQ2)'>
+<text x='436.42' y='265.93' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDU0Mi4xOHwyNTIuMjl8MzAwLjQ2'>
+    <rect x='471.77' y='252.29' width='70.41' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDU0Mi4xOHwyNTIuMjl8MzAwLjQ2)'>
+<text x='506.97' y='265.93' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='22.00px' lengthAdjust='spacingAndGlyphs'>        </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTQyLjE4fDYwMi44OHwyNTIuMjl8MzAwLjQ2'>
+    <rect x='542.18' y='252.29' width='60.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQyLjE4fDYwMi44OHwyNTIuMjl8MzAwLjQ2)'>
+<text x='572.53' y='265.93' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3wzMDAuNDZ8MzQ4LjYz'>
+    <rect x='5.00' y='300.46' width='54.43' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3wzMDAuNDZ8MzQ4LjYz)'>
+<text x='16.11' y='317.14' text-anchor='middle' style='font-size: 10.00px; font-family: "TeX Gyre Termes";' textLength='22.23px' lengthAdjust='spacingAndGlyphs'>LMA</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTI0LjM0fDMwMC40NnwzNDguNjM='>
+    <rect x='59.43' y='300.46' width='64.91' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTI0LjM0fDMwMC40NnwzNDguNjM=)'>
+<text x='91.89' y='318.05' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='42.17px' lengthAdjust='spacingAndGlyphs'>-0.020 *  </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTI0LjM0fDE5NS4wNHwzMDAuNDZ8MzQ4LjYz'>
+    <rect x='124.34' y='300.46' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTI0LjM0fDE5NS4wNHwzMDAuNDZ8MzQ4LjYz)'>
+<text x='159.69' y='318.92' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.037 - </text>
+<text x='159.69' y='328.40' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>-0.003 ) </text>
+<text x='159.69' y='337.75' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>[-2.309]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDI1OS45NnwzMDAuNDZ8MzQ4LjYz'>
+    <rect x='195.04' y='300.46' width='64.91' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDI1OS45NnwzMDAuNDZ8MzQ4LjYz)'>
+<text x='227.50' y='318.04' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='31.17px' lengthAdjust='spacingAndGlyphs'>-0.165 </text>
+<text x='227.50' y='324.29' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='16.50px' lengthAdjust='spacingAndGlyphs'>***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMjU5Ljk2fDMzMC42NXwzMDAuNDZ8MzQ4LjYz'>
+    <rect x='259.96' y='300.46' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjU5Ljk2fDMzMC42NXwzMDAuNDZ8MzQ4LjYz)'>
+<text x='295.30' y='318.92' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.175 - </text>
+<text x='295.30' y='328.40' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>-0.155 ) </text>
+<text x='295.30' y='337.75' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>[-32.421]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQwMS4wN3wzMDAuNDZ8MzQ4LjYz'>
+    <rect x='330.65' y='300.46' width='70.41' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQwMS4wN3wzMDAuNDZ8MzQ4LjYz)'>
+<text x='365.86' y='318.06' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='47.67px' lengthAdjust='spacingAndGlyphs'>-0.143 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAxLjA3fDQ3MS43N3wzMDAuNDZ8MzQ4LjYz'>
+    <rect x='401.07' y='300.46' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAxLjA3fDQ3MS43N3wzMDAuNDZ8MzQ4LjYz)'>
+<text x='436.42' y='318.92' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.150 - </text>
+<text x='436.42' y='328.40' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>-0.136 ) </text>
+<text x='436.42' y='337.75' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>[-41.380]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDU0Mi4xOHwzMDAuNDZ8MzQ4LjYz'>
+    <rect x='471.77' y='300.46' width='70.41' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDU0Mi4xOHwzMDAuNDZ8MzQ4LjYz)'>
+<text x='506.97' y='318.06' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='47.67px' lengthAdjust='spacingAndGlyphs'>-0.143 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTQyLjE4fDYwMi44OHwzMDAuNDZ8MzQ4LjYz'>
+    <rect x='542.18' y='300.46' width='60.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQyLjE4fDYwMi44OHwzMDAuNDZ8MzQ4LjYz)'>
+<text x='572.53' y='318.92' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.150 - </text>
+<text x='572.53' y='328.40' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>-0.136 ) </text>
+<text x='572.53' y='337.75' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>[-41.396]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3wzNDguNjN8Mzk2Ljgw'>
+    <rect x='5.00' y='348.63' width='54.43' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3wzNDguNjN8Mzk2Ljgw)'>
+<text x='13.06' y='365.25' text-anchor='middle' style='font-size: 10.00px; font-family: "TeX Gyre Termes";' textLength='16.11px' lengthAdjust='spacingAndGlyphs'>LBI</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTI0LjM0fDM0OC42M3wzOTYuODA='>
+    <rect x='59.43' y='348.63' width='64.91' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTI0LjM0fDM0OC42M3wzOTYuODA=)'>
+<text x='91.89' y='366.21' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='31.17px' lengthAdjust='spacingAndGlyphs'>-0.055 </text>
+<text x='91.89' y='372.46' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='16.50px' lengthAdjust='spacingAndGlyphs'>***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTI0LjM0fDE5NS4wNHwzNDguNjN8Mzk2Ljgw'>
+    <rect x='124.34' y='348.63' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTI0LjM0fDE5NS4wNHwzNDguNjN8Mzk2Ljgw)'>
+<text x='159.69' y='367.09' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.063 - </text>
+<text x='159.69' y='376.57' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>-0.046 ) </text>
+<text x='159.69' y='385.92' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>[-12.920]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDI1OS45NnwzNDguNjN8Mzk2Ljgw'>
+    <rect x='195.04' y='348.63' width='64.91' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDI1OS45NnwzNDguNjN8Mzk2Ljgw)'>
+<text x='227.50' y='366.21' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='31.17px' lengthAdjust='spacingAndGlyphs'>-0.037 </text>
+<text x='227.50' y='372.47' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='16.50px' lengthAdjust='spacingAndGlyphs'>***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMjU5Ljk2fDMzMC42NXwzNDguNjN8Mzk2Ljgw'>
+    <rect x='259.96' y='348.63' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjU5Ljk2fDMzMC42NXwzNDguNjN8Mzk2Ljgw)'>
+<text x='295.30' y='367.09' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.046 - </text>
+<text x='295.30' y='376.57' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>-0.029 ) </text>
+<text x='295.30' y='385.92' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>[-8.814]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQwMS4wN3wzNDguNjN8Mzk2Ljgw'>
+    <rect x='330.65' y='348.63' width='70.41' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQwMS4wN3wzNDguNjN8Mzk2Ljgw)'>
+<text x='365.86' y='366.22' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='47.67px' lengthAdjust='spacingAndGlyphs'>-0.017 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAxLjA3fDQ3MS43N3wzNDguNjN8Mzk2Ljgw'>
+    <rect x='401.07' y='348.63' width='70.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAxLjA3fDQ3MS43N3wzNDguNjN8Mzk2Ljgw)'>
+<text x='436.42' y='367.09' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.023 - </text>
+<text x='436.42' y='376.57' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>-0.012 ) </text>
+<text x='436.42' y='385.92' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>[-6.468]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDU0Mi4xOHwzNDguNjN8Mzk2Ljgw'>
+    <rect x='471.77' y='348.63' width='70.41' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDU0Mi4xOHwzNDguNjN8Mzk2Ljgw)'>
+<text x='506.97' y='366.22' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='47.67px' lengthAdjust='spacingAndGlyphs'>-0.017 ***</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTQyLjE4fDYwMi44OHwzNDguNjN8Mzk2Ljgw'>
+    <rect x='542.18' y='348.63' width='60.70' height='48.17' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQyLjE4fDYwMi44OHwzNDguNjN8Mzk2Ljgw)'>
+<text x='572.53' y='367.09' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='41.25px' lengthAdjust='spacingAndGlyphs'>(-0.023 - </text>
+<text x='572.53' y='376.57' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='37.58px' lengthAdjust='spacingAndGlyphs'>-0.012 ) </text>
+<text x='572.53' y='385.92' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>[-6.482]</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3wzOTYuODB8NDMyLjk2'>
+    <rect x='5.00' y='396.80' width='54.43' height='36.16' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3wzOTYuODB8NDMyLjk2)'>
+<line x1='5.00' y1='432.96' x2='59.43' y2='432.96' style='stroke-width: 2.13;' />
+<text x='23.76' y='413.71' text-anchor='middle' style='font-size: 10.00px; font-weight: bold; font-style: italic; font-family: "TeX Gyre Termes";' textLength='37.50px' lengthAdjust='spacingAndGlyphs'>Random </text>
+<text x='18.33' y='421.79' text-anchor='middle' style='font-size: 10.00px; font-weight: bold; font-style: italic; font-family: "TeX Gyre Termes";' textLength='26.66px' lengthAdjust='spacingAndGlyphs'>effects</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTI0LjM0fDM5Ni44MHw0MzIuOTY='>
+    <rect x='59.43' y='396.80' width='64.91' height='36.16' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTI0LjM0fDM5Ni44MHw0MzIuOTY=)'>
+<line x1='59.43' y1='432.96' x2='124.34' y2='432.96' style='stroke-width: 2.13;' />
+<text x='91.89' y='410.52' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='22.00px' lengthAdjust='spacingAndGlyphs'>        </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTI0LjM0fDE5NS4wNHwzOTYuODB8NDMyLjk2'>
+    <rect x='124.34' y='396.80' width='70.70' height='36.16' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTI0LjM0fDE5NS4wNHwzOTYuODB8NDMyLjk2)'>
+<line x1='124.34' y1='432.96' x2='195.04' y2='432.96' style='stroke-width: 2.13;' />
+<text x='159.69' y='410.52' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDI1OS45NnwzOTYuODB8NDMyLjk2'>
+    <rect x='195.04' y='396.80' width='64.91' height='36.16' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDI1OS45NnwzOTYuODB8NDMyLjk2)'>
+<line x1='195.04' y1='432.96' x2='259.96' y2='432.96' style='stroke-width: 2.13;' />
+<text x='227.50' y='410.52' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='22.00px' lengthAdjust='spacingAndGlyphs'>        </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMjU5Ljk2fDMzMC42NXwzOTYuODB8NDMyLjk2'>
+    <rect x='259.96' y='396.80' width='70.70' height='36.16' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjU5Ljk2fDMzMC42NXwzOTYuODB8NDMyLjk2)'>
+<line x1='259.96' y1='432.96' x2='330.65' y2='432.96' style='stroke-width: 2.13;' />
+<text x='295.30' y='410.52' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQwMS4wN3wzOTYuODB8NDMyLjk2'>
+    <rect x='330.65' y='396.80' width='70.41' height='36.16' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQwMS4wN3wzOTYuODB8NDMyLjk2)'>
+<line x1='330.65' y1='432.96' x2='401.07' y2='432.96' style='stroke-width: 2.13;' />
+<text x='365.86' y='410.52' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='22.00px' lengthAdjust='spacingAndGlyphs'>        </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAxLjA3fDQ3MS43N3wzOTYuODB8NDMyLjk2'>
+    <rect x='401.07' y='396.80' width='70.70' height='36.16' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAxLjA3fDQ3MS43N3wzOTYuODB8NDMyLjk2)'>
+<line x1='401.07' y1='432.96' x2='471.77' y2='432.96' style='stroke-width: 2.13;' />
+<text x='436.42' y='410.52' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDU0Mi4xOHwzOTYuODB8NDMyLjk2'>
+    <rect x='471.77' y='396.80' width='70.41' height='36.16' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDU0Mi4xOHwzOTYuODB8NDMyLjk2)'>
+<line x1='471.77' y1='432.96' x2='542.18' y2='432.96' style='stroke-width: 2.13;' />
+<text x='506.97' y='410.52' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='22.00px' lengthAdjust='spacingAndGlyphs'>        </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTQyLjE4fDYwMi44OHwzOTYuODB8NDMyLjk2'>
+    <rect x='542.18' y='396.80' width='60.70' height='36.16' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQyLjE4fDYwMi44OHwzOTYuODB8NDMyLjk2)'>
+<line x1='542.18' y1='432.96' x2='602.88' y2='432.96' style='stroke-width: 2.13;' />
+<text x='572.53' y='410.52' text-anchor='middle' style='font-size: 11.00px; font-weight: bold; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3w0MzIuOTZ8NDYwLjY5'>
+    <rect x='5.00' y='432.96' width='54.43' height='27.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3w0MzIuOTZ8NDYwLjY5)'>
+<text x='8.61' y='449.64' text-anchor='middle' style='font-size: 10.00px; font-family: "TeX Gyre Termes";' textLength='7.22px' lengthAdjust='spacingAndGlyphs'>N</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTI0LjM0fDQzMi45Nnw0NjAuNjk='>
+    <rect x='59.43' y='432.96' width='64.91' height='27.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTI0LjM0fDQzMi45Nnw0NjAuNjk=)'>
+<text x='91.89' y='450.46' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>2250        </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTI0LjM0fDE5NS4wNHw0MzIuOTZ8NDYwLjY5'>
+    <rect x='124.34' y='432.96' width='70.70' height='27.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTI0LjM0fDE5NS4wNHw0MzIuOTZ8NDYwLjY5)'>
+<text x='159.69' y='446.60' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDI1OS45Nnw0MzIuOTZ8NDYwLjY5'>
+    <rect x='195.04' y='432.96' width='64.91' height='27.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDI1OS45Nnw0MzIuOTZ8NDYwLjY5)'>
+<text x='227.50' y='450.46' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>2250        </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMjU5Ljk2fDMzMC42NXw0MzIuOTZ8NDYwLjY5'>
+    <rect x='259.96' y='432.96' width='70.70' height='27.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjU5Ljk2fDMzMC42NXw0MzIuOTZ8NDYwLjY5)'>
+<text x='295.30' y='446.60' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQwMS4wN3w0MzIuOTZ8NDYwLjY5'>
+    <rect x='330.65' y='432.96' width='70.41' height='27.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQwMS4wN3w0MzIuOTZ8NDYwLjY5)'>
+<text x='365.86' y='450.40' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>2400        </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAxLjA3fDQ3MS43N3w0MzIuOTZ8NDYwLjY5'>
+    <rect x='401.07' y='432.96' width='70.70' height='27.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAxLjA3fDQ3MS43N3w0MzIuOTZ8NDYwLjY5)'>
+<text x='436.42' y='446.60' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDU0Mi4xOHw0MzIuOTZ8NDYwLjY5'>
+    <rect x='471.77' y='432.96' width='70.41' height='27.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDU0Mi4xOHw0MzIuOTZ8NDYwLjY5)'>
+<text x='506.97' y='450.40' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>2400        </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTQyLjE4fDYwMi44OHw0MzIuOTZ8NDYwLjY5'>
+    <rect x='542.18' y='432.96' width='60.70' height='27.72' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQyLjE4fDYwMi44OHw0MzIuOTZ8NDYwLjY5)'>
+<text x='572.53' y='446.60' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3w0NjAuNjl8NDg5Ljcw'>
+    <rect x='5.00' y='460.69' width='54.43' height='29.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3w0NjAuNjl8NDg5Ljcw)'>
+<text x='18.34' y='478.50' text-anchor='middle' style='font-size: 10.00px; font-family: "TeX Gyre Termes";' textLength='26.66px' lengthAdjust='spacingAndGlyphs'>logLik</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTI0LjM0fDQ2MC42OXw0ODkuNzA='>
+    <rect x='59.43' y='460.69' width='64.91' height='29.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTI0LjM0fDQ2MC42OXw0ODkuNzA=)'>
+<text x='91.89' y='478.21' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>3923.846 </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTI0LjM0fDE5NS4wNHw0NjAuNjl8NDg5Ljcw'>
+    <rect x='124.34' y='460.69' width='70.70' height='29.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTI0LjM0fDE5NS4wNHw0NjAuNjl8NDg5Ljcw)'>
+<text x='159.69' y='474.33' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDI1OS45Nnw0NjAuNjl8NDg5Ljcw'>
+    <rect x='195.04' y='460.69' width='64.91' height='29.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDI1OS45Nnw0NjAuNjl8NDg5Ljcw)'>
+<text x='227.50' y='478.12' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='44.01px' lengthAdjust='spacingAndGlyphs'>4774.024 </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMjU5Ljk2fDMzMC42NXw0NjAuNjl8NDg5Ljcw'>
+    <rect x='259.96' y='460.69' width='70.70' height='29.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjU5Ljk2fDMzMC42NXw0NjAuNjl8NDg5Ljcw)'>
+<text x='295.30' y='474.33' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQwMS4wN3w0NjAuNjl8NDg5Ljcw'>
+    <rect x='330.65' y='460.69' width='70.41' height='29.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQwMS4wN3w0NjAuNjl8NDg5Ljcw)'>
+<text x='365.86' y='478.23' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='49.51px' lengthAdjust='spacingAndGlyphs'>5356.469   </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAxLjA3fDQ3MS43N3w0NjAuNjl8NDg5Ljcw'>
+    <rect x='401.07' y='460.69' width='70.70' height='29.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAxLjA3fDQ3MS43N3w0NjAuNjl8NDg5Ljcw)'>
+<text x='436.42' y='474.33' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDU0Mi4xOHw0NjAuNjl8NDg5Ljcw'>
+    <rect x='471.77' y='460.69' width='70.41' height='29.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDU0Mi4xOHw0NjAuNjl8NDg5Ljcw)'>
+<text x='506.97' y='478.19' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='49.51px' lengthAdjust='spacingAndGlyphs'>5365.113   </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTQyLjE4fDYwMi44OHw0NjAuNjl8NDg5Ljcw'>
+    <rect x='542.18' y='460.69' width='60.70' height='29.01' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQyLjE4fDYwMi44OHw0NjAuNjl8NDg5Ljcw)'>
+<text x='572.53' y='474.33' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw1OS40M3w0ODkuNzB8NTE3LjUx'>
+    <rect x='5.00' y='489.70' width='54.43' height='27.81' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw1OS40M3w0ODkuNzB8NTE3LjUx)'>
+<line x1='5.00' y1='517.51' x2='59.43' y2='517.51' style='stroke-width: 2.67;' />
+<text x='13.61' y='506.45' text-anchor='middle' style='font-size: 10.00px; font-family: "TeX Gyre Termes";' textLength='17.22px' lengthAdjust='spacingAndGlyphs'>AIC</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTkuNDN8MTI0LjM0fDQ4OS43MHw1MTcuNTE='>
+    <rect x='59.43' y='489.70' width='64.91' height='27.81' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuNDN8MTI0LjM0fDQ4OS43MHw1MTcuNTE=)'>
+<line x1='59.43' y1='517.51' x2='124.34' y2='517.51' style='stroke-width: 2.67;' />
+<text x='91.89' y='507.22' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='44.92px' lengthAdjust='spacingAndGlyphs'>-7829.691</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTI0LjM0fDE5NS4wNHw0ODkuNzB8NTE3LjUx'>
+    <rect x='124.34' y='489.70' width='70.70' height='27.81' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTI0LjM0fDE5NS4wNHw0ODkuNzB8NTE3LjUx)'>
+<line x1='124.34' y1='517.51' x2='195.04' y2='517.51' style='stroke-width: 2.67;' />
+<text x='159.69' y='503.34' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMTk1LjA0fDI1OS45Nnw0ODkuNzB8NTE3LjUx'>
+    <rect x='195.04' y='489.70' width='64.91' height='27.81' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTk1LjA0fDI1OS45Nnw0ODkuNzB8NTE3LjUx)'>
+<line x1='195.04' y1='517.51' x2='259.96' y2='517.51' style='stroke-width: 2.67;' />
+<text x='227.50' y='507.24' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='44.92px' lengthAdjust='spacingAndGlyphs'>-9508.049</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMjU5Ljk2fDMzMC42NXw0ODkuNzB8NTE3LjUx'>
+    <rect x='259.96' y='489.70' width='70.70' height='27.81' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjU5Ljk2fDMzMC42NXw0ODkuNzB8NTE3LjUx)'>
+<line x1='259.96' y1='517.51' x2='330.65' y2='517.51' style='stroke-width: 2.67;' />
+<text x='295.30' y='503.34' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpMzMwLjY1fDQwMS4wN3w0ODkuNzB8NTE3LjUx'>
+    <rect x='330.65' y='489.70' width='70.41' height='27.81' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzMwLjY1fDQwMS4wN3w0ODkuNzB8NTE3LjUx)'>
+<line x1='330.65' y1='517.51' x2='401.07' y2='517.51' style='stroke-width: 2.67;' />
+<text x='365.86' y='507.22' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='50.42px' lengthAdjust='spacingAndGlyphs'>-10670.938</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDAxLjA3fDQ3MS43N3w0ODkuNzB8NTE3LjUx'>
+    <rect x='401.07' y='489.70' width='70.70' height='27.81' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDAxLjA3fDQ3MS43N3w0ODkuNzB8NTE3LjUx)'>
+<line x1='401.07' y1='517.51' x2='471.77' y2='517.51' style='stroke-width: 2.67;' />
+<text x='436.42' y='503.34' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNDcxLjc3fDU0Mi4xOHw0ODkuNzB8NTE3LjUx'>
+    <rect x='471.77' y='489.70' width='70.41' height='27.81' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNDcxLjc3fDU0Mi4xOHw0ODkuNzB8NTE3LjUx)'>
+<line x1='471.77' y1='517.51' x2='542.18' y2='517.51' style='stroke-width: 2.67;' />
+<text x='506.97' y='507.22' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='50.42px' lengthAdjust='spacingAndGlyphs'>-10690.226</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNTQyLjE4fDYwMi44OHw0ODkuNzB8NTE3LjUx'>
+    <rect x='542.18' y='489.70' width='60.70' height='27.81' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTQyLjE4fDYwMi44OHw0ODkuNzB8NTE3LjUx)'>
+<line x1='542.18' y1='517.51' x2='602.88' y2='517.51' style='stroke-width: 2.67;' />
+<text x='572.53' y='503.34' text-anchor='middle' style='font-size: 11.00px; font-family: "TeX Gyre Termes";' textLength='13.75px' lengthAdjust='spacingAndGlyphs'>     </text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+<defs>
+  <clipPath id='cpNS4wMHw2MDIuODh8NTE3LjUxfDUzNi40MQ=='>
+    <rect x='5.00' y='517.51' width='597.88' height='18.90' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNS4wMHw2MDIuODh8NTE3LjUxfDUzNi40MQ==)'>
+<line x1='5.00' y1='536.41' x2='602.88' y2='536.41' style='stroke-width: 0.85;' />
+<text x='289.17' y='535.22' text-anchor='middle' style='font-size: 10.00px; font-style: italic; font-family: "TeX Gyre Termes";' textLength='568.17px' lengthAdjust='spacingAndGlyphs'>Significance levels are represented by asterisks [p &lt; 0.05 (*), p &lt; 0.01 (**), p &lt; 0.001 (***), and p &lt; 0.0001 (****)]. T statistics in brackets.</text>
+</g>
+<g clip-path='url(#cpMC4wMHw2MDcuODh8MC4wMHw1NDEuNDE=)'>
+</g>
+</svg>
