@@ -2598,8 +2598,25 @@ dbrda_hell_matrix <- rrfy_hell_matrix |>
   select(-c(1, 233:256))
 
 dbrda_traits <- rrfy_hell_matrix |>
-  select(X, Unique_ID, Site, Species, Elevation_m, Elevation_cat, Sample_Date, logACI, logLT, logLPS, logLMA, logLBI)|>
-  unite(Species_Elevation, Species, Elevation_cat, sep = "_", remove = FALSE) # To model interactions
+  select(
+    X,
+    Unique_ID,
+    Site,
+    Species,
+    Elevation_m,
+    Elevation_cat,
+    Sample_Date,
+    logACI,
+    logLT,
+    logLPS,
+    logLMA,
+    logLBI
+  ) |>
+  unite(Species_Elevation,
+        Species,
+        Elevation_cat,
+        sep = "_",
+        remove = FALSE) # To model interactions visually.
 ```
 
 
@@ -3293,8 +3310,12 @@ dbrda_traits |>
 
 # Dataset with missing values imputed
 dbrda_traits_imp <- dbrda_traits |>
-  mutate(across(c(, 8:12), ~ ifelse(is.na(.), median(., na.rm = TRUE), .)))
+  mutate(across(c(, 8:13), ~ ifelse(is.na(.), median(., na.rm = TRUE), .)))
 
+# Checking for any missing values
+dbrda_traits_imp |>
+  summarise(across(everything(), ~ sum(is.na(.)))) |>
+  t()
 # Scaling data
 # Not scaling data because the one I am using is the log transformed values of leaf traits.
 
@@ -3462,7 +3483,7 @@ mean_bray <- rownames_to_column(mean_bray, var = "Unique_ID") |>
   select(Unique_ID, mean_bray)
 
 # Joining to dbrda_traits to avoid duplicate DFs 
-dbrda_traits_imp <- left_join(dbrda_traits, mean_bray, by = c("X"= "Unique_ID"))
+dbrda_traits_imp <- left_join(dbrda_traits_imp, mean_bray, by = c("X"= "Unique_ID"))
 
 
 # GGplot
@@ -3557,14 +3578,14 @@ These regressions show that the mean bray-Curtis dissimilarity for each species 
 library("sjPlot")
 b1 <- glm(
   mean_bray ~ Elevation_m + Species + Site + logACI + logLT + logLPS + logLMA + logLBI,
-  data = plant_traits_IMP,
+  data = dbrda_traits_imp,
   family = gaussian
 ) # Gaussian/Normal distribution
 plot(b1)
 anova(b1)
 
 # Model with intercept only
-B0 <- lm(mean_bray ~ 1, data = plant_traits_MB, na.action = na.exclude)
+B0 <- lm(mean_bray ~ 1, data = dbrda_traits_imp, na.action = na.exclude)
 anova(B0)
 AIC(B0)
 plot(B0)
@@ -3575,11 +3596,11 @@ plot(B0)
 ################################################
 B1 <- lm(
   mean_bray ~ Elevation_m + Species + Site + logACI + logLT + logLPS + logLMA + logLBI,
-  data = plant_traits_IMP,
+  data = dbrda_traits_imp,
   na.action = na.exclude
 )
 anova(B1)
-AIC(B1) # -8760.977
+AIC(B1) # -13617.24
 
 # Model validation
 # Residuals
@@ -3591,16 +3612,18 @@ hist(B1_resid)
 hist(B1_fitted)
 
 # predicted vs. actual values
-plot(x=predict(B1), y=plant_traits_MB$mean_bray,
-     xlab='Predicted Values',
-     ylab='Actual Values',
-     main='B1 Predicted vs. Actual Values')
-abline(a=0, b=1)
+plot(
+  x = predict(B1),
+  y = dbrda_traits_imp$mean_bray,
+  xlab = 'Predicted Values',
+  ylab = 'Actual Values',
+  main = 'B1 Predicted vs. Actual Values'
+)
+abline(a = 0, b = 1)
 
 # anova(B1,type="marginal")
 Anova(B1, type = 3)
-drop1(B1, test = "F", trace = TRUE)
-drop1(B1, . ~ ., test = "F", trace = TRUE)
+#drop1(B1, . ~ ., test = "F", trace = TRUE)
 
 # Stepwise selection of linear model (lm())
 B1AIC <- stepAIC(update(B1, . ~ .), direction = "both", k = 2)
@@ -3615,13 +3638,13 @@ B1AIC$anova
 ################################################
 B2 <- lm(
   mean_bray ~ Species + Site + logACI + logLT + logLPS + logLMA + logLBI,
-  data = plant_traits_MB,
+  data = dbrda_traits_imp,
   na.action = na.exclude
 )
 
 anova(B2)
 Anova(B2, type = 3)
-AIC(B2) #-8760.977
+AIC(B2) #-13617.24
 
 # Residuals
 B2_resid <- resid(B2, type = "response")
@@ -3632,11 +3655,14 @@ hist(B2_resid)
 hist(B2_fitted)
 
 # predicted vs. actual values
-plot(x=predict(B2), y=plant_traits_MB$mean_bray,
-     xlab='Predicted Values',
-     ylab='Actual Values',
-     main='B2 Predicted vs. Actual Values')
-abline(a=0, b=1)
+plot(
+  x = predict(B2),
+  y = dbrda_traits_imp$mean_bray,
+  xlab = 'Predicted Values',
+  ylab = 'Actual Values',
+  main = 'B2 Predicted vs. Actual Values'
+)
+abline(a = 0, b = 1)
 
 # Stepwise selection of linear model 
 B2AIC <- stepAIC(update(B2, . ~ .), trace = TRUE, direction = "both", k = 2)
@@ -3661,10 +3687,10 @@ B3 <- lme(
   mean_bray ~ Species + logACI + logLT + logLPS + logLMA + logLBI,
   random = ~ 1 | Site,
   method = "ML",
-  data = na.omit(plant_traits_MB)) 
+  data = na.omit(dbrda_traits_imp)) 
 
 Anova(B3, type = 3)
-AIC(B3) # -8688.862 Increased AIC score compared to B1 and B2.
+AIC(B3) #  -13522.89 Increased AIC score compared to B1 and B2.
 
 # Residuals histograms and plots ####
 B3_resid <- resid(B3, type = "response")
@@ -3675,15 +3701,20 @@ hist(B3_resid)
 hist(B3_fitted)
 
 # Plots
-plot(x=predict(B3), y=plant_traits_MB$mean_bray,
-     xlab='Predicted Values',
-     ylab='Actual Values',
-     main='B3 Predicted vs. Actual Values')
-abline(a=0, b=1)
+plot(
+  x = predict(B3),
+  y = dbrda_traits_imp$mean_bray,
+  xlab = 'Predicted Values',
+  ylab = 'Actual Values',
+  main = 'B3 Predicted vs. Actual Values'
+)
+abline(a = 0, b = 1)
+
 plot_model(B3, type = "diag")
 
 # Stepwise selection of terms
 B3AIC <- stepAIC(update(B3, . ~ ., -1), direction = "both", k = 2)
+B3AIC$anova
 B3drop <- drop1(B3, . ~ ., test = "Chisq", trace = TRUE)
 
 # No stepwise term deletion or dropping of terms.
@@ -3698,10 +3729,10 @@ B4 <- lme(
   random = ~ 1 |
     Site / Species,
   method = "ML",
-  data = na.omit(plant_traits_MB)
+  data = na.omit(dbrda_traits_imp)
 )
 Anova(B4, type = 3)
-AIC(B4) # -8690.559
+AIC(B4) # -13717.34 is a higher AIC score than B3.
 
 # Residuals histograms and plots ####
 B4_resid <- resid(B4, type = "response")
@@ -3712,24 +3743,30 @@ hist(B4_resid)
 hist(B4_fitted)
 
 # Plots
-plot(x=predict(B4), y=plant_traits_MB$mean_bray,
-     xlab='Predicted Values',
-     ylab='Actual Values',
-     main='B4 Predicted vs. Actual Values')
-abline(a=0, b=1)
+plot(
+  x = predict(B4),
+  y = dbrda_traits_imp$mean_bray,
+  xlab = 'Predicted Values',
+  ylab = 'Actual Values',
+  main = 'B4 Predicted vs. Actual Values'
+)
+abline(a = 0, b = 1)
 
-plot_model(B4, type = "diag")
+plot_model(B4AIC, type = "diag")
 
 # Stepwise selection of terms
 B4AIC <- stepAIC(update(B4, . ~ ., -1),
                  trace = TRUE,
                  direction = "both",
                  k = 2)
+B4AIC$anova
 drop1(B4, . ~ ., test = "Chisq", trace = TRUE)
 
-# logLPS eliminated
+# logLT and logLBI eliminated from the model.
 ```
-The B4AIC model has a lower AIC score. We seem to have hit a good model. The fixed terms are `mean_bray ~ logACI + logLT + logLMA + logLBI`. Let's take that an model random effects taking into account variance structure. 
+The B4AIC model has a lower AIC score. We seem to have hit a good model. The fixed terms are `mean_bray ~ logACI + logLPS + logLMA`. Let's take that an model random effects taking into account variance structure. 
+
+I will keep `Species` as a fixed term. Only `Site` as random effect. Maybe `Sampling_date` could be a random effect.
 
 
 #### REML modelling
@@ -3744,25 +3781,25 @@ B1REM <- lme(
   random = ~ 1 |
     Site,
   method = "REML",
-  data = na.omit(plant_traits_MB))
+  data = na.omit(dbrda_traits_imp))
 
 Anova(B1REM, type = 3)
-AIC(B1REM) # -8609.769 This is a higher score than B4AIC.
+AIC(B1REM) # -13437.7 This is a higher score than B4AIC.
 
 
 B1_gls <- gls(
   mean_bray ~ Elevation_m +  Species + logACI + logLT + logLPS + logLMA + logLBI,
   method = "REML",
-  data = na.omit(plant_traits_MB)
+  data = na.omit(dbrda_traits_imp)
 )
 
 Anova(B1_gls, type = 3)
-AIC(B1_gls) # -6970.8 is a higher AIC score. Site as a random effect is important.
+AIC(B1_gls) # -11858 is a higher AIC score. Site as a random effect is important.
 
 plot_model(B1REM, type = "diag")
 
 # Model comparison
-model.sel(B1, B2, B3, B1REM, B1_gls)[, c("df", "logLik", "AICc", "delta")]
+model.sel(B1, B2, B3, B4, B4AIC, B1REM, B1_gls)[, c("df", "logLik", "AICc", "delta")]
 
 # Model B1 and B2 are the best models. B1 has a lower AIC score.
 ```
@@ -3788,11 +3825,11 @@ B3REM <- lme(
     Site,
   method = "REML",
   control = ctrl,
-  data = na.omit(plant_traits_MB)
+  data = na.omit(dbrda_traits_imp)
 )
 
 Anova(B3REM, type = 3)
-AIC(B3REM) # -9467.585 is  a lower AIC score than B1REM
+AIC(B3REM) # -16249.18 is  a lower AIC score than B1REM
 
 # Residuals histograms and plots ####
 B3REM_resid <- resid(B3REM, type = "response")
@@ -3804,33 +3841,33 @@ hist(B3REM_fitted)
 
 # Plots
 plot(B3REM)
-B3REM$
-plot(x=predict(B3REM), y=plant_traits_MB$mean_bray,
-     xlab='Predicted Values',
-     ylab='Actual Values',
-     main='Predicted vs. Actual Values')
-abline(a=0, b=1)
+plot(
+  x = predict(B3REM),
+  y = dbrda_traits_imp$mean_bray,
+  xlab = 'Predicted Values',
+  ylab = 'Actual Values',
+  main = 'Predicted vs. Actual Values'
+)
+abline(a = 0, b = 1)
 plot_model(B3REM, type = "diag")
 
 # Stepwise selection of terms
 drop1(B3REM, . ~ ., test = "Chisq", trace = TRUE)
 ```
 
-The B3REM model has the lowest AIC score yet. The the fixed terms are `mean_bray ~ logACI + logLT + logLPS + logLMA + logLBI,` with a variance structure `weights = varIdent(form = ~ 1 | Site)`. The random effects are nested `random = 1 | Site/Species`. It seems to be a good fit for the data. 
+The B3REM model has the lowest AIC score yet. The the fixed terms are `mean_bray ~ Elvation + Species + logACI + logLT + logLPS + logLMA + logLBI,` with a variance structure `weights = varIdent(form = ~ 1 | Site)`. The random effects are nested `random = 1 | Site`. It seems to be a good fit for the data. Now I eliminate `Elevation` and model with the remaining fixed terms ` Species + logACI + logLT + logLPS + logLMA + logLBI`.
 
 ```{r, reml_models3}
 # Modelling variance structure better
 # B4REM
-
 B4REM <- lme(
-  mean_bray ~ Elevation_m + logACI + logLT + logLMA + logLBI,,
-  weights = varComb(varIdent(form = ~ 1 | Site), varIdent(form = ~ 1 | Species)),
+  mean_bray ~ Species + logACI + logLT + logLPS + logLMA + logLBI,
+  weights = varIdent(form = ~ 1 | Site),
   random = ~ 1 |
-    Site/Species,
+    Site,
   method = "REML",
   control = ctrl,
-  data = plant_traits_MB,
-  na.action = na.exclude
+  data = na.omit(dbrda_traits_imp)
 )
 
 anova(B4REM) # Adding Species as a random effect DECREASES AIC score.
@@ -3895,7 +3932,7 @@ model_tables <- tab_model(
   B1REM,
   B3REM,
   B4REM,
-  B5REM,
+  #B5REM,
   show.aic = TRUE,
   show.intercept = TRUE,
   show.df = FALSE,
@@ -3906,8 +3943,8 @@ model_tables <- tab_model(
     css.centeralign = 'text-align: left;',
     css.firsttablecol = 'font-weight: bold;',
     css.summary = 'color: grey; font-weight: bold;',
-    p.style = "numeric_stars"),
-    file = file.path(path, "tables/model_tables.html")
+    p.style = "numeric_stars")
+    #file = file.path(path, "tables/model_tables.html")
 )
 
 
