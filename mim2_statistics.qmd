@@ -3723,7 +3723,7 @@ B3drop <- drop1(B3, . ~ ., test = "Chisq", trace = TRUE)
 The GLMMs with "ML" methods and "Site" as a random effects has a greater AIC value than B1 model. The stepwise selection eliminated "Elevation" as a fixed term in the model. The final model is `mean_bray ~ Species + Site`. There could be some variance structure that needs to be modeled. We will still keep "Elevation" while we focus in nestedness in the variance structure. Let's see. 
 
 ```{r, random_effects2}
-# B4 
+# B5 
 B4 <- lme(
   mean_bray ~ logACI + logLT + logLPS + logLMA + logLBI,
   random = ~ 1 |
@@ -3894,38 +3894,65 @@ B5REM <- lme(
     Site/Species,
   method = "REML",
   control = ctrl,
-  data = plant_traits_MB,
-  na.action = na.exclude
+  data = na.omit(dbrda_traits_imp)
 )
+
+Anova(B5REM, type = 3)
+AIC(B5REM) # -16603.6 the lowest AIC score
+
+# Residuals histograms and plots ####
+B5REM_resid <- resid(B5REM, type = "response")
+B5REM_fitted <- fitted(B5REM)
+
+# Histograms
+hist(B5REM_resid)
+hist(B5REM_fitted)
+
+# Plots
+plot(B5REM)
+plot_models(B5REM, type = "diag")
+
+
 ```
 
 #### Model comparisons
 
+```{r}
+#Model comparison and selection
+library("MuMIn")
+model.sel(B1, B2, B3, B1REM, B3REM, B4AIC, B4REM, B5REM)[, c("df", "logLik", "AICc", "delta")]
+```
+
+
 ```{r, reml_models4}
 # Model estimate plot
 model_plots <- plot_models(
-  B1,
+  #B1,
+  #B2,
   B3,
   B1REM,
   B3REM,
   B4REM,
   B5REM,
   legend.title = "Models",
-  show.values = FALSE,
+  show.values = TRUE,
   show.p = FALSE,
   p.shape = TRUE,
-  dot.size = 3,
+  dot.size = 5,
   std.est = NULL
 ) +
   
-  theme_classic(base_size = 16) +
+  #theme_classic(base_size = 16) +
+  ylim(-0.15, 0.15) +
   geom_hline(yintercept = 0,
              color = "grey30",
              linetype = "dashed") # plot vertical line
 model_plots
 
 ggsave(file.path(path, "figures/model_plots.png"), plot = model_plots, dpi=300, units=c("mm"), width=300, height=300)
+```
 
+```{r}
 # Model table comparisons
 library("sjPlot")
 model_tables <- tab_model(
@@ -3949,10 +3976,6 @@ model_tables <- tab_model(
 
 
 model_tables
-
-#Model comparison and selection
-library("MuMIn")
-model.sel(B1, B2, B3, B1REM, B3REM, B4REM, B5REM)[, c("df", "logLik", "AICc", "delta")]
 
 
 # Huxtable
