@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(out.width ='70%', fig_align = 'center', echo = TRUE, collapse = TRUE, eval=FALSE)
 ```
 
-##Potential Packages
+## Packages
 
 ```{r}
 
@@ -21,13 +21,14 @@ library("ggfortify")
 library("rstatix")
 library("broom")
 
-
 # Linear Models
 library("car")
 library("nlme")
 library("MASS")
 library("MuMIn")
-
+library("sjPlot")
+library("class")
+library("caret")
 
 # Community Diversity
 library("vegan")
@@ -39,6 +40,12 @@ library("indicspecies")
 library("ggtext")
 library("ggpmisc")
 library("MetBrewer")
+
+# Tables
+library("huxtable")
+library("flextable")
+library("broom.mixed")
+library("officer")
 
 # Phyloseq friendly
 #Some of these are redundant and have conflicts, but have functions that I like better than others or compliment each other.
@@ -99,34 +106,45 @@ labels <- c("LOW", "MID", "HIGH")
 
 #Leaf level data set
 leaf_traits <-  traits |>
-  slice(-c(959:973))|> #Removing control samples
-  filter(!Unique_ID == "TRTB_L001") |>#Removing misidentified sample
-  rename(LMA = LMA.mg., 
+  slice(-c(959:973)) |> #Removing control samples
+  filter(!Unique_ID == "TRTB_L001") |> #Removing misidentified sample
+  rename(LMA = LMA.mg.,
          LBI = Leaf_lobe_index,
          LPS = Leaf_toughness,
-         LT = Leaf_thickness) |> 
-  select(!c(5,13:15, 23:25)) |>
+         LT = Leaf_thickness) |>
+  select(!c(5, 13:15, 23:25)) |>
   group_by(Site, Species, Unique_ID) |>
   fill(ImageJ_1, ImageJ_2, LBI, .direction = 'down') |>
-  mutate(Species = as.factor(Species), 
-         Site = as.factor(Site),
-         Elevation_cat = cut(Elevation_m, 
-                             breaks = breaks,
-                             labels = labels)) |>
+  mutate(
+    Species = as.factor(Species),
+    Site = as.factor(Site),
+    Elevation_cat = cut(Elevation_m, breaks = breaks, labels = labels)
+  ) |>
   relocate(Elevation_cat, .before = Elevation_m)|>
   as_tibble()
 
 #Plant level for ASV analyses
 plant_traits <- leaf_traits |>
   relocate(Unique_ID, .before = Site) |>
-  group_by(Unique_ID, Site, Species, Sample_Date, Elevation_m, Elevation_cat, Longitude, Latitude)|>
-  summarise(ACI = mean(ACI, na.rm = TRUE),
-            LT = mean(LT, na.rm = TRUE),
-            LPS= mean(LPS, na.rm =TRUE),
-            LMA = mean(LMA, na.rm = TRUE),
-            ImageJ_1 = mean(ImageJ_1, na.rm = TRUE),
-            ImageJ_2 = mean(ImageJ_2, na.rm = TRUE),
-            LBI = mean(LBI, na.rm = TRUE))
+  group_by(
+    Unique_ID,
+    Site,
+    Species,
+    Sample_Date,
+    Elevation_m,
+    Elevation_cat,
+    Longitude,
+    Latitude
+  ) |>
+  summarise(
+    ACI = mean(ACI, na.rm = TRUE),
+    LT = mean(LT, na.rm = TRUE),
+    LPS = mean(LPS, na.rm = TRUE),
+    LMA = mean(LMA, na.rm = TRUE),
+    ImageJ_1 = mean(ImageJ_1, na.rm = TRUE),
+    ImageJ_2 = mean(ImageJ_2, na.rm = TRUE),
+    LBI = mean(LBI, na.rm = TRUE)
+  )
 
 
 #### Log transformation ####
@@ -153,20 +171,6 @@ plant_traits <- plant_traits |>
          logLT = log10(LT),
          logLPS = log10(LPS),
          logLMA = log10(LMA))
-```
-
-### Phyloseq, mirl, and meco objects
-```{r, phylo_objects}
-###################################
-#### Load Phyloseq objects ########
-###################################
-#Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data. These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
-
-# Load Phyloseq object cleaned of singletons (231 ASVs)
-ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.rds"))
-ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.csv"))
-pseq_rrfb <- readRDS(file.path(path, "clean_data/statistics/pseq_rrfb.rds")) #Mirlyn object from Method B
-rarefied_phyloseq <- readRDS(file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
 ```
 
 ### Leaf traits with community data
@@ -224,6 +228,8 @@ ps_melt <- ps_clean_3 |>
 ```
 
 ### Load files
+
+All of these files are loaded here after I have cleaned and shaped the data throughout this notebook. The purpose of having them is to ease setting up the work space.
 ```{r}
 #####################################################
 ############### Load master files here ##############
@@ -257,7 +263,11 @@ source("functions/alpha_rfy.R")
 source("functions/pval_format.R")
 
 # Comparisons
-my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
+my_comparisons <- list(
+  c("M. nasutus", "M. laciniatus"),
+  c("M. nasutus", "M. guttatus"),
+  c("M. laciniatus", "M. guttatus")
+)
 my_comparisons3 <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
 
 # List of ASV samples
@@ -268,6 +278,33 @@ names_list <- colnames(ps_clean_3@otu_table) #List of samples
 #ordi_traits <- plant_traits |>
 #  filter(Unique_ID %in% final_names_methodB)
 ```
+
+
+#### Phyloseq, mirl, and meco objects
+```{r, phylo_objects}
+###################################
+#### Load Phyloseq objects ########
+###################################
+#Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data. These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
+
+# Load Phyloseq object cleaned of singletons (231 ASVs)
+ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.rds"))
+ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.csv"))
+pseq_rrfb <- readRDS(file.path(path, "clean_data/statistics/pseq_rrfb.rds")) #Mirlyn object from Method B
+rarefied_phyloseq <- readRDS(file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
+```
+
+#### Community matrix, avgdist and geographic distance
+
+```{r}
+# Rarefied community matrix from "Matrices" section below.
+rrfy_hell_matrix <- readRDS("clean_data/statistics/rrfy_hell_matrix.rds")
+
+asv_avgdist <- readRDS("clean_data/statistics/asv_avgdist.rds") # Loading rarefied phyloseq object
+
+geo_distm <- readRDS("clean_data/statistics/geo_distm.rds")
+```
+
 
 ## Descriptive stats
 
@@ -2699,22 +2736,26 @@ m3_hell <- dbrda(dbrda_hell_matrix ~  logLBI + Elevation_m + Site + Species,
             parallel = 8, #Passes parallelization to metaMDS function
             na.action = na.omit)
 # Save
-save(m3_hell, file = "clean_data/statistics/m3_hell.rda")
+saveRDS(m3_hell, file = "clean_data/statistics/m3_hell.rds")
 
 # Load
-load("clean_data/statistics/m3_hell.rda")
+m3_hell <- readRDS("clean_data/statistics/m3_hell.rds")
 
 
 vif.cca(m3_hell)
 summary(m3_hell)
 
 set.seed(123)
-anova_m3hell <- anova.cca(m3_hell, by = "margin", permutations = 999, parallel = 8)
+anova_m3hell_margin <- anova.cca(m3_hell,
+                          by = "margin",
+                          permutations = 999,
+                          parallel = 8)
 
 # Save
-save(anova_m3hell, file = "clean_data/statistics/anova_m3hell.rda")
+saveRDS(anova_m3hell_margin, file = "clean_data/statistics/anova_m3hell_margin.rds")
+
 #Load
-load("clean_data/statistics/anova_m3hell.rda")
+anova_m3hell_margin <- readRDS("clean_data/statistics/anova_m3hell_margin.rds")
 ```
 
 Sites are redundant. It over fits the model given all the site factors (n= 21)
@@ -2732,26 +2773,26 @@ m4_hell <-
   )
 
 # Save
-save(m4_hell, file = "clean_data/statistics/m4_hell.rda")
+saveRDS(m4_hell, file = "clean_data/statistics/m4_hell.rds")
 
 # Load
-load("clean_data/statistics/m4_hell.rda")
+m4_hell <- readRDS("clean_data/statistics/m4_hell.rds")
 
 vif.cca(m4_hell)
 summary(m4_hell)
 
 set.seed(123)
-anova_m4hell <-
+anova_m4hell_margin <-
   anova.cca(m4_hell,
             by = "margin",
             permutations = 999,
             parallel = 8)
 
 # Save
-save(anova_m4hell, file = "clean_data/statistics/anova_m4hell.rda")
-#Load
-load("clean_data/statistics/anova_m4hell.rda")
+saveRDS(anova_m4hell_margin, file = "clean_data/statistics/anova_m4hell_margin.rds")
 
+#Load
+anova_m4hell_margin <- readRDS("clean_data/statistics/anova_m4hell_margin.rds")
 
 
 # m5 with interactions
@@ -2766,10 +2807,10 @@ m5_hell <-
   )
 
 # Save
-save(m5_hell, file = "clean_data/statistics/m5_hell.rda")
+saveRDS(m5_hell, file = "clean_data/statistics/m5_hell.rds")
 
 #load
-load("clean_data/statistics/m5_hell.rda")
+m5_hell <- readRDS("clean_data/statistics/m5_hell.rds")
 
 # Anovas for m5
 vif.cca(m5_hell)
@@ -2782,8 +2823,8 @@ anova_m5hell_margin <-
             by = "margin",
             permutations = 999,
             parallel = 8)
-save(anova_m5hell, file = "clean_data/statistics/anova_m5hell_margin.rda")
-load("clean_data/statistics/anova_m5hell_margin.rda")
+saveRDS(anova_m5hell_margin, file = "clean_data/statistics/anova_m5hell_margin.rds")
+anova_m5hell_margin <- readRDS("clean_data/statistics/anova_m5hell_margin.rds")
 
 # Terms (results are the same as adonis2 but without R2)
 set.seed(123)
@@ -2792,9 +2833,8 @@ anova_m5hell_term <-
         by = "term",
         permutations = 999,
         parallel = 8)
-save(anova_m5hell_term, file = "clean_data/statistics/anova_m5hell_term.rda")
-load("clean_data/statistics/anova_m5hell_term.rda")
-
+saveRDS(anova_m5hell_term, file = "clean_data/statistics/anova_m5hell_term.rds")
+anova_m5hell_term <- readRDS("clean_data/statistics/anova_m5hell_term.rds")
 
 ###################################
 ### PERMDISP ######################
@@ -2812,8 +2852,9 @@ beta_dis1 <-
     type = "median",
     sqrt.dist = FALSE
   )
-save(beta_dis1, file = "clean_data/statistics/beta_dis1.rda")
-load(file = "clean_data/statistics/beta_dis1.rda")
+
+saveRDS(beta_dis1, file = "clean_data/statistics/beta_dis1.rds")
+beta_dis1 <- readRDS("clean_data/statistics/beta_dis1.rds")
 anova(beta_dis1)
 
 set.seed(123)
@@ -2822,8 +2863,8 @@ beta_perm1 <-
             parallel = 8,
             permutations = 999,
             by = "term")
-save(beta_perm1, file = "clean_data/statistics/beta_perm1.rda")
-load("clean_data/statistics/beta_perm1.rda")
+saveRDS(beta_perm1, file = "clean_data/statistics/beta_perm1.rds")
+beta_perm1 <- readRDS("clean_data/statistics/beta_perm1.rds")
 beta_perm1
 
 TukeyHSD(beta_dis1, conf.level = 0.95)
@@ -2837,8 +2878,9 @@ beta_dis2 <- betadisper(
   type = "median",
   sqrt.dist = FALSE
 )
-save(beta_dis2, file = "clean_data/statistics/beta_dis2.rda")
-load(file = "clean_data/statistics/beta_dis2.rda")
+
+saveRDS(beta_dis2, file = "clean_data/statistics/beta_dis2.rds")
+beta_dis2 <- readRDS("clean_data/statistics/beta_dis2.rds")
 # anova(beta_dis2)
 
 set.seed(123)
@@ -2847,10 +2889,11 @@ beta_perm2 <-
             parallel = 8,
             permutations = 999,
             by = "term")
-save(beta_perm2, file = "clean_data/statistics/beta_perm2.rda")
-load(file = "clean_data/statistics/beta_perm2.rda")
 
+saveRDS(beta_perm2, file = "clean_data/statistics/beta_perm2.rds")
+beta_perm2 <- readRDS("clean_data/statistics/beta_perm2.rds")
 beta_perm2
+
 TukeyHSD(beta_dis2, conf.level = 0.95)
 
 # By Elevation*Species
@@ -2861,8 +2904,10 @@ beta_dis3 <- betadisper(
   type = "median",
   sqrt.dist = FALSE
 )
-save(beta_dis3, file = "clean_data/statistics/beta_dis3.rda")
-load(file = "clean_data/statistics/beta_dis3.rda")
+
+saveRDS(beta_dis3, file = "clean_data/statistics/beta_dis3.rds")
+beta_dis3 <- readRDS("clean_data/statistics/beta_dis3.rds")
+
 
 set.seed(123)
 beta_perm3 <-
@@ -2870,7 +2915,9 @@ beta_perm3 <-
             parallel = 8,
             permutations = 999,
             by = "term")
-save(beta_perm3, file = "clean_data/statistics/beta_perm3.rda")
+
+saveRDS(beta_perm3, file = "clean_data/statistics/beta_perm3.rds")
+beta_perm3 <- readRDS("clean_data/statistics/beta_perm3.rds")
 
 TukeyHSD(beta_dis3, conf.level = 0.95)
 ```
@@ -2888,8 +2935,8 @@ m1_lts <- dbrda(
   na.action = na.omit
 )
 
-save(m1_lts, file = "clean_data/statistics/m1_lts.rda")
-load(file = "clean_data/statistics/m1_lts.rda")
+saveRDS(m1_lts, file = "clean_data/statistics/m1_lts.rds")
+m1_lts <- readRDS("clean_data/statistics/m1_lts.rds")
 
 # Anovas for m1_lts
 vif.cca(m1_lts)
@@ -2902,8 +2949,9 @@ anova_m1_lts_margin <-
             by = "margin",
             permutations = 999,
             parallel = 8)
-save(anova_m1_lts_margin, file = "clean_data/statistics/anova_m1_lts_margin.rda")
-load("clean_data/statistics/anova_m1_lts_margin.rda")
+
+saveRDS(anova_m1_lts_margin, file = "clean_data/statistics/anova_m1_lts_margin.rds")
+anova_m1_lts_margin <- readRDS("clean_data/statistics/anova_m1_lts_margin.rds")
 
 # Terms (results are the same as adonis2 but without R2)
 set.seed(123)
@@ -2913,10 +2961,32 @@ anova_m1_lts_term <-
             permutations = 999,
             parallel = 8)
 
-save(anova_m1_lts_term, file = "clean_data/statistics/anova_m1_lts_term.rda")
-load("clean_data/statistics/anova_m1_lts_term.rda")
+saveRDS(anova_m1_lts_term, file = "clean_data/statistics/anova_m1_lts_term.rds")
+anova_m1_lts_term <- readRDS("clean_data/statistics/anova_m1_lts_term.rds")
 
 anova_m1_lts_term
+
+#Saving all objects as a single .rda file
+save(
+  m3_hell,
+  m4_hell,
+  m5_hell,
+  anova_m3hell_margin,
+  anova_m4hell_margin,
+  anova_m5hell_margin,
+  anova_m5hell_term,
+  beta_dis1,
+  beta_perm1,
+  beta_dis2,
+  beta_perm2,
+  beta_dis3,
+  beta_perm3,
+  m1_lts,
+  anova_m1_lts_margin,
+  anova_m1_lts_term,
+  file = "clean_data/statistics/dbRDA_models.rda"
+)
+
 ```
 
 
@@ -3294,12 +3364,9 @@ pcoa_dbrda_joined
 
 ## Linear Regressions
 
-### Preparing data for modelling GLMs
+### Preparing data for modelling GLMs - Impute missing values
 
 ```{r}
-library("class")
-library("caret")
-
 # Count columns with NA's
 dbrda_traits |>
   summarise(across(everything(), ~ sum(is.na(.)))) |>
@@ -3316,6 +3383,7 @@ dbrda_traits_imp <- dbrda_traits |>
 dbrda_traits_imp |>
   summarise(across(everything(), ~ sum(is.na(.)))) |>
   t()
+
 # Scaling data
 # Not scaling data because the one I am using is the log transformed values of leaf traits.
 
@@ -3575,7 +3643,7 @@ These regressions show that the mean bray-Curtis dissimilarity for each species 
 #### Selecting fixed terms
 ```{r, glm}
 # GLMs with Beta Diversity
-library("sjPlot")
+
 b1 <- glm(
   mean_bray ~ Elevation_m + Species + Site + logACI + logLT + logLPS + logLMA + logLBI,
   data = dbrda_traits_imp,
@@ -3621,7 +3689,7 @@ plot(
 )
 abline(a = 0, b = 1)
 
-# anova(B1,type="marginal")
+anova(B1, type="marginal")
 Anova(B1, type = 3)
 #drop1(B1, . ~ ., test = "F", trace = TRUE)
 
@@ -3752,7 +3820,7 @@ plot(
 )
 abline(a = 0, b = 1)
 
-plot_model(B4AIC, type = "diag")
+plot_model(B4, type = "diag")
 
 # Stepwise selection of terms
 B4AIC <- stepAIC(update(B4, . ~ ., -1),
@@ -3764,7 +3832,7 @@ drop1(B4, . ~ ., test = "Chisq", trace = TRUE)
 
 # logLT and logLBI eliminated from the model.
 ```
-The B4AIC model has a lower AIC score. We seem to have hit a good model. The fixed terms are `mean_bray ~ logACI + logLPS + logLMA`. Let's take that an model random effects taking into account variance structure. 
+The B4AIC model has a lower AIC score. We seem to have hit a good model. The fixed terms are `mean_bray ~ logACI + logLPS + logLMA`. The delta AIC is ~2.5. I say we keep the terms since it is not a huge improvement and model random effects. Let's take that an model random effects taking into account variance structure. 
 
 I will keep `Species` as a fixed term. Only `Site` as random effect. Maybe `Sampling_date` could be a random effect.
 
@@ -3793,7 +3861,8 @@ B1_gls <- gls(
   data = na.omit(dbrda_traits_imp)
 )
 
-Anova(B1_gls, type = 3)
+anova(B1_gls, type = "marginal")
+#Anova(B1_gls, type = 3)
 AIC(B1_gls) # -11858 is a higher AIC score. Site as a random effect is important.
 
 plot_model(B1REM, type = "diag")
@@ -3852,7 +3921,7 @@ abline(a = 0, b = 1)
 plot_model(B3REM, type = "diag")
 
 # Stepwise selection of terms
-drop1(B3REM, . ~ ., test = "Chisq", trace = TRUE)
+#drop1(B3REM, . ~ ., test = "Chisq", trace = TRUE)
 ```
 
 The B3REM model has the lowest AIC score yet. The the fixed terms are `mean_bray ~ Elvation + Species + logACI + logLT + logLPS + logLMA + logLBI,` with a variance structure `weights = varIdent(form = ~ 1 | Site)`. The random effects are nested `random = 1 | Site`. It seems to be a good fit for the data. Now I eliminate `Elevation` and model with the remaining fixed terms ` Species + logACI + logLT + logLPS + logLMA + logLBI`.
@@ -3884,7 +3953,7 @@ hist(B4REM_fitted)
 
 # Plots
 plot(B4REM)
-plot_models(B4REM, type = "diag")
+plot_model(B4REM, type = "diag")
 
 # B5REM
 B5REM <- lme(
@@ -3910,16 +3979,18 @@ hist(B5REM_fitted)
 
 # Plots
 plot(B5REM)
-plot_models(B5REM, type = "diag")
-
-
+plot_model(B5REM, type = "diag")
 ```
 
 #### Model comparisons
 
 ```{r}
+# Saving model objects
+save(B1, B2, B3, B4, B4AIC, B1REM, B3REM, B4REM, B5REM, file = "clean_data/statistics/glmm_models.rda")
+
+load("clean_data/statistics/glmm_models.rda")
+
 #Model comparison and selection
-library("MuMIn")
 model.sel(B1, B2, B3, B1REM, B3REM, B4AIC, B4REM, B5REM)[, c("df", "logLik", "AICc", "delta")]
 ```
 
@@ -3954,7 +4025,6 @@ ggsave(file.path(path, "figures/model_plots.png"), plot = model_plots, dpi=300, 
 
 ```{r}
 # Model table comparisons
-library("sjPlot")
 model_tables <- tab_model(
   B1REM,
   B3REM,
@@ -3979,10 +4049,6 @@ model_tables
 
 
 # Huxtable
-library("huxtable")
-library("flextable")
-library("broom.mixed")
-library("officer")
 table1 <- huxreg(
   "Model 1" = B1REM,
   "Model 2" = B3REM,
@@ -4097,27 +4163,35 @@ save_as_image(table1, path = "tables/model_comparison.svg")
 # Exploring PCoA with taxa of interest.
 
 test <- data.frame(t(rep_otu_df(pseq_rrfb))) |>
-rownames_to_column(var = "X") |>
-  mutate(Unique_ID =  X, # Copyin column to new column 
+  rownames_to_column(var = "X") |>
+  mutate(Unique_ID =  X,
+         # Copyin column to new column
          Unique_ID =  str_remove(Unique_ID, "^.*?(_|-)")) |>
   relocate(Unique_ID, .after = X) |>
   left_join(plant_traits, by = "Unique_ID")
 
 
-test <- ggplot(test, aes(y= ASV_1, x = Elevation_m)) +
-geom_point(color = "black", size = rel(4), alpha = 0.2, stroke = 1) +
-geom_smooth(method = "lm", se = FALSE) +
-labs(y =  "Cold-tolerant fungus (ASV_1)", x = paste("Elevation (m)", sep = "")) +
-# scale_color_manual(
-#     labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
-#     values = met.brewer("Isfahan2", n = 3, type = "discrete",
-#     direction = -1)) +
-theme_classic(base_size = 16) +
-theme(legend.title = element_text(face = "bold"),
-legend.text = element_markdown(),
-legend.position = "bottom",
-plot.caption = element_markdown(),
-strip.text = element_text(face = "bold"))
+test <- ggplot(test, aes(y = ASV_1, x = Elevation_m)) +
+  geom_point(
+    color = "black",
+    size = rel(4),
+    alpha = 0.2,
+    stroke = 1
+  ) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(y =  "Cold-tolerant fungus (ASV_1)", x = paste("Elevation (m)", sep = "")) +
+  # scale_color_manual(
+  #     labels = c("*M. laciniatus*", "*M. nasutus*", "*M. guttatus*"),
+  #     values = met.brewer("Isfahan2", n = 3, type = "discrete",
+  #     direction = -1)) +
+  theme_classic(base_size = 16) +
+  theme(
+    legend.title = element_text(face = "bold"),
+    legend.text = element_markdown(),
+    legend.position = "bottom",
+    plot.caption = element_markdown(),
+    strip.text = element_text(face = "bold")
+  )
 
 
 ggsave(file.path(path, "figures/cold-tolerant_asv1.png") , plot = test, dpi=300, units=c("mm"), width=250, height=250)

@@ -202,7 +202,20 @@ dbrda_hell_matrix <- rrfy_hell_matrix |>
   select(-c(1, 233:256))
 
 dbrda_traits <- rrfy_hell_matrix |>
-  select(X, Unique_ID, Site, Species, Elevation_m, Elevation_cat, Sample_Date, logACI, logLT, logLPS, logLMA, logLBI)
+  select(
+    X,
+    Unique_ID,
+    Site,
+    Species,
+    Elevation_m,
+    Elevation_cat,
+    Sample_Date,
+    logACI,
+    logLT,
+    logLPS,
+    logLMA,
+    logLBI
+  )
 
 
 #### Summary stats about the data ####
