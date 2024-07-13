@@ -3,8 +3,8 @@ title: "Foliar fungal symbionts in sympatric yellow monkeyflowers along elevatio
 date: last-modified
 date-format: "MMMM D, YYYY"
 bibliography: references.bib
-#csl: apa.csl
-csl: american-journal-of-botany.csl
+csl: apa.csl
+#csl: american-journal-of-botany.csl
 
 author:
   - name: Bolívar Aponte Rolón
