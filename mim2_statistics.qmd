@@ -12,7 +12,6 @@ knitr::opts_chunk$set(out.width ='70%', fig_align = 'center', echo = TRUE, colla
 ## Packages
 
 ```{r}
-
 # Core packages
 library("tidyverse")
 library("data.table")
@@ -46,6 +45,7 @@ library("huxtable")
 library("flextable")
 library("broom.mixed")
 library("officer")
+library("knitr")
 
 # Phyloseq friendly
 #Some of these are redundant and have conflicts, but have functions that I like better than others or compliment each other.
@@ -2994,7 +2994,7 @@ save(
 
 ```{r, final_model}
 # Final model
-final_model <- m5_hell
+final_model <- m1_lts
 
 names(final_model)
 B <- summary(final_model)
@@ -4029,7 +4029,7 @@ model_tables <- tab_model(
   B1REM,
   B3REM,
   B4REM,
-  #B5REM,
+  B5REM,
   show.aic = TRUE,
   show.intercept = TRUE,
   show.df = FALSE,
@@ -4056,6 +4056,8 @@ table1 <- huxreg(
   "Model 4" = B5REM,
   coefs = c(
     "Intercept" = "(Intercept)",
+    "M. nasutus" = "SpeciesM. nasutus",
+  "M. guttatus" = "SpeciesM. guttatus",
     "Elevation" = "Elevation_m",
     "ACI" = "logACI",
     "LT" = "logLT",
@@ -4085,7 +4087,7 @@ table1 <- huxreg(
              "Estimate",
              "CI [t-statistic]",
              after = 1) |>
-  insert_row("Random effects", "", "", "", "", "", "", "", "", after = 9) |>
+  insert_row("Random effects", "", "", "", "", "", "", "", "", after = 11) |>
   set_all_padding(10) |>
   set_outer_padding(0) |>
   set_bold(row = 1, col = everywhere) |>
@@ -4093,14 +4095,14 @@ table1 <- huxreg(
   set_width(1.1) |>
   theme_article() |> #flextable::theme_apa() is good too.
   huxtable::as_flextable(column_to_header = TRUE) |>
-  hline(10,
+  hline(12,
         part = "all",
         border = fp_border(
           color = "black",
           style = "solid",
           width = 1
         )) |> 
-  hline(13,
+  hline(15,
         part = "all",
         border = fp_border(
           color = "black",
@@ -4123,17 +4125,17 @@ table1 <- huxreg(
     align = "center",
     part = "body"
   ) |>
-  flextable::style(i = c(1:14),
+  flextable::style(i = c(1:16),
                    j = 1,
                    pr_t = fp_text(bold = FALSE)) |> 
   flextable::italic(
-    i = c(10, 14),
+    i = c(4, 5, 12, 15),
     j = 1,
     italic = TRUE,
     part = "body"
   ) |>
   flextable::bold(
-    i = c(2, 10),
+    i = c(2, 12),
     j = 1,
     bold = TRUE,
     part = "body"
@@ -4149,11 +4151,10 @@ table1 <- huxreg(
     eastasia.family = fontname
   )
 
-table1
+knitr::knit_print(table1)
 
-save_as_docx(table1, path = "tables/model_comparison.docx")
-save_as_image(table1, path = "tables/model_comparison.svg")
-
+#save_as_docx(table1, path = "tables/model_comparison.docx")
+#save_as_image(table1, path = "tables/model_comparison.svg")
 ```
 
 
@@ -4216,11 +4217,11 @@ This analysis allows us to determine what endophytes are associated with particu
 #Subset data frame for indicator species analysis
 #Community Data
 test <- as.matrix(t(rep_otu_df(pseq_rrfb)))
-                 
-asv_matrix_df <- as.data.frame(as.matrix(t(rep_otu_df(pseq_rrfb))))|># mirl object
-  rownames_to_column(var = "Unique_ID") 
-asv_indicspp <- left_join(asv_matrix_df, dbrda_traits, by = "Unique_ID")|> # Joining to the NMDS traits data frame which has the same number of rows as the asv_matrix_df
-    select(!c(238:243)) |>
+
+asv_matrix_df <- as.data.frame(as.matrix(t(rep_otu_df(pseq_rrfb)))) |> # mirl object
+  rownames_to_column(var = "Unique_ID")
+asv_indicspp <- left_join(asv_matrix_df, dbrda_traits, by = "Unique_ID") |> # Joining to the NMDS traits data frame which has the same number of rows as the asv_matrix_df
+  select(!c(238:243)) |>
   relocate(Species, Site, Elevation_cat, Elevation_m, .after = Unique_ID)
 ```
 
