@@ -413,7 +413,7 @@ The genomic data that support the findings of this study will be submitted to NC
 
 #ggplot themes
 # Theme for leaf trait and diversity plots: discrete
-theme_lfspp_discrete <-      theme_classic(base_size = 16) +
+theme_lfspp_discrete <-      theme_classic(base_size = 12) +
   theme(legend.title = element_text(face = "bold"),
         strip.text = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
@@ -421,37 +421,37 @@ theme_lfspp_discrete <-      theme_classic(base_size = 16) +
         axis.text.x = element_blank())
 
 # Theme for leaf trait plots: continuous
-theme_lfspp_continuous <- theme_classic(base_size = 16) +
+theme_lfspp_continuous <- theme_classic(base_size = 12) +
   theme(legend.title = element_text(face = "bold"),
         panel.border = element_rect(linetype = "blank", fill = NA),
         legend.text = element_text(face = "italic"), #Make legend text italic
-        axis.text.x = element_text(size = 14),
+        axis.text.x = element_text(size = 10),
         legend.position = "bottom")
 
 # Theme for species by diversity  plots: discrete
-theme_sppdiv_discrete <-    theme_classic(base_size = 16) +
+theme_sppdiv_discrete <-    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
-         strip.text = element_text(face = "italic", size = 14),
+         strip.text = element_text(face = "italic", size = 10),
          panel.border = element_rect(linetype = "blank", fill = NA),
          legend.text = element_text(face = "italic", size = 12), #Make legend text italic
          axis.text.x.bottom = element_blank(),
          axis.title.x = element_blank())
 
 # Theme for elevation plots: discrete
-theme_elevdiv_discrete <-    theme_classic(base_size = 16) +
+theme_elevdiv_discrete <-    theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
-         strip.text = element_text(face = "italic", size = 14),
+         strip.text = element_text(face = "italic", size = 10),
          panel.border = element_rect(linetype = "blank", fill = NA),
          axis.text.x.bottom = element_blank(),
          axis.title.x = element_blank())
 
 # Theme for leaf trait and diversity  plots: continuous
-theme_lfdiv_continuous <- theme_classic(base_size = 16) +
+theme_lfdiv_continuous <- theme_classic(base_size = 12) +
    theme(legend.title = element_text(face = "bold"),
-         strip.text = element_text(face = "bold.italic", size = 14),
+         strip.text = element_text(face = "bold.italic", size = 10),
          panel.border = element_rect(linetype = "blank", fill = NA),
         legend.text = element_text(face = "italic"), #Make legend text italic
-         axis.text.x = element_text(size = 14))
+         axis.text.x = element_text(size = 10))
 ```
 
 
@@ -509,7 +509,7 @@ pca_auto <- autoplot(pca, data =leaf_traits.pca,
                level = 0.95, 
                segments = 51, na.rm = TRUE, show.legend = NA, inherit.aes = TRUE) +
   #scale_x_continuous(expand = c(0.0, -0.09)) +
-  theme_classic(base_size = 16) +
+  theme_classic(base_size = 12) +
   theme(legend.text = element_markdown(),
         legend.position = "bottom",
         legend.title = element_text(face = "bold")) 
@@ -583,7 +583,7 @@ r1gg <- r1gg +
          panel.border = element_rect(linetype = "blank", fill = NA),
          axis.text.x = element_blank())
 r1gg
-ggsave(filename = file.path(path, "figures/figure2.png"), plot = r1gg, dpi=300, units=c("mm"), width=250, height=200)
+ggsave(filename = file.path(path, "figures/figure2.png"), plot = r1gg, dpi=300, units=c("mm"), width=300, height=200)
 
 # # Arrange plots
 # ra_plots <- ggarrange(t1gg, r1gg,
@@ -704,7 +704,7 @@ p_final_model <-
     fontface = "bold",
     show.legend = FALSE,
     label = c("Elev."),
-    nudge_x = 0.65
+    nudge_x = 0.45
   ) +
   geom_text(
     label_map,
@@ -757,7 +757,7 @@ p_final_model
 
 
 #Save the plot
-ggsave(file.path(path, "figures/figure3.png"), plot = p_final_model, dpi=300, units=c("mm"), width=300, height=200)
+ggsave(file.path(path, "figures/figure3.png"), plot = p_final_model, dpi=300, units=c("mm"), width=150, height=150)
 ```
 
 ## Figure 4
@@ -1108,7 +1108,7 @@ figure5 <- ggplot(data = dbrda_traits_imp, aes(x = Elevation_m, y = mean_bray, c
 
 figure5
 
-ggsave(file.path(path, "figures/figure5.png"), plot = figure5, dpi=300, units=c("mm"), width=300, height=300)
+ggsave(file.path(path, "figures/figure5.png"), plot = figure5, dpi=300, units=c("mm"), width=250, height=250)
 
 ```
 
@@ -1119,7 +1119,7 @@ ggsave(file.path(path, "figures/figure5.png"), plot = figure5, dpi=300, units=c(
 #| echo: false
 #| eval: true
 #| tidy: true
-#| fig-width: 6
+#| fig-width: 6 
 #| fig-height: 7
 #| label: figure6MIM2
 #| fig-cap: "Dissimilarity of FEF communities correlates with *Mimulus* as a function of geographic distance per site. Data represent pairwise Bray-Curtis dissimilarity (β-diversity) among sites. A) FEF community dissimilarity in considering all host species. B) FEF community dissimilarity by host species. Blue filled points correspond to *M. laciniatus*, green filled to *M. nasutus*, and yellow to *M. guttatus*."
@@ -1284,20 +1284,29 @@ mantel_species <-
   geom_smooth(method = "lm",
               se = TRUE,
               color = "black") +
-  scale_color_manual(values = met.brewer(
+  scale_color_manual(legend_title, values = met.brewer(
     "Isfahan2",
     n = 4,
     type = "discrete",
     direction = c(-1)
   )) +
-  labs(y = "Bray Curtis dissimilarity", x = "Geographic distance (m)", col = "") +
+  labs(y = "β-diversity", x = "Geographic distance (m)", col = "") +
   scale_x_continuous(
     labels = function(x)
       format(x, scientific = FALSE)
   ) +
   theme_lfspp_continuous +
-  theme(strip.text = element_text(face = "bold.italic")) +
-  facet_wrap(~ Species)
+  theme_classic(base_size = 16) +
+  theme(
+    legend.title = element_text(face = "bold"),
+    panel.border = element_rect(linetype = "blank", fill = NA),
+    legend.text = element_text(face = "italic"),
+    strip.text = element_text(face = "bold.italic", size = 14),
+    axis.text.x = element_text(size = 10),
+    legend.position = "bottom"
+  ) +
+  guides(guide_legend(color = "Species")) +
+  facet_wrap( ~ Species)
 #mantel_species
 
 # Adding the mantel test results
@@ -2031,7 +2040,7 @@ lma_elevation <- ggarrange(lma_cont, lma, ncol = 1, nrow = 2,
 
 lma_elevation
 
-ggsave(filename = file.path(path, "figures/supp_fig5.png"), plot = lma_elevation, dpi=300, units=c("mm"), width=300, height=300)
+ggsave(filename = file.path(path, "figures/supp_fig5.png"), plot = lma_elevation, dpi=300, units=c("mm"), width=250, height=250)
 ```
 
 ## Figure S6
@@ -2138,7 +2147,7 @@ aci_elevation <- ggarrange("", aci_cont, "", aci,
                            )
 
 aci_elevation
-ggsave(filename = file.path(path, "figures/supp_fig6.png"), plot = aci_elevation, dpi=300, units=c("mm"), width=300, height=300)
+ggsave(filename = file.path(path, "figures/supp_fig6.png"), plot = aci_elevation, dpi=300, units=c("mm"), width=250, height=250)
 ```
 
 ## Figure S7
@@ -2245,7 +2254,7 @@ lbi_elevation <- ggarrange(lbi_cont, lbi, ncol = 1, nrow = 2,
 
 lbi_elevation
 
-ggsave(filename = file.path(path, "figures/supp_fig7.png"), plot = lbi_elevation, dpi=300, units=c("mm"), width=300, height=300)
+ggsave(filename = file.path(path, "figures/supp_fig7.png"), plot = lbi_elevation, dpi=300, units=c("mm"), width=250, height=250)
 ```
 
 ## Figure S8
@@ -2365,7 +2374,7 @@ lps_elevation <- ggarrange("", lps_cont, "", lps, ncol = 1, nrow = 4,
 
 lps_elevation
 
-ggsave(filename = file.path(path, "figures/supp_fig8.png"), plot = lps_elevation, dpi=300, units=c("mm"), width=300, height=300)
+ggsave(filename = file.path(path, "figures/supp_fig8.png"), plot = lps_elevation, dpi=300, units=c("mm"), width=250, height=250)
 ```
 
 ## Figure S9
@@ -2463,7 +2472,7 @@ lt_elevation <- ggarrange(lt_cont, lt, ncol = 1, nrow = 2,
                            labels = c("A", "B"),
                            heights = c(1, 1))
 lt_elevation
-ggsave(filename = file.path(path, "figures/supp_fig9.png"), plot = lt_elevation, dpi=300, units=c("mm"), width=300, height=300)
+ggsave(filename = file.path(path, "figures/supp_fig9.png"), plot = lt_elevation, dpi=300, units=c("mm"), width=250, height=250)
 ```
 
 
@@ -2510,7 +2519,7 @@ map <- ggmap(mappops, extent = "device", darken = 0) +
     ),
     shape = 21,
   ) +
-  theme_classic(base_size = 16) +
+  theme_classic(base_size = 12) +
   theme(
     legend.title = element_text(face = "bold"),
     legend.text = element_text(size = 10),
@@ -2530,14 +2539,14 @@ map <- ggmap(mappops, extent = "device", darken = 0) +
          size = guide_legend(title = "Elevation (m a.s.l.)"))
 
 plot(map)
-# ggsave(
-#   "figures/map.png",
-#   plot = map,
-#   units = "in",
-#   width = 6,
-#   height = 6,
-#   dpi = 600
-# )
+ggsave(
+  "figures/map.png",
+  plot = map,
+  units = "in",
+  width = 6,
+  height = 6,
+  dpi = 600
+)
 ```
 
 ## Table S1
