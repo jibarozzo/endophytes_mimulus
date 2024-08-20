@@ -410,6 +410,7 @@ The genomic data that support the findings of this study will be submitted to NC
 #| echo: false
 #| eval: true
 #| tidy: true
+#| warning: false
 
 #ggplot themes
 # Theme for leaf trait and diversity plots: discrete
@@ -583,7 +584,7 @@ r1gg <- r1gg +
          panel.border = element_rect(linetype = "blank", fill = NA),
          axis.text.x = element_blank())
 r1gg
-ggsave(filename = file.path(path, "figures/figure2.png"), plot = r1gg, dpi=300, units=c("mm"), width=300, height=200)
+ggsave(filename = file.path(path, "figures/figure2.png"), plot = r1gg, dpi=300, units=c("mm"), width=300, height=300)
 
 # # Arrange plots
 # ra_plots <- ggarrange(t1gg, r1gg,
@@ -1030,7 +1031,7 @@ hill_numbers <-
   )
 
 hill_numbers
-ggsave(filename = file.path(path, "figures/figure4.png"), plot = hill_numbers, dpi=300, units=c("mm"), width=275, height=300)
+ggsave(filename = file.path(path, "figures/figure4.jpg"), plot = hill_numbers, dpi=300, units=c("mm"), width=275, height=300)
 ```
 
 
@@ -1502,7 +1503,7 @@ t4gg <- t4$cal_autocor(group = "Species", upper = list(continuous = GGally::wrap
   scale_color_manual(values = met.brewer("Isfahan2", n = 3, type = "discrete", direction = c(-1)))
 
 t4gg
-ggplot2::ggsave(file.path(path, "figures/supp_fig1.png") , plot = t4gg, dpi=300, units=c("mm"), width=300, height=300)
+ggplot2::ggsave(file.path(path, "figures/supp_fig1.jpg") , plot = t4gg, dpi=300, units=c("mm"), width=300, height=300)
 ```
 
 ## Figure S2
@@ -1559,7 +1560,7 @@ r2gg <-
   )
 
 r2gg
-ggsave(filename = file.path(path, "figures/supp_fig2b.png"), plot = r2gg, dpi=300, units=c("mm"), width=300, height=200)
+ggsave(filename = file.path(path, "figures/supp_fig2b.jpg"), plot = r2gg, dpi=300, units=c("mm"), width=300, height=250)
 
 # Joined heatplots
 heatplots <- ggarrange(t2gg, r2gg, ncol = 1, nrow = 2, 
@@ -1660,7 +1661,7 @@ rrfy_venn <-
 
 rrfy_venn
 
-ggsave(filename = file.path(path, "figures/supp_fig3.png"), plot = rrfy_venn, dpi=300, units=c("mm"), width=250, height=100)
+ggsave(filename = file.path(path, "figures/supp_fig3.jpg"), plot = rrfy_venn, dpi=300, units=c("mm"), width=250, height=225)
 
 # # Save
 # ggsave(filename = file.path(path, "figures/supp_fig3.png"), plot = venn_plots, dpi=300, units=c("mm"), width=300, height=300)
@@ -1915,7 +1916,7 @@ alpha_beta_diversity <- ggarrange(hill_numbers_species, "", hill_beta,
 
 alpha_beta_diversity
 
-ggsave(filename = file.path(path, "figures/supp_fig4.png"), plot = alpha_beta_diversity, dpi=300, units=c("mm"), width=300, height=275)
+ggsave(filename = file.path(path, "figures/supp_fig4.jpg"), plot = alpha_beta_diversity, dpi=300, units=c("mm"), width=300, height=275)
 
 # Alpha and beta diversity plot for defense talk
 # defense_alpha_beta <- ggarrange(hill1_diversity, hill1_species,
@@ -2040,7 +2041,7 @@ lma_elevation <- ggarrange(lma_cont, lma, ncol = 1, nrow = 2,
 
 lma_elevation
 
-ggsave(filename = file.path(path, "figures/supp_fig5.png"), plot = lma_elevation, dpi=300, units=c("mm"), width=250, height=250)
+ggsave(filename = file.path(path, "figures/supp_fig5.jpg"), plot = lma_elevation, dpi=300, units=c("mm"), width=250, height=250)
 ```
 
 ## Figure S6
@@ -2147,7 +2148,7 @@ aci_elevation <- ggarrange("", aci_cont, "", aci,
                            )
 
 aci_elevation
-ggsave(filename = file.path(path, "figures/supp_fig6.png"), plot = aci_elevation, dpi=300, units=c("mm"), width=250, height=250)
+ggsave(filename = file.path(path, "figures/supp_fig6.jpg"), plot = aci_elevation, dpi=300, units=c("mm"), width=250, height=250)
 ```
 
 ## Figure S7
@@ -2254,7 +2255,7 @@ lbi_elevation <- ggarrange(lbi_cont, lbi, ncol = 1, nrow = 2,
 
 lbi_elevation
 
-ggsave(filename = file.path(path, "figures/supp_fig7.png"), plot = lbi_elevation, dpi=300, units=c("mm"), width=250, height=250)
+ggsave(filename = file.path(path, "figures/supp_fig7.jpg"), plot = lbi_elevation, dpi=300, units=c("mm"), width=250, height=250)
 ```
 
 ## Figure S8
@@ -2374,7 +2375,7 @@ lps_elevation <- ggarrange("", lps_cont, "", lps, ncol = 1, nrow = 4,
 
 lps_elevation
 
-ggsave(filename = file.path(path, "figures/supp_fig8.png"), plot = lps_elevation, dpi=300, units=c("mm"), width=250, height=250)
+ggsave(filename = file.path(path, "figures/supp_fig8.jpg"), plot = lps_elevation, dpi=300, units=c("mm"), width=250, height=250)
 ```
 
 ## Figure S9
@@ -2472,7 +2473,7 @@ lt_elevation <- ggarrange(lt_cont, lt, ncol = 1, nrow = 2,
                            labels = c("A", "B"),
                            heights = c(1, 1))
 lt_elevation
-ggsave(filename = file.path(path, "figures/supp_fig9.png"), plot = lt_elevation, dpi=300, units=c("mm"), width=250, height=250)
+ggsave(filename = file.path(path, "figures/supp_fig9.jpg"), plot = lt_elevation, dpi=300, units=c("mm"), width=250, height=250)
 ```
 
 
@@ -2540,7 +2541,7 @@ map <- ggmap(mappops, extent = "device", darken = 0) +
 
 plot(map)
 ggsave(
-  "figures/map.png",
+  "figures/map.jpg",
   plot = map,
   units = "in",
   width = 6,
