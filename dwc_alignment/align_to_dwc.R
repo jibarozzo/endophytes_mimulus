@@ -21,8 +21,8 @@ tax_tab <- read_csv(file = "clean_data/taxonomy/TAXA_8450_cleaned_10_percent.csv
 
 ASV_tab <- ASV_tab %>% 
     dplyr::rename(ASV_name = ...1) %>% 
-    pivot_longer(names_to = "Plant_Sample", values_to = "organismQuantity", cols = -ASV_name) %>% 
-    group_by(Leaf_Sample) %>% 
+    pivot_longer(names_to = "Plant_Sample", values_to = "organismQuantity", cols = -ASV_name) %>%
+    group_by(Plant_Sample) %>% 
     mutate("sampleSizeValue" = sum(organismQuantity))
 
 samples_tab_with_traits <- samples_tab %>% 
@@ -86,18 +86,20 @@ occ_tab_ASV <- df %>%
             stringr::str_replace(pattern = "\\s", replacement = "T") %>% 
             stringr::str_replace(pattern = "T07:00:00Z", replacement = ""),
         
-        eventID = NA,
+        eventID = NA, # Maybe something like "MIM2:LEF:ASV:202120220407" for example. This is MIM2 project, LEF = LEAF, ASV = ASV, 202120220407 = unique identifier (2021 and 2022 between months 04 and 07)
         sampleSizeValue = sampleSizeValue,
         sampleSizeUnit = "DNA sequence reads",
-        samplingProtocol = NA,
+        samplingProtocol = "Aponte Rolón, B. (2023). High‐Molecular‐Weight SPRI‐aided DNA extraction from Mimulus (Phrymaceae) leaf tissue.
+        https://dx.doi.org/10.17504/protocols.io.bp2l6xn8rlqe/v2",
         eventType = "Sample",
         decimalLatitude = Latitude,
         decimalLongitude = Longitude,
-        coordinatePrecision = NA,
+        coordinatePrecision = "0.000278 (nearest second)",
         coordinateUncertaintyInMeters = NA,
         geodeticDatum = 'WGS84', #double check this
         locationID = Site,
-        locality = NA,  # Must be derived from lat/lon, could just say Sierra Nevada, CA
+        locality = NA,  # Must be derived from lat/lon, could just say Sierra Nevada, CA 
+        # ^ Maybe this can be a polygon?
         
         # 3 Locations
         # Yosemite National Park, CA, USA
@@ -110,10 +112,10 @@ occ_tab_ASV <- df %>%
         maximumElevantionInMeters = Elevation_m,
         basisOfRecord = "MaterialSample",
         recordedBy = "Bolívar Aponte Rolón",
-        materialSampleID = NA,
+        materialSampleID = NA, # This is gonna be either Plant_Sample or Unique_ID (from the initial data entry unique identifier)
         associatedSequences = NA,
         identificationRemarks = NA,
-        identificationReferences = NA, #Jepsen guide
+        identificationReferences = NA, #Jepsn guide
         verbatimIdentification = paste0(Kingdom, Phylum, Class, Order, Family, Genus, Fungal_Species),
         
         #Will need to be aligned with GBIF taxonomic backbone
@@ -141,24 +143,31 @@ occ_tab_plant <- df %>%
             stringr::str_replace(pattern = "\\s", replacement = "T") %>% 
             stringr::str_replace(pattern = "T07:00:00Z", replacement = ""),
         
-        eventID = NA,
-        sampleSizeValue = NA,
-        sampleSizeUnit = NA,
+        eventID = # Maybe something like "MIM2:LEF:ASV:202120220407" for example. This is MIM2 project, LEF = LEAF, ASV = ASV, 202120220407 = unique identifier (2021 and 2022 between months 04 and 07),
+        sampleSizeValue = 400,
+        sampleSizeUnit = milligram,
         samplingProtocol = NA,
         eventType = "Sample",
         decimalLatitude = Latitude,
         decimalLongitude = Longitude,
         coordinatePrecision = NA,
         coordinateUncertaintyInMeters = NA,
-        locationID = NA,
-        locality = "Yosemite National Park, CA, USA",
+        locationID = Site,
+        locality = NA,  # Must be derived from lat/lon, could just say Sierra Nevada, CA 
+        # ^ Maybe this can be a polygon?
+        
+        # 3 Locations
+        # Yosemite National Park, CA, USA
+        # Stanislaus National Forest, CA, USA
+        # Sierra National Forest, CA, USA
+        
         countryCode = "US",
         continent = "North America",
         minimumElevationInMeters = Elevation_m,
         maximumElevantionInMeters = Elevation_m,
         basisOfRecord = "MaterialSample",
         recordedBy = "Bolívar Aponte Rolón",
-        materialSampleID = NA,
+        materialSampleID = NA, # This is gonna be either Plant_Sample or Unique_ID (from the initial data entry unique identifier)
         associatedSequences = NA,
         identificationRemarks = NA,
         identificationReferences = NA,
