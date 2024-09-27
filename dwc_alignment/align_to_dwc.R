@@ -113,7 +113,7 @@ occ_tab_ASV <- df %>%
         basisOfRecord = "MaterialSample",
         recordedBy = "Bolívar Aponte Rolón",
         materialSampleID = NA, # This is gonna be either Plant_Sample or Unique_ID (from the initial data entry unique identifier)
-        associatedSequences = NA,
+        associatedSequences = NA, # BioProject or SRA accession number
         identificationRemarks = NA,
         identificationReferences = NA, #Jepsn guide
         verbatimIdentification = paste0(Kingdom, Phylum, Class, Order, Family, Genus, Fungal_Species),

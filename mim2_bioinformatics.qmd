@@ -743,11 +743,11 @@ dim(seqtab_seq1)
 table(nchar(getSequences(seqtab_seq1)))
 
 #Save file R object, and .csv
-#saveRDS(seqtab_seq1, file.path(out_dir, "clean_data/ASV_tables/ASV_8450_seqtable_raw.rds")) #Functions to write a single R object to a file, and to restore it.
-#write.csv(seqtab_seq1, file.path(out_dir, "clean_data/ASV_tables/ASV_8450_seqtable_raw.rds"))
+#saveRDS(seqtab_seq1, file.path(out_dir, "clean_data/ASV_tables/01-ASV_8450_seqtable_raw.rds")) #Functions to write a single R object to a file, and to restore it.
+#write.csv(seqtab_seq1, file.path(out_dir, "clean_data/ASV_tables/01-ASV_8450_seqtable_raw.rds"))
 
 #Open from here in case R crashes
-seqtab <- readRDS(file.path(out_dir, "clean_data/ASV_tables/ASV_8450_seqtable_raw.rds"))
+seqtab <- readRDS(file.path(out_dir, "clean_data/ASV_tables/01-ASV_8450_seqtable_raw.rds"))
 ```
 
 ### Remove chimeras
@@ -769,10 +769,10 @@ seqtab_seq1_nochim <- removeBimeraDenovo(seqtab_seq1,
 sum(seqtab_seq1_nochim)/sum(seqtab_seq1)
 
 #Save file
-#saveRDS(seqtab_seq1_nochim, file.path(out_dir, "clean_data/ASV_tables/ASV_8450_seqtable_nochim_denoise.rds"))
-#write.csv(seqtab_seq1_nochim, file.path(out_dir, "clean_data/ASV_tables/ASV_8450_seqtable_nochim_denoise.csv")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
+#saveRDS(seqtab_seq1_nochim, file.path(out_dir, "clean_data/ASV_tables/02-ASV_8450_seqtable_nochim_denoise.rds"))
+#write.csv(seqtab_seq1_nochim, file.path(out_dir, "clean_data/ASV_tables/02-ASV_8450_seqtable_nochim_denoise.csv")) # Long file name but it indicates this file has gone through all the steps in the pipeline.
 
-seqtab_seq1_nochim <- readRDS(file.path(out_dir,"ASV_tables/ASV_8450_seqtable_nochim_denoise.rds"))
+seqtab_seq1_nochim <- readRDS(file.path(out_dir,"ASV_tables/02-ASV_8450_seqtable_nochim_denoise.rds"))
 ```
 
 Inspect distribution of sequence lengths
@@ -880,7 +880,7 @@ rownames(taxa.print_seq1) <- NULL
 head(taxa.print_seq1)
 
 # Save file
-#write.csv(taxa.print_seq1, file.path(out_dir, "clean_data/taxonomy/assign_tax_8450.csv"))
+#write.csv(taxa.print_seq1, file.path(out_dir, "clean_data/taxonomy/01-assigned_tax_8450.csv"))
 ```
 
 Done!
@@ -1206,7 +1206,7 @@ rownames(taxa.print_seq2) <- NULL
 head(taxa.print_seq2)
 
 # Save file
-#write.csv(taxa.print_seq2, file.path(out_dir, "clean_data/taxonomy/assign_tax_8756.csv"))
+#write.csv(taxa.print_seq2, file.path(out_dir, "clean_data/taxonomy/assigned_tax_8756.csv"))
 
 #Done
 ```
@@ -1252,7 +1252,7 @@ library("data.table")
 library("tidyverse")
 set.seed(123)
 out_dir <- file.path("../mim2_bioinformatics")
-taxa <- read.csv(file.path(out_dir, "clean_data/taxonomy/assign_tax_8450.csv"))
+taxa <- read.csv(file.path(out_dir, "clean_data/taxonomy/01-assigned_tax_8450.csv"))
 
 # Adding "ASV_" to the taxonomical assignment
 rownames(taxa)<-paste0("ASV_",1:nrow(taxa))
@@ -1261,13 +1261,13 @@ taxa <- taxa |>
   setDT(keep.rownames = "ASV_ID")
 
 # Save file
-#saveRDS(taxa, file.path(out_dir, "clean_data/taxonomy/assign_tax_8450.rds"))
+#saveRDS(taxa, file.path(out_dir, "clean_data/taxonomy/01-assigned_tax_8450.rds"))
 # Read file
-taxa <- readRDS(file.path(out_dir, "clean_data/taxonomy/assign_tax_8450.rds"))
+taxa <- readRDS(file.path(out_dir, "clean_data/taxonomy/01-assigned_tax_8450.rds"))
 
 
 #Sequences (ASV) per sample table 
-seqtab.nochim <- readRDS(file.path(out_dir, "clean_data/ASV_tables/ASV_8450_seqtable_nochim_denoise.rds"))
+seqtab.nochim <- readRDS(file.path(out_dir, "clean_data/ASV_tables/02-ASV_8450_seqtable_nochim_denoise.rds"))
 samples.out <- rownames(seqtab.nochim)
 
 #Code from Astrobiomike
@@ -1281,18 +1281,18 @@ asv_headers <- vector(dim(seqtab.nochim)[2], mode="character")
 
 # Making and writing out a fasta of our final ASV seqs:
 asv_fasta <- c(rbind(asv_headers, asv_seqs))
-#write(asv_fasta, file.path(out_dir, "clean_data/ASV_tables/ASVs_8450_amplicons.fa"))
+#write(asv_fasta, file.path(out_dir, "clean_data/ASV_tables/03-ASV_8450_amplicons.fa"))
 
 # count table:
 asv_tab_raw <- t(seqtab.nochim) #Transposing
 row.names(asv_tab_raw) <- sub(">", "", asv_headers) #Substituting sequences for shorthand ASV identifier.
 
 # Save file
-#write.table(asv_tab_raw, file.path(out_dir, "clean_data/ASV_tables/ASVs_8450_counts_raw.tsv") , sep="\t", quote=F, col.names=NA) #Also saved as a .csv
-#saveRDS(asv_tab_raw, file.path(out_dir, "clean_data/ASV_tables/ASVs_8450_counts_raw.rds"))
+#write.table(asv_tab_raw, file.path(out_dir, "clean_data/ASV_tables/04-ASV_8450_counts_raw.tsv") , sep="\t", quote=F, col.names=NA) #Also saved as a .csv
+#saveRDS(asv_tab_raw, file.path(out_dir, "clean_data/ASV_tables/04-ASV_8450_counts_raw.rds"))
 
 # Load file
-asv_tab_raw <- readRDS(file.path(out_dir, "clean_data/ASV_tables/ASVs_8450_counts_raw.rds"))
+asv_tab_raw <- readRDS(file.path(out_dir, "clean_data/ASV_tables/04-ASV_8450_counts_raw.rds"))
 ```
 
 We now have a table with ASV ID's for each of our samples. Now we clean
@@ -1630,11 +1630,11 @@ decontaminated_p2 <- plate2[!rownames(plate2) %in% cont2, ]
 ##Saving decontaminated files as one.
 
 all_decontaminated <- bind_rows(decontaminated_p1, decontaminated_p2)
-#write.csv(all_decontaminated,file.path(out_dir , "clean_data/ASV_tables/ASVs_8450_decont_blankandnegs.csv"))
+#write.csv(all_decontaminated,file.path(out_dir , "clean_data/ASV_tables/05-ASV_8450_decont_blankandnegs.csv"))
 
 asv.decon <- t(all_decontaminated)
 asv.decon <- as.data.frame(asv.decon)
-#write.csv(asv.decon, file.path(out_dir , "clean_data/ASV_tables/ASVs_8450_toFilt_10_percent.csv")) ## in the format to remove <10% OTUs -- see below
+#write.csv(asv.decon, file.path(out_dir , "clean_data/ASV_tables/05-ASV_8450_toFilt_10_percent.csv")) ## in the format to remove <10% OTUs -- see below
 
 #### Script to remove < 0.10% abundance per sample #### From Shuzo Oita
 ####################################################
@@ -1654,9 +1654,9 @@ i <- colnames(asv_10)
 asv_10[ , i] <- apply(asv_10[ , i],2,
                     function(x) round(x, digits = 0))
 
-#write.csv(asv_10, file.path(out_dir, "clean_data/ASV_tables/ASVs_8450_cleaned_10_percent.csv"))
-#saveRDS(asv_10, file.path(out_dir, "clean_data/ASV_tables/ASVs_8450_cleaned_10_percent.rds"))
-asv_10 <- readRDS(file.path(out_dir, "clean_data/ASV_tables/ASVs_8450_cleaned_10_percent.rds"))
+#write.csv(asv_10, file.path(out_dir, "clean_data/ASV_tables/06-ASV_8450_cleaned_10_percent.csv"))
+#saveRDS(asv_10, file.path(out_dir, "clean_data/ASV_tables/06-ASV_8450_cleaned_10_percent.rds"))
+asv_10 <- readRDS(file.path(out_dir, "clean_data/ASV_tables/06-ASV_8450_cleaned_10_percent.rds"))
 ```
 
 We end up with 688 ASVs in 176 samples after removing those that
@@ -1735,11 +1735,11 @@ rel_abund_ps_clean <- prune_samples(sample_sums(rel_abund_ps_clean ) > 0, rel_ab
 # Result: 231 taxa in 160 samples.
 
 # Save file
-#saveRDS(ps_clean_3, file.path(out_dir, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons.rds"))
-#saveRDS(rel_abund_ps_clean, file.path(out_dir, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.rds"))
+#saveRDS(ps_clean_3, file.path(out_dir, "clean_data/taxonomy/02-TAXA_8450_phyloseq_nonsingletons.rds"))
+
 
 # Load file
-ps_clean_3 <- readRDS(file.path(out_dir, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons.rds"))
+ps_clean_3 <- readRDS(file.path(out_dir, "clean_data/taxonomy/02-TAXA_8450_phyloseq_nonsingletons.rds"))
 ```
 
 #### Phyloseq CLEANED summary statistics
@@ -1810,7 +1810,7 @@ downstream analyses.
 # Saving phyloseq with not relative abundance calculated
 ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
   rename(ASV = OTU)
-write.csv(ps_clean_3_df,file.path(out_dir, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons.csv"))
+write.csv(ps_clean_3_df,file.path(out_dir, "clean_data/taxonomy/02-TAXA_8450_phyloseq_nonsingletons.csv"))
 
 # Relative abundance calculated
 rel_ps_clean_df <- metagMisc::phyloseq_to_df(rel_abund_ps_clean, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
@@ -1818,7 +1818,7 @@ rel_ps_clean_df <- metagMisc::phyloseq_to_df(rel_abund_ps_clean, addtax = T, add
 
 #Replacing forced NaNs when turned into df
 rel_ps_clean_df  <- replace(rel_ps_clean_df , rel_ps_clean_df  == "NaN", 0) 
-write.csv(rel_ps_clean_df, file.path(out_dir, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons.csv"))
+write.csv(rel_ps_clean_df, file.path(out_dir, "clean_data/taxonomy/02-TAXA_8450_relabun_nonsingletons.csv"))
 
 
 # Remove species B from the phyloseq object
@@ -1832,11 +1832,11 @@ rel_abund_ps_clean <- subset_samples(rel_abund_ps_clean, !Sample %in% bicolor)
 ps_clean_3_df <- metagMisc::phyloseq_to_df(ps_clean_3, addtax = T, addtot = F, addmaxrank = F, sorting = "abundance") |>
   rename(ASV = OTU)
 
-saveRDS(ps_clean_3, file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.rds"))
-write.csv(ps_clean_3_df, file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.csv"))
+saveRDS(ps_clean_3, file.path(path, "clean_data/taxonomy/02-TAXA_8450_phyloseq_nonsingletons_noB.rds"))
+write.csv(ps_clean_3_df, file.path(path, "clean_data/taxonomy/02-TAXA_8450_phyloseq_nonsingletons_noB.csv"))
 # 
-saveRDS(rel_abund_ps_clean, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.rds"))
-write.csv(rel_ps_clean_df, file.path(path, "clean_data/taxonomy/ASV_8450_relabun_nonsingletons_noB.csv"))
+saveRDS(rel_abund_ps_clean, file.path(path, "clean_data/taxonomy/02-TAXA_8450_relabun_nonsingletons_noB.rds"))
+write.csv(rel_ps_clean_df, file.path(path, "clean_data/taxonomy/02-TAXA_8450_relabun_nonsingletons_noB.csv"))
 ```
 
 Now we have the objects from `phyloseq` saved as R objects as well as
@@ -1862,9 +1862,9 @@ plot_richness(ps_clean_3, x="Species", measures=c("Shannon", "Simpson"), color="
 
 # Important files resulting from the pipeline
 
--   asv_10 == clean_data/ASV_tables/ASVs_8450_cleaned_10_percent.rds
--   ps_clean_3 == clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons.rds
--   ps_clean_3_df == clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons.csv
+-   asv_10 == clean_data/ASV_tables/06-ASV_8450_cleaned_10_percent.rds
+-   ps_clean_3 == clean_data/taxonomy/02-TAXA_8450_phyloseq_nonsingletons.rds
+-   ps_clean_3_df == clean_data/taxonomy/02-TAXA_8450_phyloseq_nonsingletons.csv
 
 All of these files and objects underwent the complete pipeline and have
 been removed of contaminant ASVs, sample cross-contamination and cut-off
