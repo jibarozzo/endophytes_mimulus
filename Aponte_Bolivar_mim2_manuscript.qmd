@@ -276,22 +276,34 @@ my_comparisons3 <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
 
 # Abstract
 
-The Mimulus guttatus species complex is a phenotypically and ecologically diverse group of flowering plants with leaf functional trait variation that provides key advantages for adapting to harsh environments. The potential for microbial symbionts to contribute to their ecological and evolutionary success, however, has been overlooked. We explored how leaf functional traits and foliar endophytic fungi (FEF) abundance, richness, and community composition in three sympatric Monkeyflowers change across elevation in the Sierra Nevada, CA, USA. We asked: Q1) Are there differences in leaf functional traits and FEF communities *among* sympatric *Mimulus* spp. populations along at similar elevations? Q2) How do traits and FEF communities change across an elevation gradient within species? Q3) Are FEF richness, diversity and community composition correlated with leaf functional traits and/or elevation? Q4) How does FEF community composition differ with geographic distance within each species? We collected *M. guttatus*, *M. nasutus*, and *M.laciniatus* individuals from natural populations across the Sierra Nevada, measured leaf functional traits and used ITS sequencing to describe the leaf endophyte community. We found  significant associations of FEF community composition with leaf lobing, host species, and elevation, suggesting that these factors may influence fungal community composition. Furthermore, FEF community dissimilarity was correlated with geographical distance indicating isolation by distance and limited dispersal of fungal endophytes. We detected the prevalence of *Vishniacozyma victoriae*, an endophyte found most commonly in Antarctica, across all Sierran *Mimulus* populations. The presence of *V. victoriae* could play a role in the adaptation of *Mimulus* to cold, high elevation environments.  Our findings offer novel insights into the intricate interactions between fungal endophyte communities, plant traits, and elevation.
+The *Mimulus guttatus* species complex is a phenotypically and ecologically diverse group of flowering plants with leaf functional trait variation that provides key advantages for adapting to harsh environments. The potential for microbial symbionts to contribute to their ecological and evolutionary success, however, has been overlooked. We explored how leaf functional traits and foliar endophytic fungi (FEF) abundance, richness, and community composition in three sympatric Monkeyflowers change across elevation in the Sierra Nevada, CA, USA. We asked: Q1) Are there differences in leaf functional traits and FEF communities *among* sympatric *Mimulus* spp. populations along at similar elevations? Q2) How do traits and FEF communities change across an elevation gradient within species? Q3) Are FEF richness, diversity and community composition correlated with leaf functional traits and/or elevation? Q4) How does FEF community composition differ with geographic distance within each species? We collected *M. guttatus*, *M. nasutus*, and *M.laciniatus* individuals from natural populations across the Sierra Nevada, measured leaf functional traits and used ITS sequencing to describe the leaf endophyte community. We found  significant associations of FEF community composition with 
+<!-- leaf lobing,  -->
+host species, and elevation, suggesting that these factors may influence fungal community composition. Furthermore, FEF community dissimilarity was correlated with geographical distance indicating isolation by distance and limited dispersal of fungal endophytes. We detected the prevalence of *Vishniacozyma victoriae*, an endophyte found most commonly in Antarctica, across all Sierran *Mimulus* populations. The presence of *V. victoriae* could play a role in the adaptation of *Mimulus* to cold, high elevation environments.  Our findings offer novel insights into the intricate interactions between fungal endophyte communities, plant traits, and elevation.
 
 
 <!-- The distance-based Redundancy Analysis (dbRDA) has demonstrated the influence of leaf lobation, host species, and elevation on fungal endophyte communities, emphasizing the environmental determinants of fungal community composition. Furthermore, the significant correlation between FEF community dissimilarity and geographical distance provides insights into the spatial dynamics of fungal endophyte distribution associated with different host species. -->
 
-# Introduction
 
-Phenotypic plasticity and genetic adaptation are key drivers of evolution, and both processes may aid in plant adaptation to a warming climate [@jump2005]. Leaves are essential structures for plants, playing a crucial role in various physiological processes such as photosynthesis, transpiration, and nutrient uptake [@oguchi2018; @fritz2018; @tsukaya2018]. They display various shapes driven by both genetic and environmental factors [@tsukaya2018; @tsukaya2005; @nicotra2011; @fritz2018]. Since photosynthetic leaves are crucial for plant growth and survival, it has been proposed that natural selection has shaped leaf functional traits in response to environmental conditions and ecological demands [@jump2005; @oguchi2018; @nicotra2010]. The leaf functional traits involved in the resulting leaf shape respond to three main stimuli: light, temperature modulation, and hydraulic constraints. Therefore, proposed explanations for the evolution of different leaf shapes have included: 1) thermoregulation to arid and hot environments, 2) hydraulic constraints and biomechanical constraints, 3) adaptations against plant enemies, and 4) adaptations to optimize light interception [@nicotra2011; @oguchi2018]. 
+
+# Introduction
+Microbial dispersal is hard to trace. The general assumption is that many, if not all, microbes are ubiquitous. Nevertheless, the dispersal of microbial communities is not random, their distribution can be influenced by environmental conditions, geographic distance, and host species[CITE]. The parallel evolution and symbiotic interaction between plants microbes, like fungi, aided plants’ colonization of land across multiples climates [reviewed in @peay2016; @remy1994; @wang2006; @field2015] and bacteria [@soltis1995; @adams2002; @delaux2015]; however, little is known about how plant microbiomes influence or are influenced by local adaptation of their host species. Geographic location and environmental conditions are known to influence community composition of symbiotic fungi, with varying effects across different fungal guilds [@bowman2021; CITE]. Previous studies have suggested that foliar endophytic fungi (FEF), which live inside plant leaves, can alter plant traits under stressful conditions such as drought [@song2016] and therefore may contribute to local adaptation. Thus, the resulting FEF community is influenced by the interplay of environmental conditions, geographic distance and host species.
+
+Host traits and host genetic background can influence FEF communities in a variety of ways.  Leaf functional traits, such as leaf thickness, leaf mass per area, and leaf toughness are known to influence plant's response to abiotic factors like light, temperature, and hydraulic constraints [@nicotra2011; @oguchi2018]. such , are known to influence the structure of FEF communities [@tellezTraits2022]. Leaf functional traits are also  
+
+In addition to the central role of photosynthesis for explaining leaf shape, emphasizing specific leaf functional traits such as leaf thickness (LT), leaf mass per area (LMA), and leaf toughness can illustrate how mechanical properties impact plants' response to their abiotic and biotic environments [@oguchi2018]. Such characteristics are part of a leaf economic spectrum, with leaves at one extreme having short lifespans, high nitrogen content, low LMA, thin leaf blades, and thin cell walls. At the opposite end are long-lived leaves with low nitrogen content, high LMA, thick leaf blades and thick cell walls [@mason2015; @wright2004]. These traits not only determine the chemical, structural, and longevity attributes of leaves but influence their associated microbial communities [@saunders2010; @tellezTraits2022]. 
+ Host genetics may structure the foliar microbiomes of plants. For example, a study on the classical plant model, *Arabidopsis thaliana*, revealed that bacterial and fungal communities in leaves are shaped by host genotype, at least for the most common operational taxonomic units (OTUs) [@horton2014]. Little i known abou the symbionts of *Mimulus* species. Beslile et al. [-@belisle2012] reported on the distribution of diverse fungal communities in the flower nectar of *Mimulus aurantiacus*. The authors considered flowers as islands in a metapopulation system and found that the frequency of micro fungi (i.e., yeasts) was significantly correlated to the location of the plant and marginally correlated with the density of the flowers in the plant [@belisle2012]. 
+
+Understanding the factors that shape FEF communities is essential for understanding the ecological and evolutionary dynamics of plant-microbe interactions.
+
+Leaves are essential structures for plants, playing a crucial role in various physiological processes such as photosynthesis, transpiration, and nutrient uptake [@oguchi2018; @fritz2018; @tsukaya2018]. They display various shapes driven by both genetic and environmental factors [@tsukaya2018; @tsukaya2005; @nicotra2011; @fritz2018]. Since photosynthetic leaves are crucial for plant growth and survival, it has been proposed that natural selection has shaped leaf functional traits in response to environmental conditions and ecological demands [@jump2005; @oguchi2018; @nicotra2010]. The leaf functional traits involved in the resulting leaf shape respond to three main stimuli: light, temperature modulation, and hydraulic constraints. Therefore, proposed explanations for the evolution of different leaf shapes have included: 1) thermoregulation to arid and hot environments, 2) hydraulic constraints and biomechanical constraints, 3) adaptations against plant enemies, and 4) adaptations to optimize light interception [@nicotra2011; @oguchi2018]. 
 <!-- These are not mutually exclusive, and the expected patterns are not always clear, for example, the optimal leaf width, the distance from mid-vein to the leaf margin, is driven evolutionarily by the environmental conditions experienced by species [@tsukaya2018].   -->
 
 Leaf shape can be markedly different within closely related species. For example, Wang et al. [-@wang2022] provide evidence of the favored genetic pathways for leaf shape differentiation in a comparative study  *Arabidopsis thaliana* which has narrow entire leaves, and close relative *Cardamine hirsute* which has deeply lobed leaves. While the biological insights gathered from the *A. thaliana* model system are invaluable [@kramer2015; @koornneef2010] yet another ecologically and morphologically distinct model system can expand our understanding of leaf shape. Owing to the diversity of habitats occupied by members of the *Mimulus guttatus* species complex, comprised of closely related species that are interfertile with widespread range and considerable morphological variation [@vickery1978; @wu2008], lends itself be an ideal model system to explore the interactions between leaf traits and their interaction with abiotic and biotic factors. 
-In addition to the central role of photosynthesis for explaining leaf shape, emphasizing specific leaf functional traits such as leaf thickness (LT), leaf mass per area (LMA), and leaf toughness can illustrate how mechanical properties impact plants' response to their abiotic and biotic environments [@oguchi2018]. Such characteristics are part of a leaf economic spectrum, with leaves at one extreme having short lifespans, high nitrogen content, low LMA, thin leaf blades, and thin cell walls. At the opposite end are long-lived leaves with low nitrogen content, high LMA, thick leaf blades and thick cell walls [@mason2015; @wright2004]. These traits not only determine the chemical, structural, and longevity attributes of leaves but influence their associated microbial communities [@saunders2010; @tellezTraits2022]. 
 
-Plants’ colonization of land across multiples climates has been aided by their parallel evolution with fungi [reviewed in @peay2016; @remy1994; @wang2006; @field2015] and bacteria [@soltis1995; @adams2002; @delaux2015]; however, little is known about how plant microbiomes influence or are influenced by local adaptation or phenotypic plasticity of plants. Lack of knowledge about this is a problem because ecology aims to predict how plant distribution may change as the climate becomes further altered. Previous studies have suggested that foliar endophytic fungi (FEF) can alter plant traits under stressful conditions such as drought [@song2016]. FEF live inside plant leaves and they may contribute to local adaptation and/or phenotypic plasticity. Host genetics may structure the foliar microbiomes of plants. For example, a study on the classical plant model, *Arabidopsis thaliana*, revealed that bacterial and fungal communities in leaves are shaped by host genotype, at least for the most common operational taxonomic units (OTUs) [@horton2014]. There is scarce research that focuses on the symbionts of *Mimulus* spp. Beslile et al. [-@belisle2012] reported on the distribution of diverse fungal communities in the flower nectar of *Mimulus aurantiacus*. The authors considered flowers as islands in a metapopulation system and found that the frequency of micro fungi (i.e., yeasts) was significantly correlated to the location of the plant and marginally correlated with the density of the flowers in the plant [@belisle2012]. 
 
-To our knowledge, no previous studies have considered symbionts in leaf tissue of *Mimulus* spp. and how leaf functional traits influence symbiont community composition. Given the potential benefits FEF can provide their hosts under stressful conditions [@giauque2019; @aimone2023; @shankarnaik2019] and the wide range of habitats the *M. guttatus* species complex occupies, it is important to understand the role of FEF communities play in *Mimulus* spp. The aim of this study was to explore some baseline questions about the FEF communities in sympatric populations of *Mimulus* spp. along an elevation gradient. We formulated the following questions:Q1) Are there differences in leaf functional traits and FEF communities among sympatric Mimulus spp. populations at similar elevations? Q2) How do traits and FEF communities change across elevation within species? Q3) Are FEF richness, diversity and community composition correlated with leaf functional traits and/or elevation? Q4) How does FEF community composition differ with geographic distance within each species? We predict that abundance, diversity,and richness would decline with increased elevation, and community composition of FEF would be more similar among the same sites (alpha diversity) than between sites (beta diversity) regardless of host species.
+
+
+To our knowledge, no previous studies have considered symbionts in leaf tissue of *Mimulus* or how host species or leaf functional traits influence symbiont community composition. Given the potential benefits FEF can provide their hosts under stressful conditions [@giauque2019; @aimone2023; @shankarnaik2019] and the wide range of habitats the *M. guttatus* species complex occupies, it is important to understand the composition of FEF communities across *Mimulus* species and how they interact with the abiotic environment. In this study we use amplicon sequencing to explore how FEF communities vary among sympatric populations of *M. guttatus*, *M. laciniatus* and *M. nasutus* collected along elevation gradients throughout the central Sierra Nevada, CA (@fig-figure1). We test the following questions:Q1) Are there differences in leaf functional traits and FEF communities among sympatric *Mimulus* species populations at similar elevations? Q2) How do traits and FEF communities change across elevation within species? Q3) Are FEF richness, diversity and community composition correlated with leaf functional traits and/or elevation? Q4) How does FEF community composition differ with geographic distance within each species? We predict that abundance, diversity,and richness would decline with increased elevation, and community composition of FEF would be more similar among the same sites (alpha diversity) than between sites (beta diversity) regardless of host species.
 
 
 # Materials and Methods
@@ -453,6 +465,79 @@ theme_lfdiv_continuous <- theme_classic(base_size = 12) +
          axis.text.x = element_text(size = 10))
 ```
 
+
+## Figure S10
+```{r}
+#| echo: false
+#| eval: true
+#| tidy: true
+#| fig-width: 6
+#| fig-height: 6
+#| label: figure1
+#| fig-cap: "Figure S10. Map of *Mimulus* spp. sampling sites in the Sierra Nevada, California, USA. A) Map of the Sierra Nevada region showing the location of the three species sampled. The color gradient represents the elevation gradient from low (yellow) to high (purple)."
+
+# Map of sampling sites
+
+#register_google(key ='SECRET_KEY', write = TRUE)
+
+map_latlong <- read_excel("field_data/Mimulus_CH2_Field_Survey.xlsx", sheet = "clean_site_lat_long")
+
+map_latlong <- plant_traits |>
+  select(Site, Species, Longitude, Latitude, Elevation_m) |>
+  filter(!Site == "FVWB" & !Site == "LYFB" & !Site == "TRTB")
+
+mappops <- get_map(
+  location = c(
+    lon =
+      mean(map_latlong$Longitude),
+    lat =
+      mean(map_latlong$Latitude)
+  ),
+  zoom = 9,
+  maptype = "terrain",
+  scale = 4
+)
+map <- ggmap(mappops, extent = "device", darken = 0) +
+  geom_point(
+    data = map_latlong,
+    aes(
+      x
+      = Longitude,
+      y = Latitude,
+      size = Elevation_m,
+      fill = Site
+    ),
+    shape = 21,
+  ) +
+  theme_classic(base_size = 12) +
+  theme(
+    legend.title = element_text(face = "bold"),
+    legend.text = element_text(size = 10),
+    panel.border = element_rect(linetype = "blank", fill = NA),
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10)
+  ) +
+  ylab("Latitude") +
+  xlab("Longitude") +
+  annotation_north_arrow(
+    location = "tr",
+    which_north = "true",
+    height = unit(0.7, "cm"),
+    width = unit(0.7, "cm"),
+  ) +
+  guides(fill = guide_legend(title = "Site"),
+         size = guide_legend(title = "Elevation (m a.s.l.)"))
+
+plot(map)
+ggsave(
+  "figures/map.jpg",
+  plot = map,
+  units = "in",
+  width = 6,
+  height = 6,
+  dpi = 600
+)
+```
 
 ## Figure 1
 
@@ -2473,79 +2558,6 @@ lt_elevation
 ggsave(filename = file.path(path, "figures/supp_fig9.jpg"), plot = lt_elevation, dpi=300, units=c("mm"), width=250, height=250)
 ```
 
-
-## Figure S10
-```{r}
-#| echo: false
-#| eval: true
-#| tidy: true
-#| fig-width: 6
-#| fig-height: 6
-#| label: suppfigMIM210
-#| fig-cap: "Figure S10. Map of *Mimulus* spp. sampling sites in the Sierra Nevada, California, USA. A) Map of the Sierra Nevada region showing the location of the three species sampled. The color gradient represents the elevation gradient from low (yellow) to high (purple)."
-
-# Map of sampling sites
-
-#register_google(key ='SECRET_KEY', write = TRUE)
-
-map_latlong <- read_excel("field_data/Mimulus_CH2_Field_Survey.xlsx", sheet = "clean_site_lat_long")
-
-map_latlong <- plant_traits |>
-  select(Site, Species, Longitude, Latitude, Elevation_m) |>
-  filter(!Site == "FVWB" & !Site == "LYFB" & !Site == "TRTB")
-
-mappops <- get_map(
-  location = c(
-    lon =
-      mean(map_latlong$Longitude),
-    lat =
-      mean(map_latlong$Latitude)
-  ),
-  zoom = 9,
-  maptype = "terrain",
-  scale = 4
-)
-map <- ggmap(mappops, extent = "device", darken = 0) +
-  geom_point(
-    data = map_latlong,
-    aes(
-      x
-      = Longitude,
-      y = Latitude,
-      size = Elevation_m,
-      fill = Site
-    ),
-    shape = 21,
-  ) +
-  theme_classic(base_size = 12) +
-  theme(
-    legend.title = element_text(face = "bold"),
-    legend.text = element_text(size = 10),
-    panel.border = element_rect(linetype = "blank", fill = NA),
-    axis.text.x = element_text(size = 10),
-    axis.text.y = element_text(size = 10)
-  ) +
-  ylab("Latitude") +
-  xlab("Longitude") +
-  annotation_north_arrow(
-    location = "tr",
-    which_north = "true",
-    height = unit(0.7, "cm"),
-    width = unit(0.7, "cm"),
-  ) +
-  guides(fill = guide_legend(title = "Site"),
-         size = guide_legend(title = "Elevation (m a.s.l.)"))
-
-plot(map)
-ggsave(
-  "figures/map.jpg",
-  plot = map,
-  units = "in",
-  width = 6,
-  height = 6,
-  dpi = 600
-)
-```
 
 ## Table S1
 ```{r, supp_table1}
