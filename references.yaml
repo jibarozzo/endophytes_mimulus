@@ -193,8 +193,8 @@ references:
   page: 17-28
   source: DOI.org (Crossref)
   title: >-
-    Endophytic fungi in European aspen (Populus tremula) leaves—diversity,
-    detection, and a suggested correlation with herbivory resistance
+    Endophytic fungi in European aspen (*Populus tremula>/i>) leaves—diversity,
+    detection, and a suggested correlation with herbivory resistance*
   type: article-journal
   URL: http://link.springer.com/10.1007/s13225-009-0011-y
   volume: '41'
@@ -283,7 +283,7 @@ references:
       day: 15
   page: 1-15
   publisher: Wiley
-  title: Permutational Multivariate Analysis of Variance ( PERMANOVA )
+  title: Permutational Multivariate Analysis of Variance (PERMANOVA)
   type: chapter
 
 - id: andrews2010
@@ -455,6 +455,7 @@ references:
       given: Edward Allen
   citation-key: arnold2003
   container-title: Proceedings of the National Academy of Sciences
+  DOI: 10.1073/pnas.2533483100
   issue: '26'
   issued:
     - year: 2003
@@ -723,7 +724,7 @@ references:
   language: en
   page: 2623-2632
   source: DOI.org (Crossref)
-  title: FORWARD SELECTION OF EXPLANATORY VARIABLES
+  title: Forward Selection of Explanatory Variables
   type: article-journal
   URL: https://esajournals.onlinelibrary.wiley.com/doi/10.1890/07-0986.1
   volume: '89'
@@ -1100,9 +1101,9 @@ references:
 
 - id: callahan2016
   accessed:
-    - year: 2023
-      month: 9
-      day: 26
+    - year: 2024
+      month: 8
+      day: 12
   author:
     - family: Callahan
       given: Benjamin J
@@ -1125,8 +1126,9 @@ references:
   issued:
     - year: 2016
       month: 7
-  language: english
-  page: 581–583
+  language: en
+  page: 581-583
+  source: DOI.org (Crossref)
   title: 'DADA2: High-resolution sample inference from Illumina amplicon data'
   title-short: DADA2
   type: article-journal
@@ -2010,7 +2012,7 @@ references:
   language: english
   page: 3476–3482
   title: >-
-    Error filtering, pair assembly and error correction for next-Generation
+    Error filtering, pair assembly and error correction for next-generation
     sequencing reads
   type: article-journal
   URL: https://academic.oup.com/bioinformatics/article/31/21/3476/194979
@@ -3460,26 +3462,6 @@ references:
   URL: https://linkinghub.elsevier.com/retrieve/pii/S1369526617301280
   volume: '44'
 
-- id: inbook
-  author:
-    - literal: White
-    - literal: Bruns
-    - literal: Tom
-    - family: Lee
-      given: Steven
-    - family: Taylor
-      given: John
-  citation-key: inbook
-  ISBN: 0-12-372180-6
-  issued:
-    - year: 1990
-      month: 1
-  page: 315–322
-  title: >-
-    White, T. J., T. D. Bruns, S. B. Lee, and J. W. Taylor. Amplification and
-    direct sequencing of fungal ribosomal RNA genes for phylogenetics
-  type: chapter
-
 - id: ipcc2023
   abstract: >-
     The Working Group I contribution to the Sixth Assessment Report of the
@@ -3502,7 +3484,7 @@ references:
       month: 4
       day: 8
   author:
-    - literal: Intergovernmental Panel omojican Climate Change
+    - literal: Intergovernmental Panel on Climate Change
   citation-key: ipcc2023
   DOI: 10.1017/9781009157896
   edition: '1'
@@ -3861,6 +3843,103 @@ references:
   type: article-journal
   URL: https://www.mdpi.com/1420-3049/24/6/1065
   volume: '24'
+
+- id: karasov2024
+  abstract: |-
+    Abstract
+                
+                  Plants are colonized by distinct pathogenic and commensal microbiomes across different regions of the globe, but the factors driving their geographic variation are largely unknown. Here, using 16S ribosomal DNA and shotgun sequencing, we characterized the associations of the
+                  Arabidopsis thaliana
+                  leaf microbiome with host genetics and climate variables from 267 populations in the species’ native range across Europe. Comparing the distribution of the 575 major bacterial amplicon variants (phylotypes), we discovered that microbiome composition in
+                  A. thaliana
+                  segregates along a latitudinal gradient. The latitudinal clines in microbiome composition are predicted by metrics of drought, but also by the spatial genetics of the host. To validate the relative effects of drought and host genotype we conducted a common garden field study, finding 10% of the core bacteria to be affected directly by drought and 20% to be affected by host genetic associations with drought. These data provide a valuable resource for the plant microbiome field, with the identified associations suggesting that drought can directly and indirectly shape genetic variation in
+                  A. thaliana
+                  via the leaf microbiome.
+  accessed:
+    - year: 2024
+      month: 10
+      day: 2
+  author:
+    - family: Karasov
+      given: Talia L.
+    - family: Neumann
+      given: Manuela
+    - family: Leventhal
+      given: Laura
+    - family: Symeonidi
+      given: Efthymia
+    - family: Shirsekar
+      given: Gautam
+    - family: Hawks
+      given: Aubrey
+    - family: Monroe
+      given: Grey
+    - literal: Pathodopsis Team
+    - family: Barragán
+      given: A. Cristina
+    - family: Bezrukov
+      given: Ilja
+    - family: Friedemann
+      given: Claudia
+    - family: González Hernando
+      given: Alba
+    - family: Habring
+      given: Anette
+    - family: Hildebrandt
+      given: Julia
+    - family: Kersten
+      given: Sonja
+    - family: Lang
+      given: Patricia
+    - family: Latorre
+      given: Sergio M.
+    - family: Lucke
+      given: Miriam
+    - family: Lundberg
+      given: Derek S.
+    - family: Lutz
+      given: Ulrich
+    - family: Paul
+      given: Fiona
+    - family: Rabanal
+      given: Fernando A.
+    - family: Regalado
+      given: Julian
+    - family: Srikant
+      given: Thanvi
+    - family: Waithaka
+      given: Bridgit
+    - family: Wibowo
+      given: Anjar T.
+    - family: Yuan
+      given: Wei
+    - family: Exposito-Alonso
+      given: Moisés
+    - family: Bergelson
+      given: Joy
+    - family: Weigel
+      given: Detlef
+    - family: Schwab
+      given: Rebecca
+  citation-key: karasov2024
+  container-title: Nature Microbiology
+  container-title-short: Nat Microbiol
+  DOI: 10.1038/s41564-024-01773-z
+  ISSN: 2058-5276
+  issue: '10'
+  issued:
+    - year: 2024
+      month: 9
+      day: 6
+  language: en
+  page: 2748-2758
+  source: DOI.org (Crossref)
+  title: >-
+    Continental-scale associations of Arabidopsis thaliana phyllosphere members
+    with host genotype and drought
+  type: article-journal
+  URL: https://www.nature.com/articles/s41564-024-01773-z
+  volume: '9'
 
 - id: kassambara2023
   author:
@@ -5044,8 +5123,8 @@ references:
   page: '90'
   source: DOI.org (Crossref)
   title: >-
-    Epichloë Endophytes Shape the Foliar Endophytic Fungal Microbiome and Alter
-    the Auxin and Salicylic Acid Phytohormone Levels in Two Meadow Fescue
+    *Epichloë* Endophytes Shape the Foliar Endophytic Fungal Microbiome and
+    Alter the Auxin and Salicylic Acid Phytohormone Levels in Two Meadow Fescue
     Cultivars
   type: article-journal
   URL: https://www.mdpi.com/2309-608X/9/1/90
@@ -6119,6 +6198,25 @@ references:
   type: webpage
   URL: https://www.optisci.com/acm-200.html
 
+- id: paradis2019
+  author:
+    - family: Paradis
+      given: Emmanuel
+    - family: Schliep
+      given: Klaus
+  citation-key: paradis2019
+  container-title: Bioinformatics (Oxford, England)
+  container-title-short: Bioinformatics
+  DOI: 10.1093/bioinformatics/bty633
+  issued:
+    - year: 2019
+  page: 526-528
+  title: >-
+    ape 5.0: An environment for modern phylogenetics and evolutionary analyses
+    in R
+  type: article-journal
+  volume: '35'
+
 - id: peay2016
   accessed:
     - year: 2024
@@ -6449,14 +6547,14 @@ references:
       given: Frans
   citation-key: poorter2006
   container-title: Ecology
-  DOI: https://doi.org/10.1890/0012-9658(2006)87[1733:LTAGPO]2.0.CO;2
+  DOI: 10.1890/0012-9658(2006)87[1733:LTAGPO]2.0.CO;2
   issue: '7'
   issued:
     - year: 2006
   page: 1733-1743
   title: >-
-    LEAF TRAITS ARE GOOD PREDICTORS OF PLANT PERFORMANCE ACROSS 53 RAIN FOREST
-    SPECIES
+    Leaf Traits Are Good Predictors of Plant Performance Across 53 Rain Forest
+    Species
   type: article-journal
   URL: >-
     https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282006%2987%5B1733%3ALTAGPO%5D2.0.CO%3B2
@@ -6873,8 +6971,8 @@ references:
 - id: rosen2012
   accessed:
     - year: 2024
-      month: 2
-      day: 10
+      month: 8
+      day: 12
   author:
     - family: Rosen
       given: Michael J
@@ -6893,8 +6991,10 @@ references:
   issued:
     - year: 2012
       month: 12
-  language: english
+  language: en
+  license: http://creativecommons.org/licenses/by/2.0
   page: '283'
+  source: DOI.org (Crossref)
   title: Denoising PCR-amplified metagenome data
   type: article-journal
   URL: >-
@@ -8685,6 +8785,25 @@ references:
   type: article-journal
   URL: https://www.nature.com/articles/s41598-019-50540-2
   volume: '9'
+
+- id: white1990_inbook
+  author:
+    - literal: White, T. J.
+    - literal: Bruns, T.D.
+    - family: Lee
+      given: Steven B.
+    - family: Taylor
+      given: John W.
+  citation-key: white1990_inbook
+  ISBN: 0-12-372180-6
+  issued:
+    - year: 1990
+      month: 1
+  page: 315–322
+  title: >-
+    Amplification and direct sequencing of fungal ribosomal RNA genes for
+    phylogenetics
+  type: chapter
 
 - id: willis1993
   author:
