@@ -146,8 +146,6 @@ plant_traits <- readRDS(file.path(path, "clean_data/statistics/plant_traits.rds"
 
 plant_traits_MB <- readRDS(file.path(path, "clean_data/statistics/plant_traits_MB.rds")) #Substitues ps_melt df
 
-pseq_rrfb <- readRDS("clean_data/statistics/pseq_rrfb.rds") # Loading rarefied phyloseq object Method B
-
 #Removing species B
 leaf_traits_noB <- leaf_traits |>
   filter(!Species == "M. bicolor")
@@ -158,8 +156,10 @@ leaf_traits_noB <- leaf_traits |>
 
 #Load Phyloseq object cleaned of singletons (231 ASVs)
 ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/02-TAXA_8450_phyloseq_nonsingletons_noB.rds"))
-#ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.csv"))
+
+
 pseq_rrfb <- readRDS(file.path(path, "clean_data/statistics/pseq_rrfb.rds")) #Mirlyn object from Method B
+
 rarefied_phyloseq <- readRDS(file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
 
 # Load ps_melt
@@ -264,13 +264,12 @@ dbrda_traits_imp <- dbrda_traits |>
 #sum(!is.na(plant_traits$hill_2[plant_traits$Species != "B"])) # No missing values
 
 # Functions
-source(file.path(path, "functions/alpha_rfy.R"))
-source(file.path(path, "functions/pval_format.R"))
-source(file.path(path, "functions/tag_fat.R"))
+source("src/mim2_function.R")
 
 #Comparisons
-my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
-my_comparisons3 <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
+species_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
+
+elevation_comparisons <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
 ```
 
 ## Keywords
@@ -1803,7 +1802,7 @@ hill0_species <- ggplot(data = plant_traits_MB,
   scale_color_manual(name = "Species", values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   theme_sppdiv_discrete +
   labs(y =  "Alpha diversity (\U1D492 = 0)", x = "", col = "") + 
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif") 
   #guides(color = "none")        #To turn off color legend
@@ -1835,7 +1834,7 @@ hill1_species <- ggplot(data = plant_traits_MB,
   #labs(y =  "Alpha and Beta diversity (\U1D492 = 1)", x = "", col = "") + 
   labs(y =  "Alpha diversity (\U1D492 = 1)", x = "", col = "") +
   scale_y_continuous(expand = c(0.05, 0.05)) +
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif")
  #facet_wrap(~ Elevation_cat)
@@ -1861,7 +1860,7 @@ hill2_species <- ggplot(data = plant_traits_MB,
   scale_color_manual(name = "Species", values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   theme_sppdiv_discrete +
   labs(y =  "Alpha diversity (\U1D492 = 2)", x = "", col = "") + 
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif") 
  # facet_wrap(~ Species, labeller = labeller(Species = labels_list)) +
@@ -1910,7 +1909,7 @@ hill2_species <- ggplot(data = plant_traits_MB,
    theme_elevdiv_discrete +
    theme(legend.text = element_text(size = 14)) +
    scale_y_continuous(expand = c(0.05, 0.05)) +
-   stat_compare_means(comparisons = my_comparisons3,
+   stat_compare_means(comparisons = elevation_comparisons,
                       method = "wilcox.test",
                       label = "p.signif") +
    labs(y = "Beta diversity (\U1D492 = 0)", x = "") +
@@ -1947,7 +1946,7 @@ hill2_species <- ggplot(data = plant_traits_MB,
    theme_elevdiv_discrete +
    theme(legend.text = element_text(size = 14)) +
    scale_y_continuous(expand = c(0.05, 0.05)) +
-   stat_compare_means(comparisons = my_comparisons3,
+   stat_compare_means(comparisons = elevation_comparisons,
                       method = "wilcox.test",
                       label = "p.signif") +
    labs(y = "Beta diversity (\U1D492 = 1)", x = "") +
@@ -1984,7 +1983,7 @@ hill2_beta <- ggplot(plant_traits_MB, aes(x = Elevation_cat, y = hill_2)) +
   theme_elevdiv_discrete +
   theme(legend.text = element_text(size = 14))+
   scale_y_continuous(expand = c(0.05, 0.05)) +
-  stat_compare_means(comparisons = my_comparisons3,
+  stat_compare_means(comparisons = elevation_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif") +
   labs(y = "Beta diversity (\U1D492 = 2)", x = "") +
@@ -2070,7 +2069,7 @@ errbar_lims <- group_by(leaf_traits_noB, Site) |>
               summarize(mean = mean(logLMA), se = sd(logLMA)/sqrt(n()), 
                         upper = mean+(2*se), lower = mean-(2*se))
 #Comparisons
-my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
+species_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
 
 #By Site discrete comparison
 lma <- ggplot(leaf_traits_noB, aes(y = logLMA, x = Species)) +
@@ -2086,7 +2085,7 @@ lma <- ggplot(leaf_traits_noB, aes(y = logLMA, x = Species)) +
   #scale_color_manual(aes(color = "black")) +
   theme_lfspp_discrete +
   labs(y = "log10[Leaf Mass per Area (LMA) (mg/mm)]", x = "") +
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test",
                      #label.y = c(0.4, 0.6, 1),
                      label = "p.signif") +
@@ -2175,7 +2174,7 @@ errbar_lims <- group_by(leaf_traits_noB, Species) |>
                         upper = mean + (2*se), lower = mean - (2*se))
 
 #Comparisons
-my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
+species_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
 
 
 aci <- ggplot(leaf_traits_noB, aes(y = logACI, x = Species)) +
@@ -2190,7 +2189,7 @@ aci <- ggplot(leaf_traits_noB, aes(y = logACI, x = Species)) +
   theme_lfspp_discrete +
   theme(axis.text.y = element_text(size = 10)) +
   labs(y = paste("log[Anthocyanin Content Index (ACI)]"), x = "") +
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test",
                      #label.y = c(0.4, 0.6, 1),
                      label = "p.signif") +
@@ -2284,7 +2283,7 @@ errbar_lims <- group_by(leaf_traits_noB, Species) |>
                         upper = mean + (2*se), lower = mean - (2*se))
 
 #Comparisons
-my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
+species_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
 
 lbi <- ggplot(leaf_traits_noB, aes(y = logLBI, x = Species)) +
  geom_point(
@@ -2299,7 +2298,7 @@ lbi <- ggplot(leaf_traits_noB, aes(y = logLBI, x = Species)) +
   theme_lfspp_discrete +
   labs(y = "log[Leaf Lobe Index (LBI)", x = "") +
   #scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif") +
    facet_wrap(~Elevation_cat)
@@ -2405,7 +2404,7 @@ lps <- ggplot(leaf_traits_noB, aes(y = logLPS, x = Species)) +
   theme_lfspp_discrete +
   labs(y = expression(paste("Leaf punch strength (LPS)(N mm", "^-1)")), x = "") +
   #scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test",
                      #label.y = c(0.4, 0.6, 1),
                      label = "p.signif") +
@@ -2509,7 +2508,7 @@ errbar_lims <- group_by(leaf_traits_noB, Species) |>
                         upper = mean + (2*se), lower = mean - (2*se))
 
 #Comparisons
-my_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
+species_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))
 
 lt <- ggplot(leaf_traits_noB, aes(y= logLT, x = Species)) +
  geom_point(
@@ -2523,7 +2522,7 @@ lt <- ggplot(leaf_traits_noB, aes(y= logLT, x = Species)) +
   theme_lfspp_discrete +
   labs(y = expression(paste("log[Leaf thickness (LT) (",mu,"m)]")), x = "") +
   #scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test",
                      #label.y = c(0.4, 0.6, 1),
                      label = "p.signif", hide.ns = TRUE) +

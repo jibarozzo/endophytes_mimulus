@@ -5,13 +5,10 @@ date: "`r format(Sys.time(), '%B %d, %Y')`"
 output: html_document
 ---
 
+# Setup
 ```{r setup}
 knitr::opts_chunk$set(out.width ='70%', fig_align = 'center', echo = TRUE, collapse = TRUE, eval=FALSE)
-```
 
-## Packages
-
-```{r}
 # Core packages
 library("tidyverse")
 library("data.table")
@@ -65,15 +62,27 @@ conflict_prefer("select", "dplyr")
 conflict_prefer("desc", "dplyr")
 conflict_prefer("filter", "dplyr")
 conflict_prefer("alpha", "ggplot2")
-```
 
 # File Path
 
-```{r}
-#| echo: false
-#| eval: true
-#| tidy: true
 path <- "../mim2_bioinformatics" # Change accordingly
+
+
+# Functions
+source("src/mim2_function.R")
+
+# Comparisons
+species_comparisons <- list(
+  c("M. nasutus", "M. laciniatus"),
+  c("M. nasutus", "M. guttatus"),
+  c("M. laciniatus", "M. guttatus")
+)
+elevation_comparisons <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
+
+# List of ASV samples
+names_list <- colnames(ps_clean_3@otu_table) #List of samples
+
+
 ```
 
 # Objective of the notebook
@@ -89,7 +98,8 @@ This section cleans and shapes the raw data into two main data frames: `leaf_tra
 ### Raw data sets
 
 
-```{r, cleaning_chaping_data}
+```{r}
+#| label: cleaning_chaping_data
 #| echo: false
 #| eval: true
 #| tidy: true
@@ -106,7 +116,7 @@ labels <- c("LOW", "MID", "HIGH")
 
 #Leaf level data set
 leaf_traits <-  traits |>
-  slice(-c(959:973)) |> #Removing control samples
+  slice(-c(959:973)) |> # Removing control samples
   filter(!Unique_ID == "TRTB_L001") |> #Removing misidentified sample
   rename(LMA = LMA.mg.,
          LBI = Leaf_lobe_index,
@@ -120,7 +130,7 @@ leaf_traits <-  traits |>
     Site = as.factor(Site),
     Elevation_cat = cut(Elevation_m, breaks = breaks, labels = labels)
   ) |>
-  relocate(Elevation_cat, .before = Elevation_m)|>
+  relocate(Elevation_cat, .before = Elevation_m) |>
   as_tibble()
 
 #Plant level for ASV analyses
@@ -146,69 +156,41 @@ plant_traits <- leaf_traits |>
     LBI = mean(LBI, na.rm = TRUE)
   )
 
-
-#### Log transformation ####
-
-# All variables are non-normal. I proceed with a log transformation of the data.
-# See Descriptive Statistics section for reference on this decision. Leaf_trait_transformation block.
-# Leaft traits transformed
-leaf_traits <- leaf_traits |>
-  mutate(logLBI = log10(LBI),
-         logACI = log10(ACI),
-         logLT = log10(LT),
-         logLPS = log10(LPS),
-         logLMA = log10(LMA))
-
-#Removing species B
-# I have 3 samples for species B to remove from the data set.
-leaf_traits_noB <- leaf_traits |>
-  filter(!Species == "M. bicolor")
-
-# Plant traits transformed
-plant_traits <- plant_traits |>
-  mutate(logLBI = log10(LBI),
-         logACI = log10(ACI),
-         logLT = log10(LT),
-         logLPS = log10(LPS),
-         logLMA = log10(LMA))
 ```
 
 ### Leaf traits with community data
 
+Calculating Hill orders on non-rarefied data. The `estimate_richness()` is meant to be used with untrimmed data. It is highly dependnet on singletons. My data is already trimmed and decontaminated. My singleton "removal" eliminates ASVs with all zeros or samples wil all zeros. Singletons do remain, so this is not a problem.
+Things to remember:
+- Observed richness is Hill 0
+- Simpson index is (1-D) (Hill 1)
+- InvSimpson (1/D) (Hill 2)
+
+See https://www.jak.bio/posts/me/20211227_simpson/simpson_diversity.html for a good explanation of Simpson's diversity index.
+
 ```{r}
+#| label: comm_diversity_leaf_traits
+
 #### Leaf traits with community data ####
-# Calculating Hill orders on non-rarefied data
-# The estimate_richness() is meant to be used with untrimmed data. It is highly dependnet on singletons. My data is already trimmed and decontaminated. My singleton "removal" eliminates ASVs with all zeros or samples wil all zeros. Singletons do remain, so this is not a problem.
-plant_traits <- ps_clean_3 |> #Estimating community richness and shannon diversity from phyloseq object
-  estimate_richness(split = TRUE, measures = c("Observed","Shannon", "Simpson")) |>
-       #  Simpson = 1 / Simpson) |>
-  mutate(hill_1 = exp(Shannon), #Observed column is equivalent to hill_0
-         hill_2 = 1/(1 - Simpson)) |> #Simpson index is (1-D) and InvSimpson (1/D) which is equivalent to hill_2
+
+plant_traits <- ps_clean_3 |> 
+  estimate_richness(split = TRUE,
+                    measures = c("Observed", "Shannon", "Simpson")) |>
+  #  Simpson = 1 / Simpson) |>
+  mutate(hill_1 = exp(Shannon), 
+         hill_2 = 1 / (1 - Simpson)) |> 
   rownames_to_column() |>
   rename(Unique_ID = rowname) |>
   right_join(plant_traits, by = "Unique_ID") |>
-  relocate(Observed, 
-           Shannon, 
-           Simpson, 
-           hill_1,
-           hill_2,
-           .after = logLMA) |>
+  relocate(Observed, Shannon, Simpson, hill_1, hill_2, .after = logLMA) |>
   rename(Simpson_1minusD = Simpson)
-# See https://www.jak.bio/posts/me/20211227_simpson/simpson_diversity.html for a good explanation of Simpson's diversity index.
 
 # Melt data  frame from ps_clean_3
+# This data frame is useful for barplots and other visualizations.
 ps_melt <- ps_clean_3 |>
   psmelt() |>
-  # group_by(Phylum, Elevation_cat) |>
-  # mutate(mean_abundance = mean(Abundance), 
-  #        se = sd(Abundance)/sqrt(length(Abundance)),
-  #        sd = sd(Abundance),
-  #        sample_Species = factor(sample_Species)) |>
-  # ungroup() |>
-  rename(Unique_ID = Sample, ASV = OTU) |> #Renaming OTU column
-  dplyr::select(!c(11:17))  #Reordering columns 
-#This data frame is useful for barplots and other visualizations.
-
+  rename(Unique_ID = Sample, ASV = OTU) |> 
+  dplyr::select(!c(11:17))
 
 ##########################################################
 ############### Save files after changes #################
@@ -227,96 +209,20 @@ ps_melt <- ps_clean_3 |>
 # write.csv(ps_melt, file.path(path, "clean_data/statistics/ps_melt.csv"))
 ```
 
-### Load files
-
-All of these files are loaded here after I have cleaned and shaped the data throughout this notebook. The purpose of having them is to ease setting up the work space.
-```{r}
-#####################################################
-############### Load master files here ##############
-#####################################################
-leaf_traits <- readRDS(file.path(path, "clean_data/statistics/leaf_traits.rds")) # Post all the processing aboove, lod from here.
-plant_traits <- readRDS(file.path(path, "clean_data/statistics/plant_traits.rds"))
-plant_traits_MB <- readRDS(file.path(path, "clean_data/statistics/plant_traits_MB.rds"))
-#ps_melt <- readRDS(file.path(path, "clean_data/statistics/ps_melt.rds"))
-
-# Samples with species to subset/filter matrices downstream
-# M. laciniatus
-lac_names <- plant_traits |>
-  slice(1:157) |> # Only selecting observations with ASV data 
-  filter(Species == "M. laciniatus") |>
-  pull(Unique_ID) 
-
-# M. guttatus
-gut_names <- plant_traits |> 
-  slice(1:157) |> # Only selecting observations with ASV data 
-  filter(Species == "M. guttatus") |>
-  pull(Unique_ID)
-
-# M. nasutus
-nas_names <- plant_traits |> 
-  slice(1:157) |> # Only selecting observations with ASV data 
-  filter(Species == "M. nasutus") |>
-  pull(Unique_ID)
-
-# Functions
-source("functions/alpha_rfy.R")
-source("functions/pval_format.R")
-
-# Comparisons
-my_comparisons <- list(
-  c("M. nasutus", "M. laciniatus"),
-  c("M. nasutus", "M. guttatus"),
-  c("M. laciniatus", "M. guttatus")
-)
-my_comparisons3 <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"))
-
-# List of ASV samples
-names_list <- colnames(ps_clean_3@otu_table) #List of samples
-
-#Subset data set for NMDS and dbRDA plot
-# Samples resulting from rarefaction
-#ordi_traits <- plant_traits |>
-#  filter(Unique_ID %in% final_names_methodB)
-```
-
-
-#### Phyloseq, mirl, and meco objects
-```{r, phylo_objects}
-###################################
-#### Load Phyloseq objects ########
-###################################
-#Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data. These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
-
-# Load Phyloseq object cleaned of singletons (231 ASVs)
-ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.rds"))
-ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.csv"))
-pseq_rrfb <- readRDS(file.path(path, "clean_data/statistics/pseq_rrfb.rds")) #Mirlyn object from Method B
-rarefied_phyloseq <- readRDS(file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
-```
-
-#### Community matrix, avgdist and geographic distance
-
-```{r}
-# Rarefied community matrix from "Matrices" section below.
-rrfy_hell_matrix <- readRDS("clean_data/statistics/rrfy_hell_matrix.rds")
-
-asv_avgdist <- readRDS("clean_data/statistics/asv_avgdist.rds") # Loading rarefied phyloseq object
-
-geo_distm <- readRDS("clean_data/statistics/geo_distm.rds")
-```
-
 
 ## Descriptive stats
 
-```{r, Leaf_traits_basics}
+```{r}
+#| label: descriptive_stats
 #| echo: false
 #| eval: true
 #| tidy: true
+
 # Sites and Species sampled
 leaf_traits_noB |>
-  group_by(Site,Species, Longitude, Latitude) |>
-  summarise(n = as.integer(n()/3))|> # Dividing by 3 due to replicate measurments of each sample
-  pivot_wider(names_from = Species, values_from = n)|>
+  group_by(Site, Species, Longitude, Latitude) |>
+  summarise(n = as.integer(n() / 3)) |> # Dividing by 3 due to replicate measurments of each sample
+  pivot_wider(names_from = Species, values_from = n) |>
   knitr::kable(caption = "Number of samples per population/site and species.")
 
 #LBI
@@ -394,34 +300,41 @@ fligner.test(Elevation_m ~ Site, data = leaf_traits) #Homogeneity of variances t
 
 All leaf traits and elevation are not normally distributed. This requires transformation for further analysis. I will proceed with a log transformation of the data.
 
-```{r, Leaf_traits_transformation}
+### Log transformations
+```{r}
 
-# Leaf traits transformed
-# leaf_traits <- leaf_traits |>
-#   mutate(logLBI = log10(LBI),
-#          logACI = log10(ACI),
-#          logLT = log10(Thickness),
-#          logLPS = log10(Toughness),
-#          logLMA = log10(LMA))
-# 
-# #Removing species B
-# leaf_traits_noB <- leaf_traits |>
-#   filter(!Species == "B")
-# 
-# # Plant traits transformed
-# plant_traits <- plant_traits |>
-#   mutate(logLBI = log10(LBI),
-#          logACI = log10(ACI),
-#          logLT = log10(Thickness),
-#          logLPS = log10(Toughness),
-#          logLMA = log10(LMA))
+#### Log transformation ####
+
+# All variables are non-normal. I proceed with a log transformation of the data.
+# See Descriptive Statistics section for reference on this decision. Leaf_trait_transformation block.
+# Leaft traits transformed
+leaf_traits <- leaf_traits |>
+  mutate(logLBI = log10(LBI),
+         logACI = log10(ACI),
+         logLT = log10(LT),
+         logLPS = log10(LPS),
+         logLMA = log10(LMA))
+
+#Removing species B
+# I have 3 samples for species B to remove from the data set.
+leaf_traits_noB <- leaf_traits |>
+  filter(!Species == "M. bicolor")
+
+# Plant traits transformed
+plant_traits <- plant_traits |>
+  mutate(logLBI = log10(LBI),
+         logACI = log10(ACI),
+         logLT = log10(LT),
+         logLPS = log10(LPS),
+         logLMA = log10(LMA))
 ```
 
 I will not omiting samples with NAs because some have the complete data for some leaf traits and not for others. I will omit samples with NAs for the Fungal analyses.
 
 ## Post data transformations
 
-```{r, post_transformation}
+```{r}
+#| label: post_transformation
 #| echo: false
 #| eval: true
 #| tidy: true
@@ -458,6 +371,75 @@ shapiro.test(leaf_traits$logACI) #Another transformation that does not meet norm
 ```
 
 The log transformations improve the normality of the data, but it does not meet the assumptions for normality. I will proceed with the analyses using the log transformed data. I will use non-parametric tests for the analyses.
+
+
+### Load files
+
+All of these files are loaded here after I have cleaned and shaped the data throughout this notebook. The purpose of having them is to ease setting up the work space.
+```{r}
+#####################################################
+############### Load master files here ##############
+#####################################################
+leaf_traits <- readRDS(file.path(path, "clean_data/statistics/leaf_traits.rds")) # Post all the processing aboove, lod from here.
+plant_traits <- readRDS(file.path(path, "clean_data/statistics/plant_traits.rds"))
+plant_traits_MB <- readRDS(file.path(path, "clean_data/statistics/plant_traits_MB.rds"))
+#ps_melt <- readRDS(file.path(path, "clean_data/statistics/ps_melt.rds"))
+
+# Samples with species to subset/filter matrices downstream
+# M. laciniatus
+lac_names <- plant_traits |>
+  slice(1:157) |> # Only selecting observations with ASV data 
+  filter(Species == "M. laciniatus") |>
+  pull(Unique_ID) 
+
+# M. guttatus
+gut_names <- plant_traits |> 
+  slice(1:157) |> # Only selecting observations with ASV data 
+  filter(Species == "M. guttatus") |>
+  pull(Unique_ID)
+
+# M. nasutus
+nas_names <- plant_traits |> 
+  slice(1:157) |> # Only selecting observations with ASV data 
+  filter(Species == "M. nasutus") |>
+  pull(Unique_ID)
+
+
+
+#Subset data set for NMDS and dbRDA plot
+# Samples resulting from rarefaction
+#ordi_traits <- plant_traits |>
+#  filter(Unique_ID %in% final_names_methodB)
+```
+
+
+#### Phyloseq, mirl, and meco objects
+```{r, phylo_objects}
+###################################
+#### Load Phyloseq objects ########
+###################################
+#Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data. These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
+
+# Load Phyloseq object cleaned of singletons (231 ASVs)
+ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.rds"))
+ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.csv"))
+pseq_rrfb <- readRDS(file.path(path, "clean_data/statistics/pseq_rrfb.rds")) #Mirlyn object from Method B
+rarefied_phyloseq <- readRDS(file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
+```
+
+#### Community matrix, avgdist and geographic distance
+
+```{r}
+# Rarefied community matrix from "Matrices" section below.
+rrfy_hell_matrix <- readRDS("clean_data/statistics/rrfy_hell_matrix.rds")
+
+asv_avgdist <- readRDS("clean_data/statistics/asv_avgdist.rds") # Loading rarefied phyloseq object
+
+geo_distm <- readRDS("clean_data/statistics/geo_distm.rds")
+```
+
+
+
 
 ## Non-parametric tests
 
@@ -650,7 +632,7 @@ lma <- ggplot(leaf_traits_noB, aes(y = logLMA, x = Species)) +
                     values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
   theme_lfspp_discrete +
   labs(y = "log10[Leaf Mass per Area (LMA) (mg/mm)]", x = "") +
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test",
                      #label.y = c(0.4, 0.6, 1),
                      label = "p.signif") +
@@ -726,7 +708,7 @@ errbar_lims <- group_by(leaf_traits_noB, Species) |>
                         upper = mean + (2*se), lower = mean - (2*se))
 
 #Comparisons
-my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
+species_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
 
 
 aci <- ggplot(leaf_traits_noB, aes(y = logACI, x = Species)) +
@@ -743,7 +725,7 @@ aci <- ggplot(leaf_traits_noB, aes(y = logACI, x = Species)) +
                     values= met.brewer("Isfahan2", n = 4, type = "discrete", direction = -1)) +
   theme_lfspp_discrete +
   labs(y = expression(paste("log[ACI (% ", italic("A") [lambda]," at 931 nm / % ", italic("A") [lambda]," at 530 nm)]")), x = "") +
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test",
                      #label.y = c(0.4, 0.6, 1),
                      label = "p.signif") +
@@ -819,7 +801,7 @@ errbar_lims <- group_by(leaf_traits_noB, Species) |>
                         upper = mean + (2*se), lower = mean - (2*se))
 
 #Comparisons
-my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
+species_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
 
 lbi <- ggplot(leaf_traits_noB, aes(y = logLBI, x = Species)) +
   geom_violin(aes(fill = Species)) +
@@ -836,7 +818,7 @@ lbi <- ggplot(leaf_traits_noB, aes(y = logLBI, x = Species)) +
                     values = met.brewer("Isfahan2", n = 4, type = "discrete", direction = c(-1))) +
   theme_lfspp_discrete +
   labs(y = "log10[LBI (convex_hull - true_area]/convex_hull)]", x = "") +
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test",
                      #label.y = c(0.4, 0.6, 1),
                      label = "p.signif") +
@@ -909,7 +891,7 @@ errbar_lims <- group_by(leaf_traits_noB, Species) |>
                         upper = mean + (2*se), lower = mean - (2*se))
 
 #Comparisons
-my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
+species_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
 
 lps <- ggplot(leaf_traits_noB, aes(y = logLPS, x = Species)) +
   geom_violin(aes(fill = Species)) +
@@ -928,7 +910,7 @@ lps <- ggplot(leaf_traits_noB, aes(y = logLPS, x = Species)) +
   theme_lfspp_discrete +
   labs(y = expression(paste("Leaf punch strength (N mm","^-1)")), x = "") +
   #scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test",
                      #label.y = c(0.4, 0.6, 1),
                      label = "p.signif") +
@@ -1003,7 +985,7 @@ errbar_lims <- group_by(leaf_traits_noB, Species) |>
                         upper = mean + (2*se), lower = mean - (2*se))
 
 #Comparisons
-my_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
+species_comparisons <- list(c("N", "L"), c("N", "G"), c("L", "G"))
 
 lt <- ggplot(leaf_traits_noB, aes(y= logLT, x = Species)) +
   geom_violin(aes(fill = Species)) +
@@ -1022,7 +1004,7 @@ lt <- ggplot(leaf_traits_noB, aes(y= logLT, x = Species)) +
   theme_lfspp_discrete +
   labs(y = expression(paste("Leaf thickness (",mu,"m)")), x = "") +
   scale_x_discrete(labels = c('M. laciniatus', 'M. nasutus', 'M. guttatus')) +
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test",
                      #label.y = c(0.4, 0.6, 1),
                      label = "p.signif") +
@@ -1587,7 +1569,8 @@ random_samples <- rand_select(rand_matrix)
 ###########################
 #After playing around with these functions I decided to change the `alphadivDF()` function to return a data frame with the alpha diversity indices, similar to how `estimate_richness()` calculates, from rarefied data sets. 
 # Data frame with alpha diversity indices calculated from rarefied data sets
-source("functions/alpha_rfy.R")
+# src/alpha_rfy.R
+
 plant_traits_MA <- alpha_rfy_DF(pseq_rrfa, diversity = c("shannon", "simpson", "invsimpson")) # Alpha diversity indices
 
 
@@ -2205,7 +2188,7 @@ hill0_species <- ggplot(data = plant_traits_MB,
   scale_color_manual(aes(color = "black")) +
   theme_sppdiv_discrete +
   labs(y =  "\U1D492 = 0", x = "", col = "") + 
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif") 
   #guides(color = "none")        #To turn off color legend
@@ -2235,7 +2218,7 @@ hill1_species <- ggplot(data = plant_traits_MB,
   theme_sppdiv_discrete +
   labs(y =  "\U1D492 = 1", x = "", col = "") + 
   scale_y_continuous(expand = c(0.05, 0.05)) +
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif") 
  # facet_wrap(~ Species, labeller = labeller(Species = labels_list)) +
@@ -2262,7 +2245,7 @@ hill2_species <- ggplot(data = plant_traits_MB,
   scale_color_manual(aes(color = "black")) +
   theme_sppdiv_discrete +
   labs(y =  "\U1D492 = 2", x = "", col = "") + 
-  stat_compare_means(comparisons = my_comparisons,
+  stat_compare_means(comparisons = species_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif") 
  # facet_wrap(~ Species, labeller = labeller(Species = labels_list)) +
@@ -2302,7 +2285,7 @@ hill0_beta <-  ggplot(plant_traits_MB, aes(x = Elevation_cat, y = Observed)) +
   scale_shape_manual(values=c(15:18),labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
   theme_elevdiv_discrete +
   scale_x_discrete(labels = c('', '', '', '')) +
-  stat_compare_means(comparisons = my_comparisons3,
+  stat_compare_means(comparisons = elevation_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif") +
   labs(y = "\U1D492 = 0", x = "") +
@@ -2330,7 +2313,7 @@ hill1_beta <- ggplot(plant_traits_MB, aes(x = Elevation_cat, y = hill_1)) +
   scale_shape_manual(values=c(15:18),labels=c('*M. laciniatus*', '*M. nasutus*', '*M. guttatus*')) +
   theme_elevdiv_discrete +
   scale_x_discrete(labels = c('', '', '', '')) +
-  stat_compare_means(comparisons = my_comparisons3,
+  stat_compare_means(comparisons = elevation_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif") +
   labs(y = "\U1D492 = 1", x = "") +
@@ -2357,7 +2340,7 @@ hill2_beta <- ggplot(plant_traits_MB, aes(x = Elevation_cat, y = hill_2, color =
   scale_fill_manual(labels=c('Low', 'Mid', 'High'),values= met.brewer("Cassatt1", n = 3, type = "discrete", direction = -1)) +
   theme_elevdiv_discrete +
   scale_x_discrete(labels = c('', '', '', '')) +
-  stat_compare_means(comparisons = my_comparisons3,
+  stat_compare_means(comparisons = elevation_comparisons,
                      method = "wilcox.test", 
                      label = "p.signif") +
   labs(y = "\U1D492 = 2", x = "") +
