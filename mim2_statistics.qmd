@@ -5,7 +5,11 @@ date: "`r format(Sys.time(), '%B %d, %Y')`"
 output: html_document
 ---
 
-# Setup
+# Objective of the notebook
+
+The goal of this notebook is to explore the relationship between leaf endophytes of *Mimulus* spp. with elevation and host leaf traits. I attempt to analyze in every possible way by firs performing descriptive statistics and then the adequate analyses for each question. The notebook is meant to serves as a draft for the analyses I include in the manuscript. Because of this there will be some differences between the documents. The code here can be at times messy and not well organized. The manuscript document has all the refined code for plots and analyses. I try to keep both documents as similar as possible, but the manuscript document is the final product. Here you may find violin plots and the manuscript boxplots, things like that.
+
+# 00-Setup
 ```{r setup}
 knitr::opts_chunk$set(out.width ='70%', fig_align = 'center', echo = TRUE, collapse = TRUE, eval=FALSE)
 
@@ -82,14 +86,84 @@ elevation_comparisons <- list(c("LOW", "MID"), c("LOW", "HIGH"), c("MID", "HIGH"
 # List of ASV samples
 names_list <- colnames(ps_clean_3@otu_table) #List of samples
 
-
 ```
 
-# Objective of the notebook
+# 00.1 Fast-Setup (post analyses)
 
-The goal of this notebook is to explore the relationship between leaf endophytes of *Mimulus* spp. with elevation and host leaf traits. I attempt to analyze in every possible way by firs performing descriptive statistics and then the adequate analyses for each question. The notebook is meant to serves as a draft for the analyses I include in the manuscript. Because of this there will be some differences between the documents. The code here can be at times messy and not well organized. The manuscript document has all the refined code for plots and analyses. I try to keep both documents as similar as possible, but the manuscript document is the final product. Here you may find violin plots and the manuscript boxplots, things like that.
+All of these files are loaded here after I have cleaned and shaped the data throughout this notebook. The purpose of having them is to ease setting up the work space.
+```{r}
+#####################################################
+############### Load master files here ##############
+#####################################################
+leaf_traits <- readRDS(file.path(path, "clean_data/statistics/leaf_traits.rds")) 
 
-# Data sets
+plant_traits <- readRDS(file.path(path, "clean_data/statistics/plant_traits.rds"))
+
+plant_traits_MB <- readRDS(file.path(path, "clean_data/statistics/plant_traits_MB.rds"))
+
+#ps_melt <- readRDS(file.path(path, "clean_data/statistics/ps_melt.rds"))
+
+# Samples with species to subset/filter matrices downstream
+# M. laciniatus
+lac_names <- plant_traits |>
+  slice(1:157) |> # Only selecting observations with ASV data 
+  filter(Species == "M. laciniatus") |>
+  pull(Unique_ID) 
+
+# M. guttatus
+gut_names <- plant_traits |> 
+  slice(1:157) |> # Only selecting observations with ASV data 
+  filter(Species == "M. guttatus") |>
+  pull(Unique_ID)
+
+# M. nasutus
+nas_names <- plant_traits |> 
+  slice(1:157) |> # Only selecting observations with ASV data 
+  filter(Species == "M. nasutus") |>
+  pull(Unique_ID)
+
+#Subset data set for NMDS and dbRDA plot
+# Samples resulting from rarefaction
+#ordi_traits <- plant_traits |>
+#  filter(Unique_ID %in% final_names_methodB)
+```
+
+
+#### Phyloseq, mirl, and meco objects
+
+Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data. These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
+```{r}
+#| label: phyloseq_objects
+
+###################################
+#### Load Phyloseq objects ########
+###################################
+# Load Phyloseq object cleaned of singletons (231 ASVs)
+ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.rds"))
+
+ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.csv"))
+
+pseq_rrfb <- readRDS(file.path(path, "clean_data/statistics/pseq_rrfb.rds"))
+
+#Mirlyn object from Method B
+rarefied_phyloseq <- readRDS(file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
+```
+
+#### Community matrix, avgdist and geographic distance
+
+```{r}
+#| label: community_matrices
+
+# Rarefied community matrix from "Matrices" section below.
+rrfy_hell_matrix <- readRDS("clean_data/statistics/rrfy_hell_matrix.rds")
+
+asv_avgdist <- readRDS("clean_data/statistics/asv_avgdist.rds") # Loading rarefied phyloseq object
+
+geo_distm <- readRDS("clean_data/statistics/geo_distm.rds")
+```
+
+
+# 01-Data sets
 
 ## Cleaning and Shaping
 
@@ -210,7 +284,7 @@ ps_melt <- ps_clean_3 |>
 ```
 
 
-## Descriptive stats
+# 02-Exploratory Data Analysis
 
 ```{r}
 #| label: descriptive_stats
@@ -300,7 +374,7 @@ fligner.test(Elevation_m ~ Site, data = leaf_traits) #Homogeneity of variances t
 
 All leaf traits and elevation are not normally distributed. This requires transformation for further analysis. I will proceed with a log transformation of the data.
 
-### Log transformations
+## 02.1-Log transformations
 ```{r}
 
 #### Log transformation ####
@@ -331,7 +405,7 @@ plant_traits <- plant_traits |>
 
 I will not omiting samples with NAs because some have the complete data for some leaf traits and not for others. I will omit samples with NAs for the Fungal analyses.
 
-## Post data transformations
+## 02.2-Post data transformations
 
 ```{r}
 #| label: post_transformation
@@ -372,132 +446,35 @@ shapiro.test(leaf_traits$logACI) #Another transformation that does not meet norm
 
 The log transformations improve the normality of the data, but it does not meet the assumptions for normality. I will proceed with the analyses using the log transformed data. I will use non-parametric tests for the analyses.
 
-
-### Load files
-
-All of these files are loaded here after I have cleaned and shaped the data throughout this notebook. The purpose of having them is to ease setting up the work space.
-```{r}
-#####################################################
-############### Load master files here ##############
-#####################################################
-leaf_traits <- readRDS(file.path(path, "clean_data/statistics/leaf_traits.rds")) # Post all the processing aboove, lod from here.
-plant_traits <- readRDS(file.path(path, "clean_data/statistics/plant_traits.rds"))
-plant_traits_MB <- readRDS(file.path(path, "clean_data/statistics/plant_traits_MB.rds"))
-#ps_melt <- readRDS(file.path(path, "clean_data/statistics/ps_melt.rds"))
-
-# Samples with species to subset/filter matrices downstream
-# M. laciniatus
-lac_names <- plant_traits |>
-  slice(1:157) |> # Only selecting observations with ASV data 
-  filter(Species == "M. laciniatus") |>
-  pull(Unique_ID) 
-
-# M. guttatus
-gut_names <- plant_traits |> 
-  slice(1:157) |> # Only selecting observations with ASV data 
-  filter(Species == "M. guttatus") |>
-  pull(Unique_ID)
-
-# M. nasutus
-nas_names <- plant_traits |> 
-  slice(1:157) |> # Only selecting observations with ASV data 
-  filter(Species == "M. nasutus") |>
-  pull(Unique_ID)
-
-
-
-#Subset data set for NMDS and dbRDA plot
-# Samples resulting from rarefaction
-#ordi_traits <- plant_traits |>
-#  filter(Unique_ID %in% final_names_methodB)
-```
-
-
-#### Phyloseq, mirl, and meco objects
-```{r, phylo_objects}
-###################################
-#### Load Phyloseq objects ########
-###################################
-#Phyloseq joins various objects that we have already prepare: taxonomic table, ASV table and our sample data. These are the data frames resulting from the phyloseq section in mim2_bioinformatics.qmd notebook.
-
-# Load Phyloseq object cleaned of singletons (231 ASVs)
-ps_clean_3 <- readRDS(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.rds"))
-ps_clean_3_df  <- read.csv(file.path(path, "clean_data/taxonomy/TAXA_8450_phyloseq_nonsingletons_noB.csv"))
-pseq_rrfb <- readRDS(file.path(path, "clean_data/statistics/pseq_rrfb.rds")) #Mirlyn object from Method B
-rarefied_phyloseq <- readRDS(file.path(path, "clean_data/statistics/rarefied_phyloseq.rds"))
-```
-
-#### Community matrix, avgdist and geographic distance
+## 02.3-Non-parametric tests
+Because the data does not meet normality assumptions after transformation, I decisded to stick to a non-parametric test like Kruskal-Wallis.
 
 ```{r}
-# Rarefied community matrix from "Matrices" section below.
-rrfy_hell_matrix <- readRDS("clean_data/statistics/rrfy_hell_matrix.rds")
+#| label: non_parametric_tests
 
-asv_avgdist <- readRDS("clean_data/statistics/asv_avgdist.rds") # Loading rarefied phyloseq object
+#Kruskal-Wallis tests
 
-geo_distm <- readRDS("clean_data/statistics/geo_distm.rds")
-```
+leaf_trait_vector <- c("logLBI", "logLMA", "logLPS", "logLT", "logACI")
 
-
-
-
-## Non-parametric tests
-
-```{r, non_parametric}
-#M1 <- lme(logLBI ~ , method = "REML", data = imagej1) # this is not the best given that I don't have continuous data.
-
-#Kruskal-Wallis
-#Because the data does not meet normality assumptions after transformation, I decisded to stick to a non-parametric test like Kruskal-Wallis.
-# LBI by Site
-print(kruskal.test(logLBI ~ Site, 
-                   data = leaf_traits,
-                   na.action = na.omit))
-
-# LBI by Elevation_m
-print(kruskal.test(logLBI ~ Elevation_m, 
-             data = leaf_traits,
-             na.action = na.omit))
-
-# LMA by Site
-print(kruskal.test(logLMA ~ Site, 
-                   data = leaf_traits,
-                   na.action = na.omit))
-
-# LMA by Elevation_m
-print(kruskal.test(logLMA ~ Elevation_m, 
-                   data = leaf_traits,
-                   na.action = na.omit))
-
-# Toughness by Site
-print(kruskal.test(logLPS ~ Site, 
-                   data = leaf_traits,
-                   na.action = na.omit))
-
-# Toughness by Elevation_m
-print(kruskal.test(logLPS ~ Elevation_m, 
-                   data = leaf_traits,
-                   na.action = na.omit))
-
-# Thickness by Site
-print(kruskal.test(logLT ~ Site, 
-                   data = leaf_traits,
-                   na.action = na.omit))
-
-# Thickness by Elevation_m
-print(kruskal.test(logLT ~ Elevation_m, 
-                   data = leaf_traits,
-                   na.action = na.omit))
-
-# ACI by Site
-print(kruskal.test(logACI ~ Site, 
-                   data = leaf_traits,
-                   na.action = na.omit))
-
-# ACI by Elevation_m
-print(kruskal.test(logACI ~ Elevation_m, 
-                   data = leaf_traits,
-                   na.action = na.omit))
-
+non_parametric_tests <- data.frame(
+  lf_traits = leaf_trait_vector
+) |>
+  mutate(
+    site_test_pvalue = map(
+      leaf_trait_vector,
+      ~ kruskal.test(as.formula(paste0(., " ~ Site")), data = leaf_traits, na.action = na.omit) |>
+        broom::tidy() |>
+        pull(p.value) |>
+        format.pval(digits = 5)
+    ),
+    elev_test_pvalue = map(
+      leaf_trait_vector,
+      ~ kruskal.test(as.formula(paste0(., " ~ Elevation_m")), data = leaf_traits, na.action = na.omit) |>
+        broom::tidy() |>
+        pull(p.value) |>
+        format.pval(digits = 5)
+    )
+  ) 
 
 
 #Post-Hoc tests
@@ -506,6 +483,7 @@ pairwise.wilcox.test(imagej1$logLBI, g = imagej1$Site)
 pairwise.wilcox.test(imagej1$logLBI, g = imagej1$Elevation_m)
 pairwise.wilcox.test(imagej1$logLBI, g = imagej1$Genotype)
 ```
+
 
 # Figures
 
