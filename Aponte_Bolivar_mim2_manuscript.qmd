@@ -264,7 +264,7 @@ dbrda_traits_imp <- dbrda_traits |>
 #sum(!is.na(plant_traits$hill_2[plant_traits$Species != "B"])) # No missing values
 
 # Functions
-source("src/mim2_function.R")
+source("src/mim2_functions.R")
 
 #Comparisons
 species_comparisons <- list(c("M. nasutus", "M. laciniatus"), c("M. nasutus", "M. guttatus"), c("M. laciniatus", "M. guttatus"))

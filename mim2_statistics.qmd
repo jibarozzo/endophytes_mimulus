@@ -73,7 +73,7 @@ path <- "../mim2_bioinformatics" # Change accordingly
 
 
 # Functions
-source("src/mim2_function.R")
+source("src/mim2_functions.R")
 
 # Comparisons
 species_comparisons <- list(
