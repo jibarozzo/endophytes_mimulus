@@ -7,6 +7,9 @@
 #' @return Named list with original data plus derived objects.
 #' @export
 prepare_derived_data <- function(data) {
+  data$leaf_traits_noB <- leaf_traits_noB <- data$leaf_traits |>
+    filter(!Species == "M. bicolor")
+
   # Species-specific sample names (first 157 observations have ASV data)
   data$lac_names <- data$plant_traits |>
     dplyr::slice(1:157) |>
