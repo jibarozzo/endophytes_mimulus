@@ -397,7 +397,7 @@ theme_lfdiv_continuous <- theme_classic(base_size = 12) +
 #register_google(key ='SECRET_KEY', write = TRUE)
 
 map_latlong <- read_excel(
-  "field_data/Mimulus_CH2_Field_Survey.xlsx",
+  "data/field_data/Mimulus_CH2_Field_Survey.xlsx",
   sheet = "clean_site_lat_long"
 )
 
@@ -1015,7 +1015,7 @@ ggsave(
 
 # dbRDA using Elevation as continuous variable
 #logACI + logLT + logLPS + logLMA +
-m5_hell <- readRDS("clean_data/statistics/m5_hell.rds")
+m5_hell <- readRDS("data/clean_data/statistics/m5_hell.rds")
 
 # Final model
 final_model <- m5_hell # Previously m4_hell was the best
@@ -1533,7 +1533,7 @@ ggsave(
 #| label: tab-table1
 #| tbl-cap: "Generalized linear mixed models (GLMMs) for predicting mean Bray-Curtis dissimilarity"
 
-load("clean_data/statistics/glmm_models.rda")
+load("data/clean_data/statistics/glmm_models.rda")
 
 # Huxtable to flextable
 table1 <- huxreg(
@@ -3001,9 +3001,9 @@ phyloseq_ntaxa_by_tax(
 #| tbl-cap: "Table S3. Permutational ANOVA for the best-fit dbRDA model with hybrid cross-types. Significance levels are represented by asterisks [*p* < .05 (\\*), *p* < .01 (\\*\\*), *p* < .001 (\\*\\*\\*), and *p* < .0001 (\\*\\*\\*\\*)]."
 
 #dbRDA table  (results from terms are the same as adonis2 but without R2)
-load("clean_data/statistics/dbRDA_models.rda")
+load("data/clean_data/statistics/anova_m5hell_margin.rds")
 
-anova_table3 <- tidy(anova_m5hell_term) |>
+anova_table3 <- tidy(anova_m5hell_margin) |>
   as.data.frame() |>
   mutate("p-value" = str_replace_all(p.value, "0.001", "***")) |>
   rename(
