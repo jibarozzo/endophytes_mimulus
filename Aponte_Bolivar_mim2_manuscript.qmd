@@ -12,24 +12,15 @@ author:
     email: bolivar@iastate.edu
     corresponding: true
     affiliations:
-      - ref: [ia, tu]
-        # name: Iowa State University
-        # department: Department of Agricultural and Biosystems Engineering
-        # city: Ames
-        # state: IA
-        # country: USA
-        # url: www.iastate.edu
+      - ref: ia
+      - ref: tu
+
   - name: Kathleen G. Ferris
     email: kferris@tulane.edu
     corresponding: false
     affiliations:
       - ref: tu
-        # name: Tulane University
-        # department: Ecology and Evolutionary Biology
-        # city: New Orleans
-        # state: LA
-        # country: US
-        # url: www.tulane.edu
+
   - name: Sunshine A. Van Bael
     orcid: 0000-0001-7317-3533
     email: svanbael@tulane.edu
@@ -38,10 +29,11 @@ author:
       - ref: tu
 
 affiliations:
-  - id: tu
-    name: Department of Ecology and Evolutionary Biology, Tulane University, 6823 St. Charles Avenue, New Orleans, LA 70118
   - id: ia
     name: Department of Agricultural and Biosystems Engineering, Iowa State University, Ames, IA 50011, USA
+  - id: tu
+    name: Department of Ecology and Evolutionary Biology, Tulane University, 6823 St. Charles Avenue, New Orleans, LA 70118
+
 
 filters:
   - authors-block
@@ -120,8 +112,7 @@ Microbial symbionts have the potential to contribute to host-plant's ecological 
 
 # Introduction
 
-Microbial dispersal is challenging to trace. The general assumption is that most, if not all, microbes are ubiquitous. Nevertheless, the dispersal of microbial communities is not random as it is the result of neutral and selective processes influenced by environmental conditions, geographic distance, and host species [@rebolledagomez2019; CITE MORE]. The co-evolution and symbiotic interactions plant microbes, such as fungi [@remy1994; @wang2006; @field2015; reviewed in @peay2016] and bacteria [@soltis1995; @adams2002; @delaux2015], aided plants’ colonization of land across multiple varying climates. However, little is still known about how plant microbiomes influence or are influenced by local adaptation of their host species. Geographic location and environmental conditions are known to influence community composition of symbiotic fungi, with varying effects across different fungal guilds [@bowman2021; CITE]. Previous studies have suggested that foliar endophytic fungi (FEF), which live inside plant leaves, can alter plant traits under stressful conditions such as drought [@song2016; @giauque2019; @giauque2013] and therefore may contribute to local adaptation. Given these close associations between host and symbiont the resulting FEF community is influenced by the interplay of environmental conditions, geographic distance and host species. Because climate change is expected to alter species distributions [CITE], studying how host-microbe interactions contribute to local adaptation and population persistence is essential for understanding and predicting species’ responses under shifting environmental conditions.
-
+Microbial dispersal is challenging to trace. The general assumption is that most, if not all, microbes are ubiquitous. Nevertheless, the dispersal of microbial communities is not random as it is the result of neutral and selective processes influenced by environmental conditions, geographic distance, and host species [@rebolledagomez2019]. The co-evolution and symbiotic interactions plant microbes, such as fungi [@remy1994; @wang2006; @field2015; reviewed in @peay2016] and bacteria [@soltis1995; @adams2002; @delaux2015], aided plants’ colonization of land across multiple varying climates. However, little is still known about how plant microbiomes influence or are influenced by local adaptation of their host species. Geographic location and environmental conditions are known to influence community composition of symbiotic fungi, with varying effects across different fungal guilds [@bowman2021; @kivlin2022]. Previous studies have suggested that foliar endophytic fungi (FEF), which live inside plant leaves, can alter plant traits under stressful conditions such as drought [@song2016; @giauque2019; @giauque2013] and therefore may contribute to local adaptation. Given these close associations between host and symbiont the resulting FEF community is influenced by the interplay of environmental conditions, geographic distance and host species.
 Host traits and host identity can influence FEF communities in a variety of ways. Leaf functional traits, such as leaf thickness, leaf mass per area, and leaf toughness are known to influence plant's response to abiotic factors like light, temperature, and hydraulic constraints [@nicotra2011; @oguchi2018]. These traits serve as host-imposed filters that play a role in structuring FEF communities [@saunders2010; @tellezTraits2022]. Jointly, host identity has been shown to structure the foliar microbiomes of plants. For example, a study of the classical plant model, *Arabidopsis thaliana*, revealed that bacterial and fungal communities in leaves were shaped by host genotype [@horton2014]. Recently, Karasov et al. [-@karasov2024], found robust trends in further support of this hypothesis, showing that the bacterial leaf microbiome in diverse European populations of *A. thaliana* is influenced by genetic variation in the host. At the local scale, *A. thaliana* genotype can impose strong selection on the composition of its leaf microbiome, but at the continental scale, while genotype still plays a role, geography and abiotic factors also contribute strongly to symbiont community composition [@karasov2024]. The patterns observed in this model system encourage testing these hypotheses in other plant species to determine their broader applicability. The *Mimulus guttatus* species complex, a closely related interfertile group of species with considerable morphological and ecological variation, is an ideal model system to explore questions about FEF communities and their relationship with host species traits and environmental conditions [@vickery1978; @wu2008]. 
 
 Previous studies have examined floral and root microbial symbionts in *Mimulus* species, yet little is known about their foliar symbionts [@belisle2012; @rebolledagomez2019; @mcintosh2024]. Aboveground, Beslile et al. [-@belisle2012] reported on the distribution of diverse fungal communities in the flower nectar of *Mimulus aurantiacus*. The authors considered flowers as islands in a metapopulation system and found that the frequency of micro-fungi (i.e., yeasts) was significantly correlated to the location of the plant and marginally correlated with the density of the flowers in the plant [@belisle2012]. Another study by Rebolleda et al [-@rebolledagomez2019], examined epiphytic bacterial communities of different flower parts in *Mimulus guttatus* and found that pollinator choice drives strong micro-environmental selection of bacterial communities, overwhelming the effects of geographic distance. Belowground, arbuscular mycorrhizal fungi (AMF) are known to associate with *M. guttatus*. 
@@ -169,7 +160,7 @@ We used the `decontam` package [v1.20.0; @davis2018] to statistically determine 
 
 ### Leaf traits
 
-We checked for normality and homoscedasticity of the leaf traits measured. We used Shapiro-Wilk and Fligner-Killen tests from the `stats` package [@rcoreteam2024] to check for normality and homoscedasticity, respectively. We established that the leaf functional trait data was not normally distributed and not homoscedastic. We then used non-parametric tests, the Wilcoxon Rank Sum test, to compare leaf functional trait means among species and sites to answer the first portion of Q1 and Q2. We used the `compare_means` and `stat_compare_means`functions from the `ggpubr` package [@kassambara2023] to perform these tests and properly visualize them. We adjusted *p* values to account for false discovery rates in multiple comparisons by using “BH” method [@benjamini1995]. We performed Principal Component Analysis (PCA) to understand patterns and relationships among leaf traits of host species. We used the `prcomp` function from the `vegan` package [@oksanen2022] compute the PCA analysis with variables ACI, LT, LPS, LMA, and LBI, all log-transformed. We used only complete raw leaf functional traits measurements to compute the PCA analysis (*n* = 504), samples with missing values were omitted.  All statistical analyses were performed in *R* programming language [v.4.4.1; @rcoreteam2024]. We present the log-transformed leaf functional trait data at the leaf level from a total of `r leaf_traits_noB |> filter(!Unique_ID == "FVWB_G002") |> nrow()/3` plants: ACI (*n* = `r sum(!is.na(leaf_traits_noB$logACI))`), LT (*n* = `r sum(!is.na(leaf_traits_noB$logLT))`), LPS (*n* = `r sum(!is.na(leaf_traits_noB$logLPS))`), LMA (*n* = `r sum(!is.na(leaf_traits_noB$logLMA))`), LBI (*n* = `r sum(!is.na(leaf_traits_noB$logLBI))`). The FEF community data is presented at the plant/sample level (*n* = `r sum(!is.na(plant_traits$Observed))`).
+We checked for normality and homoscedasticity of the leaf traits measured. We used Shapiro-Wilk and Fligner-Killen tests from the `stats` package [@rcoreteam2024] to check for normality and homoscedasticity, respectively. We established that the leaf functional trait data was not normally distributed and not homoscedastic. We then used non-parametric tests, the Wilcoxon Rank Sum test, to compare leaf functional trait means among species and sites to answer the first portion of Q1 and Q2. We used the `compare_means` and `stat_compare_means`functions from the `ggpubr` package [@kassambara2023] to perform these tests and properly visualize them. We adjusted *p* values to account for false discovery rates in multiple comparisons by using “BH” method [@benjamini1995]. We performed Principal Component Analysis (PCA) to understand patterns and relationships among leaf traits of host species. We used the `prcomp` function from the `vegan` package [@oksanen2022] compute the PCA analysis with variables ACI, LT, LPS, LMA, and LBI, all log-transformed. We used only complete raw leaf functional traits measurements to compute the PCA analysis (*n* = 504), samples with missing values were omitted.  All statistical analyses were performed in *R* programming language [v.4.4.1; @rcoreteam2024]. We present the log-transformed leaf functional trait data at the leaf level from a total of `r leaf_traits_noB |> filter(!Unique_ID == "FVWB_G002") |> nrow()/3` plants: ACI (*n* = `r sum(!is.na(leaf_traits_noB$logACI))`), LT (*n* = `r sum(!is.na(leaf_traits_noB$logLT))`), LPS (*n* = `r sum(!is.na(leaf_traits_noB$logLPS))`), LMA (*n* = `r sum(!is.na(leaf_traits_noB$logLMA))`), LBI (*n* = `r sum(!is.na(leaf_traits_noB$logLBI))`). The FEF community data is presented from a subset of individuals at the plant/sample level (*n* = `r sum(!is.na(plant_traits$Observed))`).
 
 ### Community Diversity
 
@@ -1011,7 +1002,7 @@ ggsave(
 #| fig-width: 5
 #| fig-height: 6
 #| label: fig-figure5
-#| fig-cap: "FEF community composition association with leaf functional traits and elevation by host species. Distance-based Redundancy Analysis (dbRDA) plot of rarefied FEF community and leaf functional traits by species facetted by elevation zone. Each cluster of points represents a rarefied FEF community sample from one host species. Solid arrow lines represent significant associations (*p* < .01)with non-significant leaf trait associations left out for clarity. The length and direction of the arrows indicate the strength and direction of the association between the traits and the FEF community composition. Ellipses represent 95% confidence intervals. The plot is based on the Bray-Curtis dissimilarity matrix."
+#| fig-cap: "FEF community composition association with leaf functional traits and elevation by host species. Distance-based Redundancy Analysis (dbRDA) plot of rarefied FEF community and leaf functional traits by species (colors) and by elevation zone (shapes). Each cluster of points represents a rarefied FEF community sample from one host species. Solid arrow lines represent significant associations (*p* < .01)with non-significant leaf trait associations left out for clarity. The length and direction of the arrows indicate the strength and direction of the association between the traits and the FEF community composition. Ellipses represent 95% confidence intervals. The plot is based on the Bray-Curtis dissimilarity matrix."
 
 # dbRDA using Elevation as continuous variable
 #logACI + logLT + logLPS + logLMA +
