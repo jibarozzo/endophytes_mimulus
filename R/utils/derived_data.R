@@ -7,7 +7,9 @@
 #' @return Named list with original data plus derived objects.
 #' @export
 prepare_derived_data <- function(data) {
-  data$leaf_traits_noB <- leaf_traits_noB <- data$leaf_traits |>
+  data$leaf_traits |>
+    filter(!Species == "M. bicolor")
+  data$leaf_traits_noB <- data$leaf_traits |>
     filter(!Species == "M. bicolor")
 
   data$final_names_methodB <- colnames(data$asv_avgdist)

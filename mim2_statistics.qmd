@@ -182,20 +182,26 @@ This section cleans and shapes the raw data into two main data frames: `leaf_tra
 ########## RAW data sets #######
 ################################
 
-traits <- read.csv(file.path(path, "field_data/mim2_leaf_traits_field_survey.csv")) # Main raw data set
+traits <- read.csv(file.path(
+  path,
+  "data/field_data/mim2_leaf_traits_field_survey.csv"
+)) # Main raw data set
 
 #Elevation_m categories (meters)
 breaks <- c(-Inf, 1219.2, 1828.495, Inf)
 labels <- c("LOW", "MID", "HIGH")
 
 #Leaf level data set
-leaf_traits <-  traits |>
+leaf_traits <- traits |>
   slice(-c(959:973)) |> # Removing control samples
   filter(!Unique_ID == "TRTB_L001") |> #Removing misidentified sample
-  rename(LMA = LMA.mg.,
-         LBI = Leaf_lobe_index,
-         LPS = Leaf_toughness,
-         LT = Leaf_thickness) |>
+  filter(!Site == "FVWB") |> # Removing out of bounds
+  rename(
+    LMA = LMA.mg.,
+    LBI = Leaf_lobe_index,
+    LPS = Leaf_toughness,
+    LT = Leaf_thickness
+  ) |>
   select(!c(5, 13:15, 23:25)) |>
   group_by(Site, Species, Unique_ID) |>
   fill(ImageJ_1, ImageJ_2, LBI, .direction = 'down') |>

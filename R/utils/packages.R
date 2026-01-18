@@ -34,6 +34,7 @@ load_packages <- function(packages) {
       "MetBrewer",
 
       # table_packages
+      "gt",
       "huxtable",
       "flextable",
       "broom.mixed",

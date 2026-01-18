@@ -169,11 +169,11 @@ We used the `decontam` package [v1.20.0; @davis2018] to statistically determine 
 
 ### Leaf traits
 
-We checked for normality and homoscedasticity of the leaf traits measured. We used Shapiro-Wilk and Fligner-Killen tests from the `stats` package [@rcoreteam2024] to check for normality and homoscedasticity, respectively. We established that the leaf functional trait data was not normally distributed and not homoscedastic. We then used non-parametric tests, the Wilcoxon Rank Sum test, to compare leaf functional trait means among species and sites to answer the first portion of Q1 and Q2. We used the `compare_means` and `stat_compare_means`functions from the `ggpubr` package [@kassambara2023] to perform these tests and properly visualize them. We adjusted *p* values to account for false discovery rates in multiple comparisons by using “BH” method [@benjamini1995]. We performed Principal Component Analysis (PCA) to understand patterns and relationships among leaf traits of host species. We used the `prcomp` function from the `vegan` package [@oksanen2022] compute the PCA analysis with variables ACI, LT, LPS, LMA, and LBI, all log-transformed. We used only complete raw leaf functional traits measurements to compute the PCA analysis (*n* = 504), samples with missing values were omitted.  All statistical analyses were performed in *R* programming language [v.4.4.1; @rcoreteam2024]. We present the log-transformed leaf functional trait data at the leaf level: ACI (*n* = `r sum(!is.na(leaf_traits_noB$logACI))`), LT (*n* = `r sum(!is.na(leaf_traits_noB$logLT))`), LPS (*n* = `r sum(!is.na(leaf_traits_noB$logLPS))`), LMA (*n* = `r sum(!is.na(leaf_traits_noB$logLMA))`), LBI (*n* = `r sum(!is.na(leaf_traits_noB$logLBI))`). The FEF community data is presented at the plant/sample level (*n* = `r sum(!is.na(plant_traits$Observed))`).
+We checked for normality and homoscedasticity of the leaf traits measured. We used Shapiro-Wilk and Fligner-Killen tests from the `stats` package [@rcoreteam2024] to check for normality and homoscedasticity, respectively. We established that the leaf functional trait data was not normally distributed and not homoscedastic. We then used non-parametric tests, the Wilcoxon Rank Sum test, to compare leaf functional trait means among species and sites to answer the first portion of Q1 and Q2. We used the `compare_means` and `stat_compare_means`functions from the `ggpubr` package [@kassambara2023] to perform these tests and properly visualize them. We adjusted *p* values to account for false discovery rates in multiple comparisons by using “BH” method [@benjamini1995]. We performed Principal Component Analysis (PCA) to understand patterns and relationships among leaf traits of host species. We used the `prcomp` function from the `vegan` package [@oksanen2022] compute the PCA analysis with variables ACI, LT, LPS, LMA, and LBI, all log-transformed. We used only complete raw leaf functional traits measurements to compute the PCA analysis (*n* = 504), samples with missing values were omitted.  All statistical analyses were performed in *R* programming language [v.4.4.1; @rcoreteam2024]. We present the log-transformed leaf functional trait data at the leaf level from a total of `r leaf_traits_noB |> filter(!Unique_ID == "FVWB_G002") |> nrow()/3` plants: ACI (*n* = `r sum(!is.na(leaf_traits_noB$logACI))`), LT (*n* = `r sum(!is.na(leaf_traits_noB$logLT))`), LPS (*n* = `r sum(!is.na(leaf_traits_noB$logLPS))`), LMA (*n* = `r sum(!is.na(leaf_traits_noB$logLMA))`), LBI (*n* = `r sum(!is.na(leaf_traits_noB$logLBI))`). The FEF community data is presented at the plant/sample level (*n* = `r sum(!is.na(plant_traits$Observed))`).
 
 ### Community Diversity
 
-To account for uneven sampling effort and over-representation of sequences, we normalized libraries by repeated rarefying, following Cameron et al. [-@cameron2021]. We determined a sequence depth of 750 by calculating Good's coverage and qualitative evaluation of libraries to determine a balanced coverage and breadth of samples [@schloss2024]. This approach allowed for a proportionate representation of observed sequences from host species and a robust characterization of random variation inherent in rarefaction of small libraries [@cameron2021; @schloss2024]. First, we randomly selected 136 samples out of the 157 that resulted from the bioinformatic pipeline (refer to the Results section below). The sample pool was reduced to 136 to match the theoretical reduction of one sample per site (*n* = 21). We generated 50 rarefied abundance matrices without replacement by using the `mirl` function from the `mirlyn` package [@cameron2021]. After which, we calculated α-diversity per sample as Hill orders, the observed richness (𝑞 = 0), the exponent of Shannon's entropy (𝑞 = 1), and the Inverse Simpson's Diversity (𝑞 = 2) by applying a modified version of the function `alphadivDF` [@cameron2021], which wraps the common diversity indices in `vegan` [@oksanen2022] (see custom script in Supplementary material). Finally, for beta diversity analyses, we performed a Hellinger transformation on the rarefied abundance matrices and calculated a Bray-Curtis dissimilarity matrix for each.
+To account for uneven sampling effort and over-representation of sequences, we normalized libraries by repeated rarefying, following Cameron et al. [-@cameron2021]. We determined a sequence depth of 750 by calculating Good's coverage and qualitative evaluation of libraries to determine a balanced coverage and breadth of samples [@schloss2024]. This approach allowed for a proportionate representation of observed sequences from host species and a robust characterization of random variation inherent in rarefaction of small libraries [@cameron2021; @schloss2024]. First, we randomly selected 136 samples out of the `r !is.na(ncol(ps_clean_3@otu_table@.Data))` viable samples that resulted from the bioinformatic pipeline (refer to the Results section below). The sample pool was reduced to 136 to match the theoretical reduction of one sample per site (*n* = 21). We generated 50 rarefied abundance matrices without replacement by using the `mirl` function from the `mirlyn` package [@cameron2021]. After which we were left with `r ncol(asv_matrix)` samples. We then calculated α-diversity per sample as Hill orders, the observed richness (𝑞 = 0), the exponent of Shannon's entropy (𝑞 = 1), and the Inverse Simpson's Diversity (𝑞 = 2) by applying a modified version of the function `alphadivDF` [@cameron2021], which wraps the common diversity indices in `vegan` [@oksanen2022] (see custom script in Supplementary material). Finally, for beta diversity analyses, we performed a Hellinger transformation on the rarefied abundance matrices and calculated a Bray-Curtis dissimilarity matrix for each.
 
 We calculated simple linear regressions and non-parametric tests, the Wilcoxon Rank Sum test, to understand how α-diversity changed in response to elevation (Q1) and (Q2). To facilitate our understanding of the effects of elevation on FEF α-diversity, we categorized elevation as "low" (\< 1219 m.a.s.l), "mid" (1220 - 1828 m.a.s.l.) and "high" (\> 1829 m.a.s.l.). To statistically compare the FEF community similarities within each host species across sites (Q3) we applied a distance-based Redundancy Analysis (dbRDA) on the Bray-Curtis dissimilarities which effectively describes underlying patterns of compositional differences [@anderson2017; @legendre1999; @mcardle2001]. We selected model terms by calculating Spearman's rho for all leaf traits (see below and Fig. S1) to understand which leaf functional traits were correlated with FEF richness, diversity and community composition. We informed our selection of leaf traits with results from the PCA (see below and Fig. 1), and selected those with the lowest correlation coefficient per host species: logLBI. Our initial dbRDA model consisted of terms logLBI, sampling date, site, and elevation (m). The leaf functional trait data, as well as elevation, was not randomized or subsampled to match rarefied dataset, the same values applied to all 50 rarefied matrices. For our initial model, we determined the variance inflation factor (VIF) of each term with function `vif.cca` and eliminated redundant ones: site and sampling date. We performed manual model selection by evaluating the marginal significance of constraining variables after 999 permutations with function `anova.cca` and argument `by` set to "terms" to assess significance for each term [@legendre2011; @legendre2012; @oksanen2022]. We corroborated homogeneous dispersion of variances with a permutational analysis of multivariate dispersion (PERMDISP) using the `betadisper` with parameter `type = "median"`, and `permutest` functions from `vegan`, the latter with 999 permutations [@oksanen2022]. We used a post-hoc Tukey's test to compare the differences in the dispersion of the FEF communities among sites and elevation zones. We used the `simper` function from `vegan` to discriminate which species contribute the most to compositional differences between groups [@oksanen2022].
 
@@ -2956,41 +2956,109 @@ ggsave(
 ## Table S1
 ```{r, supp_table1}
 # Sites and Species sampled
-leaf_traits_noB |>
+table_data <- leaf_traits_noB |>
   group_by(Site, Species, Longitude, Latitude) |>
-  summarise(n = as.integer(n() / 3)) |> # Dividing by 3 due to replicate measurements of each sample
+  summarise(n = n_distinct(Unique_ID), .groups = "drop") |>
   pivot_wider(names_from = Species, values_from = n) |>
+  left_join(
+    extra_site_details |>
+      select(Unique_ID, Site_name, Forest_Park) |>
+      distinct(),
+    by = c("Site" = "Unique_ID")
+  ) |>
+  filter(!Site == "FVWB" & !Site == "LYFB") |> # Removing out of bounds
 
-  # huxtable::huxtable(number_format(fmt_pretty(.)))
-  # #huxtable::set_bold(1) |>
-  # huxtable::set_italic(1, 4:6, TRUE) |>
-  # set_all_padding(10) |>
-  # set_outer_padding(0) |>
-  # set_width(1.1) |>
-  # theme_article() |>
-  # huxtable::set_caption("Table 1: Number of individuals collected per population/site and species.") |>
-  # huxtable::as_flextable(column_to_header = TRUE)
-  knitr::kable(
-    caption = "Table S1. Number of individuals collected per population/site and species."
+  select(
+    Site,
+    Site_name,
+    Forest_Park,
+    Latitude,
+    Longitude,
+    `M. laciniatus`,
+    `M. nasutus`,
+    `M. guttatus`
+  ) |>
+  mutate(
+    Forest_Park = str_replace_all(Forest_Park, "_", " ")
+  ) |>
+  rename(
+    "Site Name" = Site_name,
+    "Forest/Park" = Forest_Park
   )
+
+totals <- c(
+  sum(table_data$`M. laciniatus`, na.rm = TRUE),
+  sum(table_data$`M. nasutus`, na.rm = TRUE),
+  sum(table_data$`M. guttatus`, na.rm = TRUE)
+)
+
+tableS1 <- table_data |>
+  huxtable::huxtable() |>
+  huxtable::set_number_format(everywhere, 4:5, value = "%5.6f") |>
+  huxtable::set_italic(1, 6:8, TRUE) |>
+  set_all_padding(10) |>
+  set_outer_padding(0) |>
+  set_width(1.1) |>
+  theme_article() |>
+  huxtable::set_caption(
+    "Table S1: Number of individuals collected per population/site and species."
+  ) |>
+  huxtable::as_flextable(column_to_header = TRUE) |>
+  flextable::add_footer_lines("") |>
+  flextable::add_footer_lines(
+    values = as_paragraph(
+      "Total | | ",
+      as_chunk(paste(totals, collapse = " | "))
+    )
+  )
+
+tableS1
+# knitr::kable(
+#   caption = "Table S1. Number of individuals collected per population/site and species."
+# )
 ```
 
 
 ## Table S2
 ```{r, supp_table2}
-phyloseq_ntaxa_by_tax(
+tableS2 <- phyloseq_ntaxa_by_tax(
   ps_clean_3,
   TaxRank = "Phylum",
   relative = F,
   add_meta_data = T
 ) |>
   as.data.frame() |>
-  mutate(sum = sum(N.OTU), Phylum = str_remove(Phylum, "^.*?(_|-).")) |>
+  mutate(Phylum = str_remove(Phylum, "^.*?(_|-).")) |>
   group_by(Species, Phylum) |>
-  summarise(Occurrence = n()) |>
-  knitr::kable(
-    caption = "Table S2. Prevalence of phyla in samples per species."
+  summarise(Occurrence = n(), .groups = "drop") |>
+  gt(rowname_col = "Phylum", groupname_col = "Species") |>
+  fmt_number(columns = Occurrence, decimals = 0) |>
+  tab_options(
+    table.font.names = "Tex Gyre Termes",
+    heading.title.font.size = "medium",
+    row_group.as_column = TRUE
+  ) |>
+  tab_stub_indent(
+    rows = everything(),
+    indent = 3
+  ) |>
+  tab_header(
+    title = "Table S2. Prevalence of phyla in samples per species."
+  ) |>
+  tab_style(
+    style = cell_text(style = "italic"),
+    locations = cells_row_groups()
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) |>
+  tab_footnote(
+    footnote = "Occurrence represents the number of samples where each phylum was detected per species."
   )
+
+tableS2
+
 ```
 
 ## Table S3
@@ -3001,9 +3069,11 @@ phyloseq_ntaxa_by_tax(
 #| tbl-cap: "Table S3. Permutational ANOVA for the best-fit dbRDA model with hybrid cross-types. Significance levels are represented by asterisks [*p* < .05 (\\*), *p* < .01 (\\*\\*), *p* < .001 (\\*\\*\\*), and *p* < .0001 (\\*\\*\\*\\*)]."
 
 #dbRDA table  (results from terms are the same as adonis2 but without R2)
-load("data/clean_data/statistics/anova_m5hell_margin.rds")
+anova_m5hell_term <- readRDS(
+  "data/clean_data/statistics/anova_m5hell_term.rds"
+)
 
-anova_table3 <- tidy(anova_m5hell_margin) |>
+anova_table3 <- tidy(anova_m5hell_term) |>
   as.data.frame() |>
   mutate("p-value" = str_replace_all(p.value, "0.001", "***")) |>
   rename(
@@ -3016,9 +3086,9 @@ anova_table3 <- tidy(anova_m5hell_margin) |>
 
 # Table
 
-table3 <- flextable(anova_table3) |>
-  flextable::set_table_properties(width = .5) |>
-  flextable::set_table_properties(layout = "autofit") |>
+tableS3 <- flextable(anova_table3) |>
+  flextable::set_table_properties(width = .5, layout = "autofit") |>
+  flextable::colformat_double(digits = 3) |>
   flextable::style(i = c(1:4), j = 1, pr_t = fp_text(bold = FALSE)) |>
   flextable::bold(
     i = c(1),
@@ -3027,7 +3097,7 @@ table3 <- flextable(anova_table3) |>
     part = "header"
   ) |>
   flextable::italic(
-    i = c(4),
+    i = c(5),
     j = 1,
     italic = TRUE,
     part = "body"
@@ -3043,9 +3113,19 @@ table3 <- flextable(anova_table3) |>
   ) |>
   flextable::set_caption(
     "Table S3. Permutational ANOVA for the best-fit dbRDA model with hybrid cross-types. Significance levels are represented by asterisks"
+  ) |>
+  flextable::border(
+    i = 5,
+    j = c(1:5),
+    border.top = fp_border(color = "black", width = 1)
+  ) |>
+  flextable::add_footer_lines(
+    value = as_paragraph(
+      "Significance levels are represented by ns (not significant) and asterisks [p < .05 (*), p < .01 (**), p < .001 (***), and p < .0001 (****)]."
+    )
   )
 
-table3
+tableS3
 ```
 
 ## Supplementary methods

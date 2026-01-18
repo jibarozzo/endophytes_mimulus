@@ -29,12 +29,19 @@ load_datasets <- function(path) {
     ps_clean_3_df = "data/clean_data/taxonomy/02-TAXA_8450_phyloseq_nonsingletons_noB.csv"
   )
 
+  extra_site_details <- list(
+    extra_site_details = "data/field_data/Mimulus_CH2_Field_Survey.xlsx"
+  )
   # Load RDS files using purrr
   datasets <- purrr::map(rds_files, ~ readRDS(file.path(path, .x)))
 
   # Load CSV files
   csv_data <- purrr::map(csv_files, ~ read.csv(file.path(path, .x)))
 
+  extra_site_details <- purrr::map(
+    extra_site_details,
+    ~ readxl::read_xlsx(file.path(path, .x), sheet = "FieldSites")
+  )
   # Combine all datasets
-  c(datasets, csv_data)
+  c(datasets, csv_data, extra_site_details)
 }
