@@ -27,3 +27,11 @@ data/clean_data/taxonomy/sh_general_release_dynamic_s_25.07.2023_dev.fasta
 data/clean_data/taxonomy/sh_general_release_dynamic_s_25.07.2023.fasta
 /.quarto/
 data/Aponte_8450_23052601/
+.DS_Store
+
+venv
+
+**/*.quarto_ipynb
+
+# Large statistics output, not tracked in git
+data/clean_data/statistics/dbrda_m5_hell.rds

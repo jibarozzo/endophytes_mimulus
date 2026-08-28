@@ -1980,9 +1980,13 @@ percent_phyla_clean <- phyloseq_ntaxa_by_tax(
 ) |>
   as.data.frame() |>
   mutate(sum = sum(N.OTU)) |>
-  group_by(Species, Phylum) |>
-  summarise(occurance_in_samples = n()) # Count the number of ASV per phylum
-
+  group_by(Phylum) |>
+  summarise(occurance_in_samples = n()) |> # Count the number of ASV per phylum
+mutate(
+    percent_occurance_in_samples = occurance_in_samples /
+      sum(occurance_in_samples) *
+      100
+  )
 # Coverage
 phyloseq_coverage(ps_clean_3, correct_singletons = F) #Coverage
 

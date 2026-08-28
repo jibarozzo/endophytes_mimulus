@@ -68,13 +68,13 @@
     },
     "BiocManager": {
       "Package": "BiocManager",
-      "Version": "1.30.23",
+      "Version": "1.30.27",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "utils"
       ],
-      "Hash": "47e968dfe563c1b22c2e20a067ec21d5"
+      "Hash": "594af2c6021b55271b6759d004a25ca2"
     },
     "BiocParallel": {
       "Package": "BiocParallel",
@@ -1144,32 +1144,16 @@
       ],
       "Hash": "f91f6b29f38b8c280f2b9477787d4bb2"
     },
-    "classInt": {
-      "Package": "classInt",
-      "Version": "0.4-10",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "KernSmooth",
-        "R",
-        "class",
-        "e1071",
-        "grDevices",
-        "graphics",
-        "stats"
-      ],
-      "Hash": "f5a40793b1ae463a7ffb3902a95bf864"
-    },
     "cli": {
       "Package": "cli",
-      "Version": "3.6.2",
+      "Version": "3.6.6",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "utils"
       ],
-      "Hash": "1216ac65ac55ec0058a6f75d7ca0fd52"
+      "Hash": "a73d822b669d443ff8de6928f9c49850"
     },
     "clipr": {
       "Package": "clipr",
@@ -2262,34 +2246,6 @@
       ],
       "Hash": "012d7705b4cdc7b5ee89895aeefc1d45"
     },
-    "ggmap": {
-      "Package": "ggmap",
-      "Version": "4.0.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "bitops",
-        "cli",
-        "digest",
-        "dplyr",
-        "ggplot2",
-        "glue",
-        "grid",
-        "httr",
-        "jpeg",
-        "magrittr",
-        "plyr",
-        "png",
-        "purrr",
-        "rlang",
-        "scales",
-        "stringr",
-        "tibble",
-        "tidyr"
-      ],
-      "Hash": "031b5eab3c43bf1a7cea0498e4d89233"
-    },
     "ggplot2": {
       "Package": "ggplot2",
       "Version": "3.5.1",
@@ -2440,27 +2396,6 @@
       ],
       "Hash": "a57f0f5dbcfd0d77ad4ff33032f5dc79"
     },
-    "ggspatial": {
-      "Package": "ggspatial",
-      "Version": "1.1.9",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "abind",
-        "ggplot2",
-        "glue",
-        "grid",
-        "methods",
-        "rlang",
-        "rosm",
-        "scales",
-        "sf",
-        "tibble",
-        "tidyr"
-      ],
-      "Hash": "0a4e5ed181eb823957df790ec11a28fc"
-    },
     "ggstats": {
       "Package": "ggstats",
       "Version": "0.6.0",
@@ -2540,14 +2475,14 @@
     },
     "glue": {
       "Package": "glue",
-      "Version": "1.7.0",
+      "Version": "1.8.1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "methods"
       ],
-      "Hash": "e0b3a53876554bd45879e596cdb10a52"
+      "Hash": "f8122473e9a49e00d0642f78235ca5e3"
     },
     "googledrive": {
       "Package": "googledrive",
@@ -2693,6 +2628,16 @@
         "vctrs"
       ],
       "Hash": "9171f898db9d9c4c1b2c745adc2c1ef1"
+    },
+    "here": {
+      "Package": "here",
+      "Version": "1.0.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "rprojroot"
+      ],
+      "Hash": "e5114f2abe04168238181913a8572358"
     },
     "highr": {
       "Package": "highr",
@@ -3324,7 +3269,7 @@
       "RemoteHost": "api.github.com",
       "RemoteRepo": "metagMisc",
       "RemoteUsername": "vmikk",
-      "RemoteRef": "HEAD",
+      "RemoteRef": "621e9cf8de9ea2df11d43b172648e14cd9aba224",
       "RemoteSha": "1342071c4d8e16146208211020f8e78c0a0b494d",
       "Requirements": [
         "R",
@@ -3332,7 +3277,7 @@
         "plyr",
         "vegan"
       ],
-      "Hash": "f710e4ef5c6d465663ba42502317fbfe"
+      "Hash": "0f74ca2318abf4cf3b78848620e8f808"
     },
     "mgcv": {
       "Package": "mgcv",
@@ -3439,7 +3384,7 @@
       "RemoteHost": "api.github.com",
       "RemoteRepo": "mirlyn",
       "RemoteUsername": "escamero",
-      "RemoteRef": "HEAD",
+      "RemoteRef": "48518ac5d6ef692c1394f9acb46354d829f9eaab",
       "RemoteSha": "48518ac5d6ef692c1394f9acb46354d829f9eaab",
       "Requirements": [
         "Biostrings",
@@ -3457,7 +3402,7 @@
         "tidyr",
         "vegan"
       ],
-      "Hash": "2eceb64fcfd9977b35e1ef0e7d03e523"
+      "Hash": "202371d1a460e94f00619c0d2058bd71"
     },
     "mnormt": {
       "Package": "mnormt",
@@ -3754,7 +3699,7 @@
     },
     "phangorn": {
       "Package": "phangorn",
-      "Version": "2.11.1",
+      "Version": "2.12.1",
       "Source": "Bioconductor",
       "Repository": "RSPM",
       "Requirements": [
@@ -3774,7 +3719,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "a5b899ce1f3af942e16627a995e32ba2"
+      "Hash": "eea536597b96f3df44a2d6b963ac280e"
     },
     "phyloseq": {
       "Package": "phyloseq",
@@ -4421,22 +4366,6 @@
       ],
       "Hash": "bae2e53c94459ff147aef478eac6ee94"
     },
-    "rosm": {
-      "Package": "rosm",
-      "Version": "0.3.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "curl",
-        "glue",
-        "jpeg",
-        "png",
-        "progress",
-        "rlang",
-        "wk"
-      ],
-      "Hash": "fcd529f183c4163a91430d7b7bbaece5"
-    },
     "roxygen2": {
       "Package": "roxygen2",
       "Version": "7.3.1",
@@ -4478,13 +4407,13 @@
     },
     "rprojroot": {
       "Package": "rprojroot",
-      "Version": "2.0.4",
+      "Version": "2.1.1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R"
       ],
-      "Hash": "4c8415e0ec1e29f3f4f6fc108bef0144"
+      "Hash": "b2453de2d29aa646afe4781defdc7903"
     },
     "rstatix": {
       "Package": "rstatix",
@@ -4546,18 +4475,6 @@
         "xml2"
       ],
       "Hash": "0bcf0c6f274e90ea314b812a6d19a519"
-    },
-    "s2": {
-      "Package": "s2",
-      "Version": "1.1.6",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "Rcpp",
-        "wk"
-      ],
-      "Hash": "32f7b1a15bb01ae809022960abad5363"
     },
     "sandwich": {
       "Package": "sandwich",
@@ -4644,29 +4561,6 @@
         "utils"
       ],
       "Hash": "3f9796a8d0a0e8c6eb49a4b029359d1f"
-    },
-    "sf": {
-      "Package": "sf",
-      "Version": "1.0-16",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "DBI",
-        "R",
-        "Rcpp",
-        "classInt",
-        "grDevices",
-        "graphics",
-        "grid",
-        "magrittr",
-        "methods",
-        "s2",
-        "stats",
-        "tools",
-        "units",
-        "utils"
-      ],
-      "Hash": "ad57b543f7c3fca05213ba78ff63df9b"
     },
     "shape": {
       "Package": "shape",
@@ -5129,17 +5023,6 @@
       ],
       "Hash": "f561504ec2897f4d46f0c7657e488ae1"
     },
-    "units": {
-      "Package": "units",
-      "Version": "0.8-5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "Rcpp"
-      ],
-      "Hash": "119d19da480e873f72241ff6962ffd83"
-    },
     "urlchecker": {
       "Package": "urlchecker",
       "Version": "1.0.1",
@@ -5332,16 +5215,6 @@
         "graphics"
       ],
       "Hash": "d31b6c62c10dcf11ec530ca6b0dd5d35"
-    },
-    "wk": {
-      "Package": "wk",
-      "Version": "0.9.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R"
-      ],
-      "Hash": "5d4545e140e36476f35f20d0ca87963e"
     },
     "xfun": {
       "Package": "xfun",

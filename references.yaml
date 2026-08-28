@@ -4903,6 +4903,112 @@ references:
   URL: https://linkinghub.elsevier.com/retrieve/pii/S1433831924000180
   volume: '63'
 
+- id: love2025
+  abstract: |-
+    Summary
+              
+                
+                  
+                    Phenotypic plasticity is a key mechanism by which organisms can cope with environmental heterogeneity, but its evolutionary consequences depend on how plastic responses align with the broader adaptive landscape.
+                  
+                  
+                    
+                      We tested whether plasticity in leaf shape alongside other traits is associated with differential fitness across an elevational gradient in
+                      Mimulus laciniatus
+                      , an annual wildflower endemic to montane California. Using a reciprocal transplant experiment and recombinant inbred lines (RILs) previously phenotyped for plasticity in controlled conditions, we measured variation in survival and fecundity in native low- and high-elevation habitats.
+                    
+                  
+                  
+                    Based on previous work, we expected to find selection against leaf shape plasticity at low-elevation and selection for leaf shape plasticity in the high-elevation direction (increased leaf lobing under long-day conditions) at high-elevation. Interestingly, we found that RIL genotypes exhibiting high-elevation plasticity had the greatest survival to seed production at high-elevations, but that low-elevation plasticity (increased leaf lobing under short-day conditions) was associated with greater fecundity in both elevations. RILs with high-elevation plasticity also outperformed non-plastic genotypes at high-elevation.
+                  
+                  
+                    This pattern suggests that plasticity is broadly beneficial across a species’ geographic range even if local variation in the direction of plasticity is not always adaptive.
+  accessed:
+    - year: 2026
+      month: 8
+      day: 28
+  author:
+    - family: Love
+      given: Jill M.
+    - family: Ferris
+      given: Kathleen G.
+  citation-key: love2025
+  container-title: New Phytologist
+  container-title-short: New Phytol.
+  DOI: 10.1111/nph.71365
+  ISSN: 0028-646X, 1469-8137
+  issued:
+    - year: 2026
+      month: 6
+      day: 19
+  language: en
+  license: http://creativecommons.org/licenses/by/4.0/
+  note: >-
+    Originally posted as a bioRxiv preprint (DOI 10.64898/2025.12.19.695179,
+    2025-12-22); this record has been updated to the peer-reviewed New
+    Phytologist version, verified 2026-08-28 via Crossref, OpenAlex
+    (W7165355414), and PubMed (PMID 42321964).
+  PMID: '42321964'
+  publisher: Wiley
+  source: OpenAlex, Crossref, PubMed (cross-verified 2026-08-28)
+  title: >-
+    Phenotypic plasticity is broadly adaptive across an elevation gradient in
+    the Cutleaf Monkeyflower
+  type: article-journal
+  URL: https://doi.org/10.1111/nph.71365
+
+- id: love2026
+  abstract: |-
+    ABSTRACT
+              
+                Local adaptation along altitudinal gradients is well documented in many plant species, however the genetic basis of adaptive variation over these steep environmental clines remains poorly understood. Populations of
+                Mimulus laciniatus,
+                a self-fertilizing annual plant, experience highly differentiated seasonal environments throughout the Sierra Nevada, CA, where the length of the growing season and timing of favorable flowering conditions vary with altitude. These differences have driven divergence in critical photoperiod between low- and high-elevation
+                M. laciniatus
+                , an environmental cue that enables populations to initiate flowering at locally appropriate times. To investigate the genetic basis of local adaptation in this key ecological trait, we used a bulk-segregant quantitative trait locus (QTL) analysis approach. We crossed low- and high-elevation populations of
+                M. laciniatus
+                that differ in critical photoperiod to generate an F
+                2
+                mapping population, phenotyping plants in a short-day common garden. Genomic differentiation (F
+                ST
+                and
+                G
+                -statistic) between flowering and non-flowering pools identified 46 regions genome-wide associated with short-day flowering, including a strong peak on chromosome 8 overlapping
+                GA2ox3,
+                a candidate gene in the gibberellin pathway. Another gibberellin gene (
+                GA20ox2)
+                has been implicated in photoperiodic flowering in the close relative
+                Mimulus guttatus.
+                We found additional loci on chromosomes 2 and 11 that appear unique to
+                M. laciniatus
+                . Our findings suggest that local adaptation in reproductive timing may arise through a combination of shared genetic mechanisms and novel alleles in closely related Monkeyflowers, and that the genetic architecture underlying within-species adaptive divergence can be more complex than comparisons across species.
+  accessed:
+    - year: 2026
+      month: 8
+      day: 28
+  author:
+    - family: Love
+      given: Jill M.
+    - family: Mahesh
+      given: Aditi
+    - family: Ferris
+      given: Kathleen G.
+  citation-key: love2026
+  DOI: 10.64898/2026.01.14.699501
+  issued:
+    - year: 2026
+      month: 1
+      day: 15
+  language: en
+  license: http://creativecommons.org/licenses/by-nc/4.0/
+  publisher: Genomics
+  source: DOI.org (Crossref)
+  title: >-
+    The genomic basis of local adaptation to photoperiod across altitude in a
+    self-fertilizing monkeyflower
+  type: article
+  URL: http://biorxiv.org/lookup/doi/10.64898/2026.01.14.699501
+
 - id: lovell2021
   abstract: "Abstract\n            \n              Long-term climate change and periodic environmental extremes threaten food and fuel security\n              1\n              and global crop productivity\n              2–4\n              . Although molecular and adaptive breeding strategies can buffer the effects of climatic stress and improve crop resilience\n              5\n              , these approaches require sufficient knowledge of the genes that underlie productivity and adaptation\n              6\n              —knowledge that has been limited to a small number of well-studied model systems. Here we present the assembly and annotation of the large and complex genome of the polyploid bioenergy crop switchgrass (\n              Panicum virgatum\n              ). Analysis of biomass and survival among 732\_resequenced genotypes, which were grown across 10\_common gardens that span 1,800\_km of latitude, jointly revealed extensive genomic evidence of climate adaptation. Climate–gene–biomass associations were abundant but varied considerably among deeply diverged gene pools. Furthermore, we found that gene flow accelerated climate adaptation during the postglacial colonization of northern habitats through introgression of alleles from a pre-adapted northern gene pool. The polyploid nature of switchgrass also enhanced adaptive potential through the fractionation of gene function, as there was an increased level of heritable genetic diversity on the nondominant subgenome. In addition to investigating patterns of climate adaptation, the genome resources and gene–trait associations developed here provide breeders with the necessary tools to increase switchgrass yield for the sustainable production of bioenergy."
   accessed:
@@ -9540,4 +9646,13 @@ references:
     evo-devo
   type: article-journal
   volume: '222'
+
+- id: zotero-item-3205
+  citation-key: zotero-item-3205
+  language: en
+  source: Zotero
+  title: >-
+    The genomic basis of local adaptation to photoperiod across altitude in a
+    self-fertilizing monkeyflower
+  type: article-journal
 ...
