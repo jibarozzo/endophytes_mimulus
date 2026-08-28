@@ -16,3 +16,26 @@ For: Kathleen Ferris, Sunshine Van Bael.
 ## Remaining before next draft
 
 - Item 4: find/add the AMF citation; confirm the "Dong" reference question with collaborators rather than inventing one.
+
+## ⚠ Audit found many more reviewer comments than tracked here — mostly resolved now
+
+Re-extracted the raw comments directly from the annotated HTML rather than
+relying on `revision_plan_KGF_20260210.md`, and found that document
+mis-mapped or paraphrased several comments inaccurately (in a few cases the
+ask was the *opposite* of what's recorded there — e.g. KF27 asked to *trim*
+the PERMDISP caveat discussion, not expand it). There are 36 real comments
+in total. As of the second audit pass (2026-08-28), resolved: KF27
+(PERMDISP restructure), KF32/KF33 (reframed the lobing/heat-stress and
+water-loss explanations to fix physiological-logic objections), KF25
+(removed redundant nested heading), KF23/KF24 (added PC1 species-separation
+result and trait-direction detail to Results), KF21 (fixed a malformed
+per-species sample-count expression the user had already started), KF20/
+FKG1 (harmonized the Intro's Q1–Q4 list with the Abstract's), KF19
+(reconciled the "eliminated 151 samples" vs. "139 samples in second event"
+discrepancy), and KF3/FKG5/KF6 (resolved by the user, citing
+@salinasaguilar2022). Still open: KF16 (Methods length trim — needs your
+call on what to cut), KF35 (Tataru/Dong/Love & Ferris citations — biorxiv
+fetch was rate-limited, needs a retry and a Dong et al. search), and the
+large KF22/KF26/KF28/KF29/KF30 Q-based restructuring of Results/Discussion,
+for which a proposed outline (not yet executed) is in the audit file.
+Full details in `manuscript/revision_plan_KGF_20260210_audit.md`.
